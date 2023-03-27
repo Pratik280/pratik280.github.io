@@ -1,6 +1,6 @@
 ---
 author: Pratik Chandlekar
-pubDatetime: 2023-02-04T17:05:16Z
+pubDatetime: 2023-03-25T17:05:16Z
 title: "Linux Devs Rejoice: A Comprehensive Guide to Setting Up Your React Native Development Environment"
 postSlug: "linux-devs-rejoice-a-comprehensive-guide-to-setting-up-your-react-native-development-environment"
 featured: false

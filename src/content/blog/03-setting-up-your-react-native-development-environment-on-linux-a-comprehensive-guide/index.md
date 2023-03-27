@@ -1,14 +1,14 @@
 ---
 author: Pratik Chandlekar
 pubDatetime: 2023-02-04T17:05:16Z
-title: "Setting up your react native development environment on (Arch) linux: A comprehensive guide"
-postSlug: "setting-up-your-react-native-development-environment-on-linux-a-comprehensive-guide"
+title: "Linux Devs Rejoice: A Comprehensive Guide to Setting Up Your React Native Development Environment"
+postSlug: "linux-devs-rejoice-a-comprehensive-guide-to-setting-up-your-react-native-development-environment"
 featured: false
 draft: false
 tags:
   - "linux-desktop"
 ogImage: ""
-description: Using docker and docker-compose to create a development and production setup for LEMP stack
+description: A comprehensive guide on how to set up a developer environment for React Native in Linux. From installing Node.js, Java-OpenJDK, VSCodium, to configuring Android Studio, this guide covers everything you need to get started with React Native development in Linux.
 ---
 
 ## Table of contents
@@ -98,7 +98,7 @@ node -v
 
 #### Adding JAVA_HOME environment variable in bashrc.
 
-To add the JAVA_HOME environment variable, we'll need to edit the .bashrc file, which is a hidden file located in the home directory.
+To add the JAVA_HOME environment variable, edit the .bashrc file located in the home directory (which is a hidden file). Simply copy and paste the following content to add the JAVA_HOME variable in .bashrc.
 
 - for arch and arch based linux distros.
 
@@ -120,9 +120,11 @@ To add the JAVA_HOME environment variable, we'll need to edit the .bashrc file, 
 
 ## Installing and Setting up Visual Studio Code
 
+I would recommend using VSCodium, which is functionally identical to VSCode but is a free and open-source alternative.
+
 - For Arch and Arch based linux distros
 
-  To install [VSCodium](https://vscodium.com/), a free and open-source fork of VSCode, we'll use the following command to download it from the AUR (Arch User Repository) on Arch Linux:
+  To install [VSCodium](https://vscodium.com/) we'll use the following command to download it from the AUR (Arch User Repository) on Arch Linux:
 
   ```
   yay -S vscodium-bin
@@ -183,7 +185,7 @@ To add the JAVA_HOME environment variable, we'll need to edit the .bashrc file, 
 #### Adding the necessary paths in bashrc for proper working of andoid-studio
 
 To ensure the proper functioning of Android Studio, we need to add the necessary paths to the .bashrc file.
-Copy and paste the following content into your .bashrc file, which is a hidden file located in your home directory:
+Copy and paste the following content into your .bashrc file.
 
 ```bash
 export ANDROID_HOME=$HOME/Android/Sdk
@@ -200,30 +202,32 @@ For setting up Android device. There are two ways
 
    To test your React Native application on a physical device, connect your Android device to your PC using a USB cable. Ensure that USB debugging is enabled in your Android device's developer options, and select file transfer mode for the USB connection.
 
-1. Create a virtual device in Android Studio. You can follow the [official guide](https://developer.android.com/studio/run/managing-avds.html) for creating virtual devices in android studio.
+1. Creating a virtual device in Android Studio.
+   For a more detailed guide on creating virtual devices in Android Studio, you can refer to the [official guide](https://developer.android.com/studio/run/managing-avds.html).
    - Open Android Studio click on “More Action” then click “Virtual Device Manager”
    - Select a device which has Google play icon in Playstore column. From official documentation “A device definition labeled with the Google Play logo in the **Play Store** column includes both the Google Play Store app and access to Google Play services, including a **Google Play** tab in the **Extended controls** dialog that provides a convenient button for updating Google Play services on the device.”
    - Click on the play icon to launch avd.
-   - If it doesnt launch or terminates instantly, you can run the emulater from terminal to see the logs and figure out whats wrong. For me libpulse library was missing and after downloading the emulator started.
-     - To start emulator from terminal go into you Android folder for me it is~/Android/Sdk
-       ```bash
-       cd ~/Android/Sdk/emulator
-       ```
-     - Run this command to list the avds
-       ```bash
-       ./emulator -list-avds
-       ```
-     - Then run this command to start the avd
-       ```bash
-        ./emulator @<AVD_NAME>
-        ./emulator @Pixel_4_API_33
-       ```
+   - If the emulator doesn't launch or terminates instantly, you can launch it from the terminal to see the logs and diagnose any issues.
+     In my case, the emulator failed to launch due to a missing _libpulse_ library, which I resolved by downloading it.
+   - Navigate to your Android folder, which for me is located at ~/Android/Sdk, to start the emulator from the terminal
+     ```bash
+     cd ~/Android/Sdk/emulator
+     ```
+   - Run this command to list the avds
+     ```bash
+     ./emulator -list-avds
+     ```
+   - Then run this command to start the avd
+     ```bash
+      ./emulator @<AVD_NAME>
+      ./emulator @Pixel_4_API_33
+     ```
 
 ## Starting with react-native.
 
-We will be creating Simple HelloWorld project to check if everything in working.
+To ensure everything is working, we will create a simple HelloWorld project in React Native.
 
-Create a react-native project using command:
+Create a react-native project by executing the following command:
 
 ```bash
 npx react-native init <ProjectName>
@@ -234,15 +238,13 @@ npx react-native init Hello
 cd Hello
 ```
 
-One this folder "Hello" in VSCodium/VSCode
+Open the "Hello" folder in VSCodium/VSCode.
 
-In one terminal and run following command:
+Open two separate terminals in the same folder and run these two commands.
 
 ```bash
 npx react-native start
 ```
-
-In another terminal execute the command:
 
 ```bash
 npm run android
@@ -253,6 +255,8 @@ You will see the application running in your android device.
 > I recommend installing the "ES7+ React/Redux/React-Native snippets" extension by the publisher "dsznajder" in VSCodium/VSCode. This extension provides snippets that enable you to generate React Native components quickly and easily.
 
 In VSCodium/VSCode, open the App.tsx file and delete its contents to start fresh. Type 'rnfes', and VSCode will automatically suggest the snippet from the extension we installed earlier. This snippet will create a simple component for us.
+
+App.tsx
 
 ```javascript
 import { StyleSheet, Text, View } from "react-native";

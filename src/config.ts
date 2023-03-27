@@ -3,7 +3,7 @@ import type { Site, SocialObjects } from "./types";
 export const SITE: Site = {
   website: "https://pratik280.github.io",
   author: "Pratik Chandlekar",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
+  desc: "I am a passionate developer with interests in DevOps, cloud, JavaScript, React, and React Native. I specialize in website design using CSS and Tailwind and am an enthusiastic Linux desktop user. With a willingness to learn and take on any challenge, I'm always excited to explore new technologies.",
   title: "Pratik Chandlekar",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
@@ -23,6 +23,12 @@ export const SOCIALS: SocialObjects = [
     name: "Github",
     href: "https://github.com/Pratik280",
     linkTitle: ` ${SITE.title} on Github`,
+    active: true,
+  },
+  {
+    name: "Hashnode",
+    href: "https://pratik280.hashnode.dev/",
+    linkTitle: ` ${SITE.title} on Hashnode`,
     active: true,
   },
   // {

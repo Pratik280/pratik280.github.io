@@ -11,9 +11,14 @@ With my eagerness and excitement to learn new technologies, I am always on the l
 
 As a developer, I have a strong interest in a variety of technologies including devops, cloud computing, Javascript, React and React Native. I have designed websites using CSS and Tailwind CSS and enjoy exploring the latest tools and trends in web development. As an enthusiast of Linux desktops, I am familiar with various Linux distributions and love to use them for development. I am eager and excited to learn new technologies and take on any challenges that come my way.
 
-<div>
+### Socials:
+
+- [Github](https://github.com/Pratik280)
+- [Hashnode](https://pratik280.hashnode.dev/)
+
+<!-- <div>
   <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">
-</div>
+</div> -->
 
 ## Tech Stack
 

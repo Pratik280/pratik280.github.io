@@ -15,6 +15,7 @@ As a developer, I have a strong interest in a variety of technologies including 
 
 - [Github](https://github.com/Pratik280)
 - [Hashnode](https://pratik280.hashnode.dev/)
+- [Frontend Mentor](https://www.frontendmentor.io/profile/Pratik280)
 
 <!-- <div>
   <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">

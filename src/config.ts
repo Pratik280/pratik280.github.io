@@ -31,6 +31,12 @@ export const SOCIALS: SocialObjects = [
     linkTitle: ` ${SITE.title} on Hashnode`,
     active: true,
   },
+  {
+    name: "Frontendmentor",
+    href: "https://www.frontendmentor.io/profile/Pratik280",
+    linkTitle: ` ${SITE.title} on Frontend Mentor`,
+    active: true,
+  },
   // {
   //   name: "Facebook",
   //   href: "https://github.com/satnaing/astro-paper",

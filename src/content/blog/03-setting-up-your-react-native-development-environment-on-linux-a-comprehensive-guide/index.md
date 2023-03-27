@@ -205,7 +205,9 @@ For setting up Android device. There are two ways
 1. Creating a virtual device in Android Studio.
    For a more detailed guide on creating virtual devices in Android Studio, you can refer to the [official guide](https://developer.android.com/studio/run/managing-avds.html).
    - Open Android Studio click on “More Action” then click “Virtual Device Manager”
+     ![Opening Vittual Device Manager in Android Studio](/assets/03-setting-up-your-react-native-development-environment-on-linux-a-comprehensive-guide/virtual-device-manager.png)
    - Select a device which has Google play icon in Playstore column. From official documentation “A device definition labeled with the Google Play logo in the **Play Store** column includes both the Google Play Store app and access to Google Play services, including a **Google Play** tab in the **Extended controls** dialog that provides a convenient button for updating Google Play services on the device.”
+     ![Selecting Android Virtual Device in Android Studio](/assets/03-setting-up-your-react-native-development-environment-on-linux-a-comprehensive-guide/avd.png)
    - Click on the play icon to launch avd.
    - If the emulator doesn't launch or terminates instantly, you can launch it from the terminal to see the logs and diagnose any issues.
      In my case, the emulator failed to launch due to a missing _libpulse_ library, which I resolved by downloading it.

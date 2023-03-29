@@ -35,7 +35,7 @@ export const SOCIALS: SocialObjects = [
     name: "Frontendmentor",
     href: "https://www.frontendmentor.io/profile/Pratik280",
     linkTitle: ` ${SITE.title} on Frontend Mentor`,
-    active: true,
+    active: false,
   },
   // {
   //   name: "Facebook",
@@ -49,24 +49,24 @@ export const SOCIALS: SocialObjects = [
   //   linkTitle: `${SITE.title} on Instagram`,
   //   active: true,
   // },
-  // {
-  //   name: "LinkedIn",
-  //   href: "https://github.com/satnaing/astro-paper",
-  //   linkTitle: `${SITE.title} on LinkedIn`,
-  //   active: true,
-  // },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/in/pratik280/",
+    linkTitle: `${SITE.title} on LinkedIn`,
+    active: true,
+  },
   // {
   //   name: "Mail",
   //   href: "mailto:yourmail@gmail.com",
   //   linkTitle: `Send an email to ${SITE.title}`,
   //   active: false,
   // },
-  // {
-  //   name: "Twitter",
-  //   href: "https://github.com/satnaing/astro-paper",
-  //   linkTitle: `${SITE.title} on Twitter`,
-  //   active: false,
-  // },
+  {
+    name: "Twitter",
+    href: "https://twitter.com/pratikchandlekr",
+    linkTitle: `${SITE.title} on Twitter`,
+    active: true,
+  },
   // {
   //   name: "Twitch",
   //   href: "https://github.com/satnaing/astro-paper",

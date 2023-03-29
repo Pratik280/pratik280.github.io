@@ -13,11 +13,10 @@ With my eagerness and excitement to learn new technologies, I am always on the l
 
 As a software developer, I have a passion for learning new technologies and keeping up-to-date with the latest trends in the industry. I am particularly interested in DevOps and Cloud computing, with a strong focus on Kafka. My expertise in front-end development includes working with JavaScript, React, and React Native, and I have designed websites using CSS and Tailwind. As an enthusiastic Linux desktop user, I'm always looking for new ways to optimize my workflow. I am highly motivated, and always ready and eager to take on new challenges. No matter the task, I'm committed to delivering high-quality work and exceeding expectations.
 
-### Socials:
+#### Socials:
 
-- [Github](https://github.com/Pratik280)
-- [Hashnode](https://pratik280.hashnode.dev/)
-- [Frontend Mentor](https://www.frontendmentor.io/profile/Pratik280)
+[Github](https://github.com/Pratik280) | [Hashnode](https://pratik280.hashnode.dev/) | [LinkedIn](https://www.linkedin.com/in/pratik280/)| [Twitter](https://twitter.com/pratikchandlekr) | [Frontend Mentor](https://www.frontendmentor.io/profile/Pratik280)
+| [findcoder.io](https://www.findcoder.io/u/pratik280)
 
 <!-- <div>
   <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">

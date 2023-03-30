@@ -5,7 +5,7 @@ export const SITE: Site = {
   author: "Pratik Chandlekar",
   desc: "I am a passionate developer with interests in DevOps, cloud, JavaScript, React, and React Native. I specialize in website design using CSS and Tailwind and am an enthusiastic Linux desktop user. With a willingness to learn and take on any challenge, I'm always excited to explore new technologies.",
   title: "Pratik Chandlekar",
-  ogImage: "astropaper-og.jpg",
+  ogImage: "og.png",
   lightAndDarkMode: true,
   // lightAndDarkMode: false,
   postPerPage: 3,

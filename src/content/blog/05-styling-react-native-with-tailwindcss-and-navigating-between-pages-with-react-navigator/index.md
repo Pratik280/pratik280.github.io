@@ -1,14 +1,16 @@
 ---
 author: Pratik Chandlekar
 pubDatetime: 2023-03-29T17:05:16Z
-title: "Styling React Native with TailwindCSS and Navigating Between Pages with React Navigation"
-postSlug: "styling-react-native-with-tailwindCSS-and-navigating-between-pages-with-react-navigator"
+# title: "Styling React Native with TailwindCSS and Navigating Between Pages with React Navigation"
+title: "Building Multi-page React Native App with Tailwind CSS and React Navigation"
+postSlug: "building-multi-page-react-native-app-with-tailwind-css-and-react-navigation"
 featured: false
-draft: true
+draft: false
 tags:
   - mobile-app
+  - react-native
 ogImage: ""
-description: Tailwindcss react native
+description: "In this article, you will learn how to set up TailwindCSS in React Native using the Nativewind library and style button components using TailwindCSS classes. Additionally, you will also learn how to set up React Native Navigation and implement navigation between three pages: Greeting, Login, and Signup."
 ---
 
 ## Introduction
@@ -18,6 +20,8 @@ In this article, we will explore how to enhance the styling of React Native apps
 1. Effectively incorporate tailwindcss to style React Native components.
 1. Style a TouchableOpacity button using tailwindcss.
 1. Implement page navigation for multiple pages, such as a Greeting page, Login page, and Sign up page, using React Navigation.
+
+> Disclaimer: This project is UI-focused, with an emphasis on styling and design. It's a mobile app, but it's not connected to any backend or database, so all the data is hard-coded in the pages. The primary goal of this project is to practice coding and explore various design ideas, with the aim of producing a visually appealing and functional mobile app.
 
 ### Prerequisites
 
@@ -101,7 +105,13 @@ npm run android
 npx react-native start
 ```
 
-![App component after applying tailwind classes](/assets/04-tailwindSignup/app.png)
+<!-- ![App component after applying tailwind classes](/assets/04-tailwindSignup/app.png) -->
+<p align = "center">
+<img src = "/assets/04-tailwindSignup/app.png">
+</p>
+<p align = "center">
+Fig. 1 - App.tsx
+</p>
 
 By applying inline Tailwind CSS classes to our app component, we have successfully styled it. You can now see the visual changes in the app.
 
@@ -111,50 +121,38 @@ By applying inline Tailwind CSS classes to our app component, we have successful
 
 ### What is React Navigation.
 
-[React native official docs](https://reactnative.dev/docs/navigation#react-navigation)
-[React Navigation Docs](https://reactnavigation.org/)
-
-- React Navigation Native Stack allows us to navigate between different pages and by default it has gestures and animations are in android or ios. We wrap all navigators with NavigationContainer component.
-
-- NavigationContainer is component that is responsible for managing the navigation tree and holds the navigation state.
-
-- createNativeStackNavigator is a React function that returns an object with two components: Screen and Navigator.
-
-- Screen will be our individual pages and we will house Navigator with all our individual pages that we want to navigate.
-
-First make a pages folder. Here we will keep all our pages(Greeting page, login page and signup page)
+- Web browsers use links to navigate between pages and manage the browser history stack. React Native doesn't have a built-in history stack.
+- React Navigation's native stack navigator helps transition between screens and manage navigation history in React Native.
+- With a single stack navigator, the app can push and pop items from the navigation stack similar to how a web browser manages the history stack.
+- The key difference is that React Navigation provides gestures and animations for transitioning between screens on Android and iOS.
 
 ### Setting up React Navigation in our projects.
 
-Install
+Installing necessary node js dependencies React Navigation core utilities:
 
 ```bash
 npm install @react-navigation/native @react-navigation/native-stack
 ```
 
-for bare react native project
+We also need to install `react-native-screens` and `react-native-safe-area-context`.
+
+For bare react native project execute the following command:
 
 ```bash
 npm install react-native-screens react-native-safe-area-context
 ```
 
-for expo
+For expo project execute the following command:
 
 ```bash
 npx expo install react-native-screens react-native-safe-area-context
 ```
 
+For more information in installing dependencies checkout the [React native official docs](https://reactnative.dev/docs/navigation#react-navigation) and [React Navigation Docs](https://reactnavigation.org/docs/getting-started/)
+
 ### Adding three pages for navigation.
 
-import the necessary
-
-```javascript
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-```
-
-For time being write a simple Greeting Page
-pages/Greeting.tsx
+To organize our different pages, we'll create a dedicated folder named pages/ in the root directory. This folder will contain components for pages such as the Greeting, Login, and Signup pages. For now, these components will simply return a single line of text like 'Greeting' for the Greeting page and so on. To give you an example, here is what pages/Greeting.tsx looks like:
 
 ```javascript
 import { View, Text } from "react-native";
@@ -172,67 +170,11 @@ const Greeting = () => {
 export default Greeting;
 ```
 
-> SafeAreaView for notch [Read more about SafeAreaView](https://reactnative.dev/docs/safeareaview)
+> The SafeAreaView component is used in React Native to ensure that the content of the app is visible on the screen of devices with notches, rounded corners, or other such irregularities. [Read more about SafeAreaView](https://reactnative.dev/docs/safeareaview).
 
-Make the following changes in App.tsx
+Follow a similar approach to create the code for the Signup and login pages.
 
-```javascript
-const Stack = createNativeStackNavigator();
-
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Greeting" component={Greeting} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
-```
-
-In out navigator, we have added our Greeting component as a Screen.
-
-![Greeting](/assets/04-tailwindSignup/greeting.png)
-
-Add two more components Signup.tsx and Login.tsx
-
-components/Signup.tsx
-
-```javascript
-import { View, Text } from "react-native";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const Signup = () => {
-  return (
-    <SafeAreaView>
-      <Text>Signup</Text>
-    </SafeAreaView>
-  );
-};
-
-export default Signup;
-```
-
-components/Login.tsx
-
-```javascript
-import { View, Text } from "react-native";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const Login = () => {
-  return (
-    <SafeAreaView>
-      <Text>Login</Text>
-    </SafeAreaView>
-  );
-};
-
-export default Login;
-```
-
-Add newly created components in Navigator in App.tsx
+After creating all three pages, now its time to use React Navigation our main `App.tsx` so that we can navigate between our all three pages (Greeting page, Signup page and Login page).
 
 ```javascript
 import { View, Text } from "react-native";
@@ -261,7 +203,15 @@ const App = () => {
 export default App;
 ```
 
-Now in Greeting component we will add Links(buttons) to navigate to other components ie Login Page and Signup Page
+We wrap all navigators with NavigationContainer component.
+
+- NavigationContainer is component that is responsible for managing the navigation tree and holds the navigation state.
+
+- createNativeStackNavigator is a React function that returns an object with two components: Screen and Navigator.
+
+- Screen will be our individual pages and we will house Navigator with all our individual pages that we want to navigate.
+
+Now in `pages/Greeting.tsx` we will add Links(buttons) to navigate to other pages ie Login Page and Signup Page.
 
 ```javascript
 import { View, Text, TouchableOpacity } from "react-native";
@@ -285,16 +235,27 @@ const Greeting = ({ navigation }) => {
 export default Greeting;
 ```
 
-- Because of navigation.navigate("Signup"), when we click on Singup button it will navigate to Signup page. And the title on Signup page will have a back button as well that will bring us back on Greeting page.
+When the user clicks on the "Signup" button, the app navigates to the Signup page using the navigation.navigate() method. Similarly, the navigation.navigate("Login") method is used to navigate to the Login page.
 
-- Similarly, navigation.navigate("Login") will navigate to Login page.
+<p align = "center">
+<img src = "/assets/04-tailwindSignup/navigator-work.png">
+</p>
+<p align = "center">
+Fig. 2 - Greeting page with Navigation
+</p>
 
-![Greeting](/assets/04-tailwindSignup/navigator-work.png)
-![Greeting](/assets/04-tailwindSignup/navigator-work-2.png)
+<p align = "center">
+<img src = "/assets/04-tailwindSignup/navigator-work-2.png">
+</p>
+<p align = "center">
+Fig. 3 - The sign-up page is accessed by clicking on the Signup button located on the Greeting page.
+</p>
 
-## Adding back button
+## Adding `back` button
 
-Now we will add back button on Login page that will redirect us back to Greeting page.
+Even though the Navigation header in the top of the screen has a back button, we will create our own back button in the Signup and Login pages. This custom button will redirect us back to the Greeting page.
+
+`pages/Login.tsx`
 
 ```javascript
 import { View, Text, TouchableOpacity } from "react-native";
@@ -315,15 +276,15 @@ const Login = ({ navigation }) => {
 export default Login;
 ```
 
-- onPress={() => navigation.goBack()} will take us back to Greeting page.
+- When the user presses the back button, navigation.goBack() will be called, which will take the user back to the previous screen, i.e., the Greeting page.
 
 - The Navigator component is organized as a stack where each page is stacked on top of the previous one as we navigate through the app. Using the goBack() method, we can remove the topmost page from the stack and return to the previously active page.
 
-### Working with button using tailwindcss and customizing Navigation Header
+### Styling Button using Tailwindcss.
 
-#### Styling Button using Tailwindcss.
+We we style a button using tailwindcss classes.
 
-Applying some styles to buttons
+Use the following code to style both the button ie Signup button and Login button.
 
 ```javascript
 <TouchableOpacity
@@ -335,9 +296,9 @@ Applying some styles to buttons
 </TouchableOpacity>
 ```
 
-#### Customization of Navigation Header
+### Customization of Navigation Header Bar
 
-We can customize header by passing more options
+The header bar that provided by default with React Navigation has few customizations like backgroundColor, TintColor and much more.
 
 ```javascript
 const App = () => {
@@ -361,7 +322,12 @@ const App = () => {
 };
 ```
 
-![Greeting](/assets/04-tailwindSignup/color-buttons.png)
+<p align = "center">
+<img src = "/assets/04-tailwindSignup/color-buttons.png">
+</p>
+<p align = "center">
+Fig. 4 - Styled buttons and customized Header Bar
+</p>
 
 Additionally, we can also hide the header of navbar by passing a prop `headerShown:false` to screen
 
@@ -381,18 +347,15 @@ const App = () => {
 };
 ```
 
-![Greeting](/assets/04-tailwindSignup/no-header.png)
+<p align = "center">
+<img src = "/assets/04-tailwindSignup/no-header.png">
+</p>
+<p align = "center">
+Fig. 5 - Header Bar Hidden
+</p>
 
-[More on customizing Header](https://reactnavigation.org/docs/headers)
+For more customization of header bar checkout the [official React Navigation Header docs](https://reactnavigation.org/docs/headers).
 
 ## Conclusion
 
-<!-- ## SignUp form
-
-folder assets, pages, components
-
-Install for svg
-
-```bash
-npm install --save react-native-svg
-``` -->
+In conclusion, we have successfully set up Tailwindcss in our React Native project using the nativewind library. We have also styled our button component using Tailwindcss classes to achieve a clean and modern look. Furthermore, we have set up React Native Navigation and implemented navigation between three pages: Greeting, Login, and Signup pages. With these tools, we are now well-equipped to create robust and visually appealing mobile applications with easy navigation. It's important to note that there are many more features and capabilities available with Tailwindcss and React Native Navigation, so be sure to explore and experiment with these tools to make your app stand out.

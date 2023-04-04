@@ -1,7 +1,7 @@
 ---
 author: Pratik Chandlekar
 pubDatetime: 2023-03-29T17:05:16Z
-title: "Building Multi-page Signup/Login React Native App (Part 1)"
+title: "Building Multi-page Signup Login React Native App Part 1"
 postSlug: "building-multi-page-signup-login-react-native-app-part-1"
 featured: false
 draft: false

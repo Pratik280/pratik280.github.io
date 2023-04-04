@@ -25,21 +25,21 @@ In this article, we will explore how to enhance the styling of React Native apps
 
 ### Prerequisites
 
-- Bare bones react native application.
+- Nodejs for using react native cli.
 - Text Editor / IDE (VS Code, Android Studio).
 - Android device or Android Virtual Device for testing.
 
-> If this is your first time working with react native, I have made a in-depth guide on [setting up development environment for react native on linux](https://pratik280.hashnode.dev/linux-devs-rejoice-a-comprehensive-guide-to-setting-up-your-react-native-development-environment).
+> If this is your first time working with react native, I have made a in-depth guide on [setting up development environment for react native on linux](https://pratik280.github.io/posts/linux-devs-rejoice-a-comprehensive-guide-to-setting-up-your-react-native-development-environment/).
 
 ## Setting up [Tailwindcss](https://tailwindcss.com/) with [Nativewind](https://www.nativewind.dev/) in react native application
 
-- Tailwindcss is a css library used for web, where we style UI using pre-defined in-line css classes. It as very good default set out of the box.
+- Tailwindcss is a css library used for web, where we style UI using pre-defined in-line css classes. It has very good defaults set out of the box.
 - Nativewind allows us to use tailwindcss in react-native. It acts as a compatibility layer between React Native and CSS.
 
 Creating a react native project using react-native cli:
 
 ```bash
-npx react-native init tailwindSignUpForm
+npx react-native init <projectName>
 ```
 
 Installing node js dependencies for tailwindcss and nativewind according to [official Nativewind docs](https://www.nativewind.dev/quick-starts/react-native-cli):
@@ -126,9 +126,9 @@ By applying inline Tailwind CSS classes to our app component, we have successful
 - With a single stack navigator, the app can push and pop items from the navigation stack similar to how a web browser manages the history stack.
 - The key difference is that React Navigation provides gestures and animations for transitioning between screens on Android and iOS.
 
-### Setting up React Navigation in our projects.
+### Setting up React Navigation in our project.
 
-Installing necessary node js dependencies React Navigation core utilities:
+Installing necessary node js dependencies for React Navigation core utilities:
 
 ```bash
 npm install @react-navigation/native @react-navigation/native-stack
@@ -148,11 +148,11 @@ For expo project execute the following command:
 npx expo install react-native-screens react-native-safe-area-context
 ```
 
-For more information in installing dependencies checkout the [React native official docs](https://reactnative.dev/docs/navigation#react-navigation) and [React Navigation Docs](https://reactnavigation.org/docs/getting-started/)
+For more information in installing dependencies checkout the [React native official docs](https://reactnative.dev/docs/navigation#react-navigation) and [React Navigation Docs](https://reactnavigation.org/docs/getting-started/).
 
 ### Adding three pages for navigation.
 
-To organize our different pages, we'll create a dedicated folder named pages/ in the root directory. This folder will contain components for pages such as the Greeting, Login, and Signup pages. For now, these components will simply return a single line of text like 'Greeting' for the Greeting page and so on. To give you an example, here is what pages/Greeting.tsx looks like:
+To organize our different pages, we'll create a dedicated folder named `pages/` in the root directory. This folder will contain components for pages such as the Greeting, Login, and Signup pages. For now, these components will simply return a single line of text like 'Greeting' for the Greeting page and so on. To give you an example, here is what `pages/Greeting.tsx` looks like:
 
 ```javascript
 import { View, Text } from "react-native";
@@ -174,7 +174,7 @@ export default Greeting;
 
 Follow a similar approach to create the code for the Signup and login pages.
 
-After creating all three pages, now its time to use React Navigation our main `App.tsx` so that we can navigate between our all three pages (Greeting page, Signup page and Login page).
+After creating all three pages, now its time to use React Navigation in our main `App.tsx` so that we can navigate between our all three pages (Greeting page, Signup page and Login page).
 
 ```javascript
 import { View, Text } from "react-native";
@@ -235,6 +235,8 @@ const Greeting = ({ navigation }) => {
 export default Greeting;
 ```
 
+> `TouchableOpacity` is a component in React Native that provides a touchable area that can be used to detect press gestures. It allows the user to interact with the app by tapping on a particular area of the screen, which can be customized with different styles and effects. When the user taps on the touchable area, the TouchableOpacity component will automatically animate its opacity to give a visual feedback to the user, and then call a function that is defined in its onPress property. The TouchableOpacity component is commonly used for buttons, icons, and other interactive elements in a React Native app.
+
 When the user clicks on the "Signup" button, the app navigates to the Signup page using the navigation.navigate() method. Similarly, the navigation.navigate("Login") method is used to navigate to the Login page.
 
 <p align = "center">
@@ -253,7 +255,7 @@ Fig. 3 - The sign-up page is accessed by clicking on the Signup button located o
 
 ## Adding `back` button
 
-Even though the Navigation header in the top of the screen has a back button, we will create our own back button in the Signup and Login pages. This custom button will redirect us back to the Greeting page.
+Even though the Navigation header bar in the top of the screen has a back button, we will create our own back button in the Signup and Login pages. This custom button will redirect us back to the Greeting page.
 
 `pages/Login.tsx`
 
@@ -298,7 +300,7 @@ Use the following code to style both the button ie Signup button and Login butto
 
 ### Customization of Navigation Header Bar
 
-The header bar that provided by default with React Navigation has few customizations like backgroundColor, TintColor and much more.
+The header bar that provided by default with React Navigation has many customizations like backgroundColor, TintColor and much more.
 
 ```javascript
 const App = () => {
@@ -351,7 +353,7 @@ const App = () => {
 <img src = "/assets/04-tailwindSignup/no-header.png">
 </p>
 <p align = "center">
-Fig. 5 - Header Bar Hidden
+Fig. 5 - Greeting page without header bar
 </p>
 
 For more customization of header bar checkout the [official React Navigation Header docs](https://reactnavigation.org/docs/headers).

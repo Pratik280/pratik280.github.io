@@ -1,25 +1,33 @@
 ---
 author: Pratik Chandlekar
 pubDatetime: 2023-03-29T17:05:16Z
-# title: "Styling React Native with TailwindCSS and Navigating Between Pages with React Navigation"
-title: "Building Multi-page React Native App with Tailwind CSS and React Navigation"
-postSlug: "building-multi-page-react-native-app-with-tailwind-css-and-react-navigation"
+title: "Building Multi-page Signup/Login React Native App (Part 1)"
+postSlug: "building-multi-page-signup-login-react-native-app-part-1"
 featured: false
 draft: false
 tags:
   - mobile-app
   - react-native
 ogImage: ""
-description: "In this article, you will learn how to set up TailwindCSS in React Native using the Nativewind library and style button components using TailwindCSS classes. Additionally, you will also learn how to set up React Native Navigation and implement navigation between three pages: Greeting, Login, and Signup."
+description: "Learn how to create a Login/Signup form in React Native app with this step-by-step tutorial. In this first part, you'll discover how to set up TailwindCSS using Nativewind library, style button components using TailwindCSS classes, and implement React Native Navigation between three pages."
 ---
 
 ## Introduction
 
-In this article, we will explore how to enhance the styling of React Native apps by using tailwindcss and nativewind. Additionally, we will cover how to navigate between multiple pages in a React Native app using React Navigation. By the end of this article, you will have learned how to:
+Welcome to the first part of our two-part series on building a Login/Signup form in React Native. In this article, we'll focus on the setup process and cover the following topics:
 
-1. Effectively incorporate tailwindcss to style React Native components.
-1. Style a TouchableOpacity button using tailwindcss.
-1. Implement page navigation for multiple pages, such as a Greeting page, Login page, and Sign up page, using React Navigation.
+1. How to integrate TailwindCSS in your React Native app using the Nativewind library
+1. Styling button components using TailwindCSS classes
+1. Setting up React Native Navigation and implementing navigation between three pages: Greeting, Login, and Signup."
+
+This is how the end result looks like.
+
+<p align = "center">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/endresult.png">
+</p>
+<p align = "center">
+Fig. 1 - Login/Signup Application in react native
+</p>
 
 > Disclaimer: This project is UI-focused, with an emphasis on styling and design. It's a mobile app, but it's not connected to any backend or database, so all the data is hard-coded in the pages. The primary goal of this project is to practice coding and explore various design ideas, with the aim of producing a visually appealing and functional mobile app.
 
@@ -105,12 +113,11 @@ npm run android
 npx react-native start
 ```
 
-<!-- ![App component after applying tailwind classes](/assets/04-tailwindSignup/app.png) -->
 <p align = "center">
-<img src = "/assets/04-tailwindSignup/app.png">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/app.png">
 </p>
 <p align = "center">
-Fig. 1 - App.tsx
+Fig. 2 - App.tsx
 </p>
 
 By applying inline Tailwind CSS classes to our app component, we have successfully styled it. You can now see the visual changes in the app.
@@ -240,17 +247,17 @@ export default Greeting;
 When the user clicks on the "Signup" button, the app navigates to the Signup page using the navigation.navigate() method. Similarly, the navigation.navigate("Login") method is used to navigate to the Login page.
 
 <p align = "center">
-<img src = "/assets/04-tailwindSignup/navigator-work.png">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/navigator-work.png">
 </p>
 <p align = "center">
-Fig. 2 - Greeting page with Navigation
+Fig. 3 - Greeting page with Navigation
 </p>
 
 <p align = "center">
-<img src = "/assets/04-tailwindSignup/navigator-work-2.png">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/navigator-work-2.png">
 </p>
 <p align = "center">
-Fig. 3 - The sign-up page is accessed by clicking on the Signup button located on the Greeting page.
+Fig. 4 - The sign-up page is accessed by clicking on the Signup button located on the Greeting page.
 </p>
 
 ## Adding `back` button
@@ -325,10 +332,10 @@ const App = () => {
 ```
 
 <p align = "center">
-<img src = "/assets/04-tailwindSignup/color-buttons.png">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/color-buttons.png">
 </p>
 <p align = "center">
-Fig. 4 - Styled buttons and customized Header Bar
+Fig. 5 - Styled buttons and customized Header Bar
 </p>
 
 Additionally, we can also hide the header of navbar by passing a prop `headerShown:false` to screen
@@ -350,14 +357,14 @@ const App = () => {
 ```
 
 <p align = "center">
-<img src = "/assets/04-tailwindSignup/no-header.png">
+<img src = "/assets/05-building-multi-page-signup-login-react-native-app-part-1/no-header.png">
 </p>
 <p align = "center">
-Fig. 5 - Greeting page without header bar
+Fig. 6 - Greeting page without header bar
 </p>
 
 For more customization of header bar checkout the [official React Navigation Header docs](https://reactnavigation.org/docs/headers).
 
 ## Conclusion
 
-In conclusion, we have successfully set up Tailwindcss in our React Native project using the nativewind library. We have also styled our button component using Tailwindcss classes to achieve a clean and modern look. Furthermore, we have set up React Native Navigation and implemented navigation between three pages: Greeting, Login, and Signup pages. With these tools, we are now well-equipped to create robust and visually appealing mobile applications with easy navigation. It's important to note that there are many more features and capabilities available with Tailwindcss and React Native Navigation, so be sure to explore and experiment with these tools to make your app stand out.
+In conclusion, we have successfully set up Tailwindcss in our React Native project using the nativewind library. We have also styled our button component using Tailwindcss classes to achieve a clean and modern look. Furthermore, we have set up React Native Navigation and implemented navigation between three pages: Greeting, Login, and Signup pages. With these tools, we are now well-equipped to create robust and visually appealing mobile applications with easy navigation. It's important to note that there are many more features and capabilities available with Tailwindcss and React Native Navigation, so be sure to explore and experiment with these tools to make your app stand out. In the [next part]() we will create reusable react components and style our Login/Signup app using tailwindcss.

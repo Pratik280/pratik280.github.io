@@ -1,8 +1,8 @@
 ---
 author: Pratik Chandlekar
-pubDatetime: 2023-03-29T17:05:16Z
-title: "Designing UI for Login Signup page in React Native using TailwindCSS"
-postSlug: "designing-ui-for-login-signup-page-in-react-native-Using-tailwindcss"
+pubDatetime: 2023-04-04T17:05:16Z
+title: "Building Multi-page Signup/Login React Native App (Part 2)"
+postSlug: "building-multi-page-signup-login-react-native-app-part-2"
 featured: false
 draft: true
 tags:

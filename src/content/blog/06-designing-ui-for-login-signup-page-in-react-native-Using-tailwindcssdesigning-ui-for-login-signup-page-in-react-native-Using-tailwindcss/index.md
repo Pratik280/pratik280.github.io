@@ -7,6 +7,7 @@ featured: false
 draft: true
 tags:
   - mobile-app
+  - react-native
 ogImage: ""
 description: Tailwindcss react native
 ---

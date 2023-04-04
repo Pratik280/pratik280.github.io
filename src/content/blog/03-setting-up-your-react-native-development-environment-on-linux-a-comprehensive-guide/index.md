@@ -70,7 +70,7 @@ node -v
 
 ## Installing and Setting up Java OpenJDK
 
-#### To install java openJDK use the following command:
+### To install java openJDK use the following command:
 
 - for arch and arch based linux distros.
 
@@ -96,7 +96,7 @@ node -v
 
   For more info check [docs.fedoraproject.org](https://docs.fedoraproject.org/en-US/quick-docs/installing-java/).
 
-#### Adding JAVA_HOME environment variable in bashrc.
+### Adding JAVA_HOME environment variable in bashrc.
 
 To add the JAVA_HOME environment variable, edit the .bashrc file located in the home directory (which is a hidden file). Simply copy and paste the following content to add the JAVA_HOME variable in .bashrc.
 
@@ -163,7 +163,7 @@ I would recommend using VSCodium, which is functionally identical to VSCode but 
 
 ## Installing and Setting up Android Studio
 
-#### Install android-studio.
+### Install android-studio.
 
 1. Installing android-studio (on any linux distro)
 
@@ -182,7 +182,7 @@ I would recommend using VSCodium, which is functionally identical to VSCode but 
    yay -S android-studio
    ```
 
-#### Adding the necessary paths in bashrc for proper working of andoid-studio
+### Adding the necessary paths in bashrc for proper working of andoid-studio
 
 To ensure the proper functioning of Android Studio, we need to add the necessary paths to the .bashrc file.
 Copy and paste the following content into your .bashrc file.
@@ -194,7 +194,7 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH=$PATH:$ANDROID_HOME/tools
 ```
 
-#### Adding android device for testing our react native application
+### Adding android device for testing our react native application
 
 For setting up Android device. There are two ways
 

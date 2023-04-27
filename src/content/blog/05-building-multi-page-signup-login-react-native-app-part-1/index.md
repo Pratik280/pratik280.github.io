@@ -14,7 +14,7 @@ description: "Learn how to create a Login/Signup form in React Native app with t
 
 ## Introduction
 
-Welcome to the first part of our two-part series on building a Login/Signup form in React Native. In this article, we'll focus on the setup process and cover the following topics:
+Welcome to the first part of our multi-part series on building a Login/Signup form in React Native. In this article, we'll focus on the setup process and cover the following topics:
 
 1. How to integrate TailwindCSS in your React Native app using the Nativewind library
 1. Styling button components using TailwindCSS classes

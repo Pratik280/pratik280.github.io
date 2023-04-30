@@ -20,6 +20,7 @@ Welcome to the first part of our multi-part series on building a Login/Signup fo
 1. Styling button components using TailwindCSS classes
 1. Setting up React Native Navigation and implementing navigation between three pages: Greeting, Login, and Signup."
 
+You can find the [source code on my Github](https://github.com/Pratik280/CodeGenius-React-Native-Tailwind-Signup-Login-Cards)
 This is how the end result looks like.
 
 <p align = "center">

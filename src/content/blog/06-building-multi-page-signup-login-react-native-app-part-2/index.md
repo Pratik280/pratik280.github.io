@@ -19,6 +19,8 @@ In this second part of our multi-part series, we will continue building our mult
 1. Styling components using TailwindCSS
 1. Creating individual React Native components with the ability to pass props.
 
+You can find the [source code on my Github](https://github.com/Pratik280/CodeGenius-React-Native-Tailwind-Signup-Login-Cards).
+
 > Disclaimer: This project is UI-focused, with an emphasis on styling and design. It's a mobile app, but it's not connected to any backend or database, so all the data is hard-coded in the pages. The primary goal of this project is to practice coding and explore various design ideas, with the aim of producing a visually appealing and functional mobile app.
 
 <!-- ## Creating individual React Native components with the ability to pass props -->
@@ -152,7 +154,7 @@ Fig. 1 - Heading Component
 
 ## Hero image
 
-If you want to add a vector art to your greeting page, you'll need to write some code. While there are plenty of image and vector art resources available online, we'll be using an image from [undraw](https://undraw.co/illustrations) for this demonstration. First, download the image and save it in the assets folder of your project. Then, follow these steps to add the vector art to your project.
+While there are plenty of image and vector art resources available online, we'll be using an image from [undraw](https://undraw.co/illustrations) for this demonstration. First, download the image and save it in the assets folder of your project. Then, follow these steps to add the vector art to your project.
 
 `pages/Greeting.tsx`
 
@@ -257,7 +259,7 @@ The form will provide a simple and user-friendly way for users to sign up for ou
 
 ### Text inputs
 
-Creating a text input for First Name. We will use `useState` hook which is a built-in hook in React/Reat-Native that allows functional components to have state variables and update them. It takes an initial value and returns an array with two elements: the current state value and a function to update it. This means that you can update the data within your component and React will automatically re-render the component to reflect the changes.
+Creating a text input for `First Name`. We will use `useState` hook which is a built-in hook in React/Reat-Native that allows functional components to have state variables and update them. It takes an initial value and returns an array with two elements: the current state value and a function to update it. This means that you can update the data within your component and React will automatically re-render the component to reflect the changes.
 
 `pages/Signup.tsx`
 

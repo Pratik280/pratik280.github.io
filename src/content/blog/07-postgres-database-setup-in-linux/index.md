@@ -4,7 +4,7 @@ pubDatetime: 2023-06-01T17:05:16Z
 title: "Comprehensive Postgres Database Setup Guide in Linux"
 postSlug: "comprehensive-postgres-database-setup-luide-in-linux"
 featured: false
-draft: false
+draft: true
 tags:
   - linux
   - db

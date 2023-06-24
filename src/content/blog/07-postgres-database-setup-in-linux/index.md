@@ -4,7 +4,7 @@ pubDatetime: 2023-06-01T17:05:16Z
 title: "Comprehensive Postgres Database Setup Guide in Linux"
 postSlug: "comprehensive-postgres-database-setup-luide-in-linux"
 featured: false
-draft: true
+draft: false
 tags:
   - linux
   - db
@@ -96,7 +96,7 @@ Let's break down the CREATE USER command:
 Let's proceed with creating a new database and designating `dbuser` as its owner.
 
 ```sql
-CREATE DATABASE testdb OWNER dbuser;
+CREATE DATABASE employeedb OWNER dbuser;
 ```
 
 Use the following command to list all databases:
@@ -105,17 +105,122 @@ Use the following command to list all databases:
 \l
 ```
 
-Now connect to the `testdb` database:
+Now connect to the `employeedb` database as user `dbuser`:
 
 ```psql
-\c testdb
+\c employeedb dbuser
 ```
 
-- Creating Databse dump
-- Deleting db
-- Creating Databses from dump
-- Deleting old container and creating new container with same volume.
-- hba_file
+For the purpose of demonstration, we will proceed to create a few tables in the `employeedb` database.
+
+```sql
+CREATE TABLE employees (
+  emp_id INT PRIMARY KEY,
+  emp_name VARCHAR(255)
+);
+```
+
+```sql
+CREATE TABLE designations (
+  designation_id INT PRIMARY KEY,
+  designation_name VARCHAR(255)
+);
+```
+
+Adding few rows in the tables
+
+```sql
+INSERT INTO employees (emp_id, emp_name)
+VALUES
+  (1, 'John Doe'),
+  (2, 'Jane Smith'),
+  (3, 'David Johnson'),
+  (4, 'Emily Brown'),
+  (5, 'Michael Davis');
+```
+
+```sql
+INSERT INTO designations (designation_id, designation_name)
+VALUES
+  (1, 'Manager'),
+  (2, 'Engineer'),
+  (3, 'Analyst'),
+  (4, 'Developer'),
+  (5, 'Administrator');
+```
+
+To retrieve all the rows stored in the table and display them:
+
+```sql
+SELECT * FROM employees;
+SELECT * FROM designations;
+```
+
+To create a dump file of a PostgreSQL database, you can use the following command:
+
+```bash
+pg_dump -U <username> -d <database_name> -f <dump.sql>
+```
+
+As we are running PostgreSQL inside a Docker container, we need to modify the command accordingly.
+
+```bash
+docker exec -t <container-name/container-id> pg_dump -U <db-user> -d <db-name> > <output-file>
+```
+
+```bash
+docker exec -t postgres-container pg_dump -U dbuser -d employeedb > dump.sql
+```
+
+We will now proceed to delete the employeedb database and then recreate it using the previously created dump file. Please note that before creating the database from the dump file, it is necessary to add the user specified within the dump file.
+
+```bash
+DROP DATABASE employeedb;
+```
+
+To recreate a database using a dump file, it is necessary to first create the database that is referenced within the dump file.
+
+```sql
+CREATE DATABASE employeedb;
+```
+
+```sql
+GRANT ALL PRIVILEGES ON SCHEMA public TO dbuser;
+```
+
+The command below is utilized to import/recreate a database by utilizing a dump file.
+
+```bash
+psql -U your_username -d your_database_name -f your_dump_file.sql
+```
+
+As we are running PostgreSQL inside a Docker container, we need to modify the command accordingly.
+
+```bash
+docker exec -i <CONTAINER_ID> psql -U <db-username> -d <db-name> < dump.sql
+
+docker exec -i postgres-container psql -U dbuser -d employeedb < dump.sql
+```
+
+Once the database has been created using the dump file, you can verify its creation by examining the rows within the table.
+
+To begin, establish a connection to the database using the following command:
+
+```bash
+docker exec -it <CONTAINER_NAME_OR_ID> psql -U <USERNAME> -d <DATABASE_NAME>
+```
+
+```bash
+docker exec -it postgres-container psql -U dbuser -d employeedb
+```
+
+Subsequently, execute SELECT queries to verify the consistency of tables and their respective rows following the recreation of the database using the dump file.
+
+```sql
+SELECT * FROM employees;
+SELECT * FROM designations;
+```
+
 - Connecting backend applications with postgres database. (nodejs, java springboot, python flask)
 
 sudo -u postgres psql

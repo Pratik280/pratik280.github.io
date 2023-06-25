@@ -176,13 +176,14 @@ docker exec -t <container-name/container-id> pg_dump -U <db-user> -d <db-name> >
 docker exec -t postgres-container pg_dump -U dbuser -d employeedb > dump.sql
 ```
 
-We will now proceed to delete the employeedb database and then recreate it using the previously created dump file. Please note that before creating the database from the dump file, it is necessary to add the user specified within the dump file.
+We will now proceed to delete the employeedb database and then recreate it using the previously created dump file.
 
 ```bash
 DROP DATABASE employeedb;
 ```
 
 To recreate a database using a dump file, it is necessary to first create the database that is referenced within the dump file.
+Please note that before creating the database from the dump file, it is necessary to add the user specified within the dump file.
 
 ```sql
 CREATE DATABASE employeedb;

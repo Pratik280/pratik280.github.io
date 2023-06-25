@@ -1,21 +1,21 @@
 ---
 author: Pratik Chandlekar
 pubDatetime: 2023-06-01T17:05:16Z
-title: "Comprehensive Postgres Database Setup Guide in Linux"
-postSlug: "comprehensive-postgres-database-setup-luide-in-linux"
+title: "Mastering PostgreSQL Database Setup in Docker: Persistent Volumes, User Creation, Backup, and Restoration"
+postSlug: "mastering-postgresql-database-setup-in-docker-persistent-volumes-user-creation-backup-and-restoration"
 featured: false
-draft: false
+draft: true
 tags:
   - linux
   - db
   - devops
 ogImage: ""
-description: Database
+description: Learn how to set up a PostgreSQL database in Docker, ensure data persistence, create users and databases, and perform backups/restorations using pg_dump. Master containerized database management.
 ---
 
 ## Introduction
 
-In this article we will be creating a database in postgresql from scratch with a user and encrypted password. Postgreql we be running in a docker container and the data will be stored on a local physical machine using docker volumes. We we also learn some basic psql commands and learn about importing and exporting the data using pg-dump. Then we will connect a simple backend sever application with postgresql database.
+Welcome to my blog where I dive into the world of PostgreSQL and Docker! In this article, I will guide you through the process of setting up a PostgreSQL database using Docker, leveraging volumes for data persistence. We will explore creating users and databases, and I will walk you through the steps of backing up and restoring your database using the powerful pg_dump utility. By the end of this blog, you'll have a solid understanding of how to work with PostgreSQL and Docker, ensuring data persistence and efficient management of your database environment. Let's get started on this exciting journey!
 
 ## Using docker for postgres databse.
 
@@ -111,6 +111,8 @@ Now connect to the `employeedb` database as user `dbuser`:
 \c employeedb dbuser
 ```
 
+### Creation of tables and the insertion of values into them.
+
 For the purpose of demonstration, we will proceed to create a few tables in the `employeedb` database.
 
 ```sql
@@ -155,6 +157,8 @@ To retrieve all the rows stored in the table and display them:
 SELECT * FROM employees;
 SELECT * FROM designations;
 ```
+
+### Working with pg_dump to Create a Database Backup
 
 To create a dump file of a PostgreSQL database, you can use the following command:
 
@@ -221,23 +225,48 @@ SELECT * FROM employees;
 SELECT * FROM designations;
 ```
 
-- Connecting backend applications with postgres database. (nodejs, java springboot, python flask)
+### Deleting the postgres-container and Recreating It with the Same Volume to Verify Data Persistence
 
-sudo -u postgres psql
+First stop the running docker container:
 
-psql -U postgres -d sit_devops_config -1 -f filename.sql
-CREATE USER sit-devops-config_user WITH CREATEDB CREATEROLE ENCRYPTED 'S1i2t3-devops-config_user';
-\c dbname
+```bash
+docker stop postgres-container
+```
 
-GRANT ALL ON SCHEMA PUBLIC TO "sit-devops-config_user"
-dump
+Now delete the running docker container:
 
-psql -U sit-devops-config_user sit-devops-config < dumpfilename.sql
-alter role "sit-devops-tlm_user" with encrypted password 'S1i2...'
-sudo su - postgres
+```bash
+docker rm postgres-container
+```
 
-psql -c "SHOW hba_file;"
+To ensure data persistence and verify the presence of all data (databases, users, tables, and rows), let's start a new container using the same named volume, `postgres-container-data`, that was utilized by the previous container.
 
-Doing
+```bash
+docker run -d \
+ --name postgres-container \
+ -e POSTGRES_PASSWORD=mysecretpassword \
+ -v postgres-container-data:/var/lib/postgresql/data \
+ postgres
+```
+
+Now connect to the same database `employeedb` with the same user `db user`:
+
+```bash
+docker exec -it postgres-container psql -U dbuser -d employeedb
+
+employeedb=> SELECT * FROM public.employees;
+ emp_id |   emp_name
+--------+---------------
+      1 | John Doe
+      2 | Jane Smith
+      3 | David Johnson
+      4 | Emily Brown
+      5 | Michael Davis
+(5 rows)
+```
+
+The data persistence of our container is demonstrated by the fact that even after deleting and recreating it with the same volume, all our previously created databases, users, tables, and rows remain intact. This confirms that Docker volumes effectively preserve our data across container lifecycles.
 
 ## Conclusion
+
+In conclusion, we have explored the process of setting up a PostgreSQL database in a Docker container, utilizing volumes to ensure data persistence. We learned how to create users and databases within the PostgreSQL environment, enabling efficient data management. Additionally, we delved into the powerful pg_dump utility, which allows us to create backups of our databases and restore them as needed. By following these steps, you now have the knowledge and tools to confidently work with PostgreSQL in a Dockerized environment, ensuring the integrity and availability of your data. Docker and PostgreSQL make a powerful combination, providing flexibility, scalability, and ease of use. I hope this blog has been informative and helpful in your journey of working with PostgreSQL and Docker.

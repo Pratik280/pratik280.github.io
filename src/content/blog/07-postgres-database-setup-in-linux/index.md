@@ -4,7 +4,7 @@ pubDatetime: 2023-06-01T17:05:16Z
 title: "Mastering PostgreSQL Database Setup in Docker: Persistent Volumes, User Creation, Backup, and Restoration"
 postSlug: "mastering-postgresql-database-setup-in-docker-persistent-volumes-user-creation-backup-and-restoration"
 featured: false
-draft: true
+draft: false
 tags:
   - linux
   - db

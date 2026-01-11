@@ -3,36 +3,130 @@ layout: ../layouts/AboutLayout.astro
 title: "About"
 ---
 
-<!-- As a developer, I have always been passionate about technology and learning new skills. My current areas of interest include DevOps, cloud computing, JavaScript, React, and React Native. Over the years, I have honed my skills in designing websites using CSS and Tailwind. I take pride in creating visually appealing and functional websites that offer a seamless user experience.
+# Software Engineer
 
-As an avid Linux user, I enjoy exploring the various possibilities that this platform offers for developers.
+Software Engineer with strong experience in Spring Boot and Spring Cloud microservices, building secure, production-grade REST APIs for transaction monitoring and payment systems. Skilled in schema-based multitenancy using Hibernate JPA, PostgreSQL performance optimization, and access-token security enforcement at the API gateway level. Hands-on experience with CI/CD pipelines, Docker, Helm, and Azure Kubernetes Service (AKS), along with centralized logging and observability using ELK, Prometheus, and Grafana. Proven ability to troubleshoot and resolve production-critical issues in high-availability environments.
 
-With my eagerness and excitement to learn new technologies, I am always on the lookout for new challenges that can help me grow as a developer. I am always ready to take on any task and am confident in my ability to work well under pressure. I am constantly exploring new ideas and pushing my boundaries to stay on top of the latest trends in the industry. -->
+## Experience
 
-<!-- As a developer, I have a strong interest in a variety of technologies including devops, cloud computing, Javascript, React and React Native. I have designed websites using CSS and Tailwind CSS and enjoy exploring the latest tools and trends in web development. As an enthusiast of Linux desktops, I am familiar with various Linux distributions and love to use them for development. I am eager and excited to learn new technologies and take on any challenges that come my way. -->
+### **Software Engineer at In-Solutions Global Ltd**
 
-As a software developer, I have a passion for learning new technologies and keeping up-to-date with the latest trends in the industry. I am particularly interested in DevOps and Cloud computing, with a strong focus on Kafka. My expertise in front-end development includes working with JavaScript, React, and React Native, and I have designed websites using CSS and Tailwind. As an enthusiastic Linux desktop user, I'm always looking for new ways to optimize my workflow. I am highly motivated, and always ready and eager to take on new challenges. No matter the task, I'm committed to delivering high-quality work and exceeding expectations.
+June 2022 - Present Mumbai
 
-#### Socials:
+#### Spring Boot API Development
 
-[Github](https://github.com/Pratik280) | [Hashnode](https://pratik280.hashnode.dev/) | [LinkedIn](https://www.linkedin.com/in/pratik280/)| [Twitter](https://twitter.com/pratikchandlekr) | [Frontend Mentor](https://www.frontendmentor.io/profile/Pratik280)
-| [findcoder.io](https://www.findcoder.io/u/pratik280)
+* Developed production-grade Spring Boot REST APIs with Spring MVC, Spring Data JPA, Hibernate, and layered architecture, using DTOs, ModelMapper, and Lombok for clean, maintainable code.
+    
+* Implemented consistent API responses, global exception handling with @RestControllerAdvice for reliability and testability
+    
+* Developed Spring Boot APIs for transaction monitoring dashboards.
+    
+* Built payment-link generation APIs to route transactions between Lyra, TPSL, PayU.
+    
+* Created APIs handling Amex Target Transaction calls via SOCKS proxy for POS and PG JPMC flows.
+    
+* Developed scheduled Spring Boot jobs to sync transaction data from database → Redis, exposing APIs for real-time monitoring performance dashboards.
+    
 
-<!-- <div>
-  <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">
-</div> -->
+#### Multi-Tenancy & Database Architecture
 
-## Tech Stack
+* Implemented schema-based multitenancy using Hibernate JPA, allowing a single Spring Boot application to serve multiple clients with isolated data per schema.
+    
+* Developed and optimized complex PostgreSQL join queries across multiple tables to efficiently retrieve transaction and payment data, working with both development and production environments.
+    
 
-I have a keen interest in the following technologies.
+#### Spring Cloud Microservices Architecture
 
-- Devops
+* Implemented microservices ecosystem using Spring Cloud Gateway, Eureka service discovery, and Nginx for secure routing, dynamic service resolution, and controlled API exposure.
+    
+* Designed and implemented an access-token validation filter in Spring Cloud Gateway, resolving a production issue where public requests could access microservices without authentication.
+    
+* Developed access-control components including token filters, LLT checks, bypass rules, and worked with SOCKS proxy tunneling to support secure internal communication between services.
+    
+* Configured Nginx as forward/reverse proxy with SSL termination, domain routing, rewrite rules, routing public traffic Nginx → Gateway → Microservices to ensure secure and efficient request flow.
+    
+
+#### CI/CD, Containerization & Cloud Deployment (Jenkins, Docker, Helm, AKS)
+
+* Built Jenkins pipelines for Spring Boot microservices to build JARs using Maven, create Docker images, and push images to the Nexus Docker Registry using tag-based versioning for consistent deployment flow.
+    
+* Automated Helm chart updates and deployments to Azure Kubernetes Service (AKS), and managed supporting infrastructure including Redis, Kafka, and Postgres provisioned on Azure VMs to support microservice environments.
+    
+* Used Docker Compose to spin up isolated test environments with Kafka, Redis, database, and application containers, and used Prometheus and Grafana to enhance service observability.
+    
+
+#### ELK Logging & Observability
+
+* Implemented Elastic + Logstash integration for 3 microservices.
+    
+* Streamed logs and metrics to Kibana dashboards for client-specific diagnostics (JPMC, Yes Bank).
+    
+* Improved incident analysis and reduced debugging time.
+
+## 🛠 Skills & Tech Stack
+
+### 💻 Languages
+- Java
+- JavaScript
+- SQL
+
+### ⚙️ Frameworks & Core Concepts
+- Spring Boot
+- Spring Cloud
+- Spring MVC
+- Hibernate / JPA
+- REST API Design
+- Core Java, OOP, Collections, Exception Handling
+
+### 🧩 Microservices & Networking
+- Eureka Service Discovery
+- Spring Cloud Gateway
+- Nginx (Reverse / Forward Proxy)
+- SSL, Networking Concepts
+
+### 🚀 DevOps & CI/CD
+- Jenkins
+- GitHub CI
 - Docker
-- Podman
-- Cloud (AWS)
-- Javascript
-- HTML/CSS/Tailwind-css
-- React
-- React-native
-- Bash
-- Linux Desktop
+- Kubernetes & Helm
+- Nexus Repository
+
+### ☁️ Cloud Platforms
+- AWS
+- Azure (AKS)
+- OCI
+
+### 🗄 Databases & Caching
+- PostgreSQL
+- Redis
+- Database Sharding
+- Schema-Based Multitenancy
+
+### 📊 Monitoring & Logging
+- ELK Stack (Elasticsearch, Logstash, Kibana)
+- Prometheus
+- Grafana
+
+### 🧰 Tools & Practices
+- Git
+- Agile / Scrum
+- Vim
+- VS Code
+- IntelliJ IDEA
+- ChatGPT
+
+## 📜 Certifications
+
+- **AWS Certified Cloud Practitioner**  
+  *Issued: June 30, 2024*
+
+## 🎓 Education
+
+**Bachelor of Engineering, Computer Science**  
+*University of Mumbai* | GPA: 8.68  
+*June 2018 – May 2022*
+
+
+## Socials
+
+[LinkedIn](https://www.linkedin.com/in/pratik280/) | [My Website](https://pratik280.github.io/) | [Github](https://github.com/Pratik280) | [Twitter](https://twitter.com/pratikchandlekr) | [Frontend Mentor](https://www.frontendmentor.io/profile/Pratik280) | [findcoder.io](https://www.findcoder.io/u/pratik280)

@@ -1,0 +1,780 @@
+= Apache Kafka — Complete Study Notes =
+
+_How to use these notes:_ Read top to bottom. Each section builds on the previous one. By the end, you'll be able to explain Kafka in an interview, draw a whiteboard diagram, and know exactly how Spring Boot connects to a Kafka cluster.
+
+----
+
+== Table of Contents ==
+
+# [[#What is Kafka?|1. What is Kafka?]]
+# [[#Core Concepts & Terminology|2. Core Concepts & Terminology]]
+# [[#Topics|3. Topics]]
+# [[#Partitions|4. Partitions]]
+# [[#Brokers & Clusters|5. Brokers & Clusters]]
+# [[#Partition Leader & Follower|6. Partition Leader & Follower]]
+# [[#Replication Factor|7. Replication Factor]]
+# [[#Producers|8. Producers]]
+# [[#How Spring Boot Bootstraps & Routes Messages|9. How Spring Boot Bootstraps & Routes Messages]]
+# [[#Consumers & Consumer Groups|10. Consumers & Consumer Groups]]
+# [[#Kafka Connect|11. Kafka Connect]]
+# [[#How to Decide Partition Count|12. How to Decide Partition Count]]
+# [[#Creating a Topic — CLI Commands|13. Creating a Topic — CLI Commands]]
+# [[#Starting Kafka Locally (KRaft Mode)|14. Starting Kafka Locally (KRaft Mode)]]
+# [[#Real-World Architecture Example|15. Real-World Architecture Example]]
+# [[#Interview Cheat Sheet|16. Interview Cheat Sheet]]
+
+----
+
+== 1. What is Kafka? ==
+
+*Apache Kafka is an Event Streaming Platform.*
+
+Event Streaming means:
+- *Capturing* data in real time from different sources, in the form of streams of events.
+- *Storing* these event streams durably for later retrieval.
+- *Processing / reacting* to event streams in real time _and_ retrospectively.
+
+=== Kafka's 3 Core Capabilities ===
+
+| # | Capability |
+|---|------------|
+| 1 | *Publish (write) and subscribe (read)* streams of events |
+| 2 | *Store* streams of events durably and reliably for as long as you want |
+| 3 | *Process* streams as they occur in real time or retrospectively |
+
+All of this is provided in a *distributed, fault-tolerant, elastic, and secure* manner.
+Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.
+
+----
+
+== 2. Core Concepts & Terminology ==
+
+=== Events ===
+
+An *event* is "something that happened" — a record or message.
+
+When you read or write data to Kafka, you do it in the form of *events*.
+
+Every event conceptually has:
+- *Key* — identifies the entity (e.g., `transactionId`, `userId`)
+- *Value* — the actual payload (e.g., JSON data)
+- *Timestamp* — when the event occurred
+- *Optional metadata headers*
+
+=== Producers ===
+
+*Producers* are client applications that *publish (write) events* to Kafka.
+
+- Producers are *fully decoupled* from consumers.
+- A producer does not wait to know if or when an event is consumed.
+- This decoupling is one of Kafka's biggest design strengths.
+
+=== Consumers ===
+
+*Consumers* are client applications that *read and process events* from Kafka.
+
+- Consumers are independent microservices.
+- Events in Kafka are *not deleted after consumption* — they can be re-read as many times as needed.
+- You define how long events are retained using *per-topic configuration* (retention period).
+
+----
+
+== 3. Topics ==
+
+A *Topic* is the fundamental way to organize data in Kafka.
+
+    Think of a topic like a *folder in a filesystem*, and events are the *files* inside that folder.
+
+=== Key Properties of a Topic ===
+
+| Property | Detail |
+|----------|--------|
+| *Multi-producer* | One, two, or many producers can write to the same topic |
+| *Multi-consumer* | One, two, or many consumers can read from the same topic |
+| *Events are not deleted on consumption* | Consumers can re-read events at any time |
+| *Retention is configurable* | e.g., keep events for 7 days, or forever |
+| *Topics are partitioned* | For scalability and parallelism (see next section) |
+
+=== Naming Convention (Best Practice) ===
+
+Use descriptive, hyphen-separated names. Examples:
+- `payments-processed`
+- `user-signup-events`
+- `order-created`
+
+----
+
+== 4. Partitions ==
+
+A *Partition* is the physical subdivision of a Kafka topic. This is the most important concept for scalability.
+
+    A Topic is *logical*. A Partition is *physical* (an actual append-only log on disk).
+
+Instead of storing all events of a topic in one place, Kafka *splits (shards)* the topic into multiple partitions spread across brokers.
+
+=== Why Partitions Exist ===
+
+| Reason | Explanation |
+|--------|-------------|
+| *Scalability* | Data is spread across multiple brokers; many producers/consumers work in parallel |
+| *Throughput* | Parallel reads and writes = higher throughput |
+| *Ordering guarantee* | Order is guaranteed *within a partition*, not across partitions |
+
+=== How Events Land in a Partition ===
+
+| Scenario | Behavior |
+|----------|----------|
+| *Message has a Key* | Kafka hashes the key → same key always goes to the same partition (order preserved per key) |
+| *No Key (default)* | Kafka uses *sticky partitioning* — picks a partition for a batch, then rotates |
+| *Manual override* | Producer explicitly specifies partition number |
+
+=== Visual: Partition as Append-Only Log ===
+
+{{{
+Topic: orders
+-----------------------------
+P0 → [event1] [event2] [event3]  ← appended in order
+P1 → [event4] [event5]
+P2 → [event6] [event7]
+}}}
+
+Events within a partition are ordered and immutable. New events are only ever *appended to the end*.
+
+----
+
+== 5. Brokers & Clusters ==
+
+=== Broker ===
+
+A *broker* is a single Kafka server (a single running process/node).
+
+- Each broker:
+  - Stores partitions (data) on disk
+  - Handles read/write requests from producers and consumers
+  - Participates in replication
+
+=== Cluster ===
+
+A *Kafka Cluster* is a group of multiple brokers working together.
+
+{{{
+Kafka Cluster
+┌───────────────────────────────────────┐
+│  Broker 1    Broker 2    Broker 3     │
+│  (Node 1)    (Node 2)    (Node 3)     │
+└───────────────────────────────────────┘
+}}}
+
+- Clusters can span multiple data centers or cloud regions.
+- Brokers share partition leadership — each broker is the leader for some partitions and a follower for others.
+- Adding more brokers = horizontal scaling.
+
+=== ZooKeeper vs KRaft ===
+
+| | ZooKeeper (old) | KRaft (new, Kafka 3+) |
+|--|-----------------|----------------------|
+| *Role* | External service managing cluster metadata | Built-in consensus, no external dependency |
+| *Status* | Deprecated | Current standard |
+| *Setup* | Requires separate ZooKeeper cluster | Self-contained — just start Kafka |
+
+    *Use KRaft mode for all new setups.* This is what the local setup commands below use.
+
+----
+
+== 6. Partition Leader & Follower ==
+
+This is the most important concept for understanding how Kafka achieves both *performance* and *fault tolerance*.
+
+=== The Rule ===
+
+Every partition has:
+- *Exactly 1 Leader broker* — handles ALL reads and writes for that partition
+- *0 or more Follower brokers* — maintain replicas (copies) of the partition data
+
+{{{
+Partition P1:
+┌──────────────────────────────────────┐
+│  Broker-2 (Leader)  ← ALL traffic   │
+│  Broker-1 (Follower) ← replica only │
+│  Broker-3 (Follower) ← replica only │
+└──────────────────────────────────────┘
+}}}
+
+=== Why One Leader? ===
+
+- Simpler consistency model — no risk of stale reads.
+- The leader is the single source of truth for a partition.
+- Followers only exist for *replication and failover*.
+
+=== What Happens When a Leader Fails? ===
+
+# Kafka detects that the leader broker is down.
+# Kafka automatically *elects a new leader* from the in-sync followers.
+# Producers and consumers automatically reconnect to the new leader.
+# *No manual intervention required.*
+
+This is how Kafka achieves *fault tolerance*.
+
+----
+
+== 7. Replication Factor ==
+
+The *Replication Factor (RF)* defines how many copies of a partition exist across the cluster.
+
+{{{
+Replication Factor = 3
+  → 1 leader copy + 2 follower copies = 3 total replicas
+}}}
+
+=== Example: Topic with RF=3 and 2 Partitions, 3 Brokers ===
+
+{{{
+          Broker-1        Broker-2        Broker-3
+          --------        --------        --------
+          P0 (Leader)     P1 (Leader)     P0 (Follower)
+          P1 (Follower)   P0 (Follower)   P1 (Follower)
+}}}
+
+- *Broker-1* is leader for P0
+- *Broker-2* is leader for P1
+- *Broker-3* only holds follower replicas
+
+=== What RF to Use in Production? ===
+
+| Setting | Meaning | Use Case |
+|---------|---------|----------|
+| RF = 1 | No replication — if broker dies, data is lost | Dev/testing only |
+| RF = 2 | One backup copy | Acceptable for non-critical data |
+| RF = 3 | Two backup copies | *Standard for production* |
+
+    *Rule of thumb:* RF should never exceed the number of brokers.
+    RF = 3 requires at least 3 brokers.
+
+=== How Replication Works (Step by Step) ===
+
+# *Producer writes* to the partition *leader*.
+# Leader writes to its local log.
+# *Followers pull data* from the leader and replicate it.
+# Once followers have copied the data, they are considered *in-sync* (part of the ISR — In-Sync Replica set).
+# Data is now durable.
+
+=== Without vs With Replication ===
+
+{{{
+WITHOUT replication:
+  Broker crashes → partition data gone forever ❌
+
+WITH replication (RF=3):
+  Broker crashes → follower becomes new leader → no data loss ✅
+}}}
+
+----
+
+== 8. Producers ==
+
+=== How a Producer Routes a Message ===
+
+# Producer connects to any broker listed in `bootstrap-servers` (initial contact only).
+# Downloads cluster *metadata* — a map of which broker is the leader for each partition.
+# Determines target partition (via key hash, round-robin, or manual override).
+# Sends the message *directly to the leader broker* of that partition.
+# Leader replicates to followers.
+
+=== Producer `acks` Setting ===
+
+The `acks` setting controls *durability guarantees*:
+
+| `acks` value | Meaning | Risk |
+|---|---|---|
+| `acks=0` | Fire and forget — no acknowledgment | Possible data loss |
+| `acks=1` | Leader writes to its log, then acks | Data loss if leader crashes before replication |
+| `acks=all` | Leader + all ISR followers must acknowledge | *Strongest guarantee — use in production* |
+
+----
+
+== 9. How Spring Boot Bootstraps & Routes Messages ==
+
+This is a very common interview question. Understanding this end-to-end is essential.
+
+=== Configuration ===
+
+{{{class="properties"
+# application.properties
+spring.kafka.bootstrap-servers=broker1:9092,broker2:9092,broker3:9092
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+}}}
+
+    *Common misconception:* "The producer only talks to the bootstrap server."
+    *Reality:* Bootstrap servers are just the *initial contact point*. After the first handshake, the producer talks directly to whichever broker is the partition leader.
+
+=== Step-by-Step: What Happens When Spring Boot Sends a Message ===
+
+{{{
+Step 1: Bootstrap Connection
+      Spring Boot Producer
+             │
+             │ Initial connection (just for metadata)
+             ▼
+         Broker-1 (any broker in list)
+             │
+             │ Responds with cluster metadata:
+             │   "Partition 0 → Leader: Broker-1"
+             │   "Partition 1 → Leader: Broker-2"
+             │   "Partition 2 → Leader: Broker-3"
+             ▼
+
+Step 2: Partition Selection
+      Producer hashes the message key
+      → selects Partition 1
+
+Step 3: Direct Send to Leader
+      Producer sends message DIRECTLY to Broker-2
+      (leader of Partition 1)
+
+Step 4: Replication
+      Broker-2 (Leader)
+         │ replicates
+         ├──→ Broker-1 (Follower of P1)
+         └──→ Broker-3 (Follower of P1)
+}}}
+
+=== Whiteboard Diagram ===
+
+{{{
+        +----------------------+
+        |  Spring Boot Producer|
+        +----------+-----------+
+                   │
+                   │ (1) Bootstrap connection
+                   ▼
+        +----------------------+
+        |   Broker-1           |
+        | (Metadata request)   |
+        +----------+-----------+
+                   │
+                   │ (2) Metadata response:
+                   │     Partition → Leader mapping
+                   ▼
+
+     Topic: payments
+     -------------------------
+     Partition 0 → Broker-1
+     Partition 1 → Broker-2
+     Partition 2 → Broker-3
+
+                   │
+                   │ (3) Select partition (key hash / round-robin)
+                   ▼
+        +----------------------+
+        |   Broker-2           |  ← Leader of Partition 1
+        +----------+-----------+
+                   │
+                   │ (4) Replication
+         ──────────────────────────────
+         │                            │
+         ▼                            ▼
+  +-------------+           +-------------+
+  | Broker-1    |           | Broker-3    |
+  | (Follower)  |           | (Follower)  |
+  +-------------+           +-------------+
+}}}
+
+=== Interview Answer (Crisp & Complete) ===
+
+    "Producer connects to any bootstrap broker to fetch cluster metadata — topics, partitions, and their leader brokers. When sending a message, Kafka determines the target partition based on the message key (via hashing) or using round-robin if no key is provided. The producer then sends the message *directly to the leader broker* of that partition, not necessarily the bootstrap broker. After receiving the message, the leader replicates it to follower brokers. If a broker goes down, Kafka elects a new leader and the producer automatically updates its metadata and continues — no manual intervention needed."
+
+----
+
+== 10. Consumers & Consumer Groups ==
+
+=== Consumer ===
+
+A consumer reads events from one or more partitions of a topic.
+
+- Consumers track their position using *offsets* — an incrementing number that marks which events have been read.
+- Offsets are committed to Kafka (in the `__consumer_offsets` internal topic).
+- A consumer can *replay* events by resetting its offset.
+
+=== Consumer Group ===
+
+A *Consumer Group* is a set of consumers that work together to consume a topic.
+
+    *Core rule:* Within a consumer group, each partition is consumed by *at most one consumer*. But multiple consumer groups can each independently consume the same topic.
+
+=== Partition Assignment Within a Group ===
+
+{{{
+Topic: orders (3 partitions)
+Consumer Group: payment-service
+
+P0 → Consumer-1
+P1 → Consumer-2
+P2 → Consumer-3
+}}}
+
+- If you have *more consumers than partitions*, the extra consumers sit idle.
+- If you have *fewer consumers than partitions*, some consumers handle multiple partitions.
+
+=== Scaling Consumers ===
+
+{{{
+3 partitions, 3 consumers → perfect parallelism ✅
+
+         P0    P1    P2
+          │     │     │
+          C1    C2    C3
+
+
+3 partitions, 2 consumers → C1 handles 2 partitions
+
+         P0    P1    P2
+          │     │     │
+          C1   C1    C2
+
+
+3 partitions, 4 consumers → C4 is idle
+
+         P0    P1    P2   (nothing)
+          │     │     │      │
+          C1    C2    C3     C4 ← idle ❌
+}}}
+
+*Maximum useful parallelism = number of partitions*
+
+=== Multiple Consumer Groups (Fan-Out Pattern) ===
+
+This is where Kafka truly shines. The same data can be consumed independently by completely different services.
+
+{{{
+                Topic: payments (2 partitions)
+               ─────────────────────────────────
+                   P0                 P1
+
+
+Group A (Payment Service):    C1               C2
+
+Group B (Fraud Detection):    C3 ← reads both P0 and P1
+
+Group C (Analytics):          C4 ← reads both P0 and P1
+
+Group D (Audit Logging):      C5 ← reads both P0 and P1
+}}}
+
+- Each group has its *own independent offset* — they read at their own pace.
+- One group lagging does not affect any other group.
+- This is the *fan-out* pattern — publish once, consume many times for different purposes.
+
+==== Real-World Example ====
+
+Same payment event is consumed by:
+- *Payment Service* → processes and updates the database
+- *Fraud Detection* → checks for suspicious patterns
+- *Analytics Service* → aggregates revenue metrics
+- *Audit Logger* → writes to compliance logs
+
+=== Interview Answer ===
+
+    "If consumers belong to *different consumer groups*, each group independently consumes the same data. The one-partition-per-consumer rule applies only _within_ a consumer group. So multiple services can each receive every event, enabling fan-out patterns. Offsets are tracked per consumer group, so each group reads at its own pace without affecting others."
+
+----
+
+== 11. Kafka Connect ==
+
+*Kafka Connect* is a framework for moving data into and out of Kafka without writing custom code.
+
+=== Why It Exists ===
+
+In enterprise systems, Kafka acts as a central data backbone. But you need to:
+# *Import data INTO Kafka* from existing systems (databases, file systems, etc.)
+# *Export data OUT OF Kafka* to downstream systems (search engines, data warehouses, etc.)
+
+Writing this integration code manually is error-prone, repetitive, and fragile. Kafka Connect solves this with ready-made *connectors*.
+
+=== Import (Source Connectors) ===
+
+Data flows *into Kafka* from:
+- SQL databases (MySQL, PostgreSQL, Oracle) — via CDC (Change Data Capture)
+- File systems (logs, CSV dumps)
+- Message queues (RabbitMQ, ActiveMQ)
+
+=== Export (Sink Connectors) ===
+
+Data flows *out of Kafka* to:
+- Elasticsearch (search)
+- Data warehouses (Snowflake, BigQuery, Redshift)
+- Object storage (AWS S3, GCS)
+- Other Kafka clusters
+
+=== Why Not Read Directly from the Database? ===
+
+| Problem | Why Kafka Connect Helps |
+|---------|------------------------|
+| Database overload | Kafka buffers data; downstream systems don't query DB directly |
+| Point-to-point integrations | One Kafka topic can feed many consumers instead of N×M integrations |
+| No real-time streaming | Kafka provides millisecond-latency event propagation |
+| No replay capability | Kafka retains events; consumers can replay |
+
+=== Architecture Diagram ===
+
+{{{
+Source Systems         Kafka              Sink Systems
+─────────────     ──────────────     ──────────────────
+  MySQL DB    →   │            │  →    Elasticsearch
+  PostgreSQL  →   │   Kafka    │  →    Snowflake DW
+  File System →   │  Cluster   │  →    AWS S3
+  Oracle      →   │            │  →    Another Kafka
+─────────────     ──────────────     ──────────────────
+                  ↑ Source          ↑ Sink
+                  Connectors        Connectors
+}}}
+
+----
+
+== 12. How to Decide Partition Count ==
+
+Choosing the right number of partitions is a critical design decision. Too few = bottleneck. Too many = overhead.
+
+=== Why Partition Count Matters ===
+
+{{{
+BAD DESIGN (too few partitions — bottleneck):
+
+        Topic (1 Partition)
+                │
+                ▼
+           Broker-1 (Leader)
+        (ALL traffic hits here) ❌
+
+
+GOOD DESIGN (distributed load):
+
+        Topic (6 Partitions)
+
+   P0 → Broker-1      P3 → Broker-1
+   P1 → Broker-2      P4 → Broker-2
+   P2 → Broker-3      P5 → Broker-3
+
+   ✔ Load spread across all brokers
+   ✔ Parallel producers & consumers
+}}}
+
+=== Rules for Deciding Partition Count ===
+
+| Factor | Guidance |
+|--------|----------|
+| *Max consumer parallelism* | Partitions = max number of consumers you'll ever want in a group |
+| *Throughput target* | Measure throughput per partition, then divide target by that |
+| *Number of brokers* | Partitions should be a multiple of broker count for even distribution |
+| *Ordering requirements* | If you need strict ordering for an entity (e.g., per user), all messages for that entity go to one partition via key |
+
+=== Practical Formula ===
+
+{{{
+Desired partition count ≈ max(
+    target throughput / throughput per partition,
+    max consumer instances you'll scale to
+)
+}}}
+
+=== Real Example ===
+
+- Target: 600 MB/s throughput
+- Throughput per partition: ~100 MB/s
+- Max consumers you plan to scale to: 12
+
+→ Use *12 partitions* (covers both throughput and consumer parallelism)
+
+=== Important Caveat ===
+
+    You can *increase* partitions later, but you *cannot decrease* them.
+    Increasing partitions can also break key-based ordering for existing keys.
+    So: *over-partition slightly* rather than under-partition.
+
+=== General Recommendations ===
+
+| Cluster Size | Recommendation |
+|---|---|
+| Small / Dev | 3–6 partitions per topic |
+| Medium | 12–24 partitions for high-throughput topics |
+| Large / Enterprise | 50–100+ partitions, based on SLA and scaling targets |
+
+----
+
+== 13. Creating a Topic — CLI Commands ==
+
+=== Start Kafka Locally (KRaft Mode) ===
+
+{{{class="bash"
+# Step 1: Generate Cluster ID
+KAFKA_CLUSTER_ID="$(./bin/kafka-storage.sh random-uuid)"
+
+# Step 2: Format storage
+./bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
+
+# Step 3: Start the broker
+./bin/kafka-server-start.sh config/server.properties
+}}}
+
+=== Topic Operations ===
+
+{{{class="bash"
+# Create a topic
+./bin/kafka-topics.sh \
+  --create \
+  --topic payments \
+  --partitions 3 \
+  --replication-factor 1 \
+  --bootstrap-server localhost:9092
+
+# Describe a topic (shows partition distribution, leaders, ISR)
+./bin/kafka-topics.sh \
+  --describe \
+  --topic payments \
+  --bootstrap-server localhost:9092
+
+# List all topics
+./bin/kafka-topics.sh \
+  --list \
+  --bootstrap-server localhost:9092
+
+# Delete a topic
+./bin/kafka-topics.sh \
+  --delete \
+  --topic payments \
+  --bootstrap-server localhost:9092
+}}}
+
+=== Producer & Consumer (CLI Testing) ===
+
+{{{class="bash"
+# Start a console producer
+./bin/kafka-console-producer.sh \
+  --topic payments \
+  --bootstrap-server localhost:9092
+
+# Start a console consumer (read from beginning)
+./bin/kafka-console-consumer.sh \
+  --topic payments \
+  --from-beginning \
+  --bootstrap-server localhost:9092
+
+# Consumer in a group
+./bin/kafka-console-consumer.sh \
+  --topic payments \
+  --group payment-service \
+  --bootstrap-server localhost:9092
+}}}
+
+----
+
+== 14. Starting Kafka Locally (KRaft Mode) ==
+
+=== What KRaft Mode Is ===
+
+Before Kafka 3.x, Kafka required *ZooKeeper* as a separate service to manage cluster metadata (leader elections, broker registry, etc.).
+
+*KRaft (Kafka Raft)* removes this dependency. Kafka now manages its own metadata internally using a built-in Raft consensus protocol.
+
+=== Process Roles in KRaft ===
+
+In `server.properties`:
+
+{{{class="properties"
+# Combined mode (broker + controller in one process) — good for local dev
+process.roles=broker,controller
+
+# Recommended log directory configuration
+log.dirs=/path/to/kafka-broker-logs
+metadata.log.dir=/path/to/kafka-metadata-logs
+}}}
+
+For production, these directories should be on *separate disks* for reliability.
+
+=== Why Two Log Directories? ===
+
+| Directory | Purpose |
+|-----------|---------|
+| `log.dirs` | Broker data logs — actual topic/partition event data |
+| `metadata.log.dir` | KRaft controller metadata — cluster state, leader info |
+
+Separating them ensures metadata writes (which need low latency) don't compete with data writes.
+
+----
+
+== 15. Real-World Architecture Example ==
+
+=== Payment Processing Platform ===
+
+This is a real architecture using Kafka to decouple services:
+
+{{{
+External        Config      Kafka          Middleware     Targets
+Sources         Manager    Cluster         Service        (3rd Party)
+─────────      ─────────  ─────────       ─────────      ─────────
+                          ┌─────────┐
+ Merchant  →  CM Service →│bin data │→ MW consumes →    Cache
+ Data                     │merchant │   merchant &       (Redis)
+                          │ topic   │   bin data     →  Payment
+                          └─────────┘                   Processor A
+                                                    →  Payment
+                          ┌─────────┐                   Processor B
+ Transaction →  App      →│txn      │→ TLM consumes → DB (save txn)
+ Events                   │events   │
+                          │ topic   │
+                          └─────────┘
+                           Kafka Cluster
+}}}
+
+*Flow:*
+# *CM (Config Manager)* publishes merchant and BIN data → Kafka topic.
+# *Middleware (MW)* consumes this data → stores in *Redis cache*.
+# During a transaction, MW checks Redis first; if cache miss → falls back to CM API.
+# Transaction data is produced to a Kafka topic → *TLM (Transaction Ledger Manager)* consumes → saves to DB.
+# *Frontend dashboards* (merchants, transactions, monitoring) query the DB and cache.
+
+*Why Kafka here?*
+- CM doesn't get hammered by MW polling it constantly — data is pushed via Kafka.
+- Multiple consumers (MW, analytics, audit) all independently read transaction events.
+- If MW goes down, events are retained in Kafka and processed when it recovers.
+
+----
+
+== 16. Interview Cheat Sheet ==
+
+=== One-Line Answers ===
+
+| Question | One-Line Answer |
+|----------|----------------|
+| What is Kafka? | A distributed, fault-tolerant event streaming platform for publishing, storing, and processing real-time data streams. |
+| What is a topic? | A logical category for organizing events, similar to a folder, split into partitions for scalability. |
+| What is a partition? | A physical, ordered, append-only log that is the actual unit of storage and parallelism in Kafka. |
+| What is a broker? | A single Kafka server that stores partitions and serves producer/consumer requests. |
+| What is a partition leader? | The one broker responsible for all reads and writes for a given partition. |
+| What is replication factor? | The number of copies of each partition across the cluster — ensures fault tolerance. |
+| How does Spring Boot connect to Kafka? | It connects to bootstrap servers for initial metadata, then routes messages directly to the partition leader. |
+| What is a consumer group? | A set of consumers that together consume a topic, with each partition assigned to exactly one consumer in the group. |
+| How does Kafka scale? | By increasing partition count and adding brokers, distributing leader partitions across the cluster. |
+| Why can't consumers share a partition in a group? | To guarantee ordering — only one consumer reads from a partition at a time within a group. |
+
+=== Key Numbers to Remember ===
+
+| Setting | Common Value |
+|---------|-------------|
+| Replication Factor (production) | 3 |
+| Min brokers for RF=3 | 3 |
+| Default retention | 7 days |
+| Max consumers useful per topic | = number of partitions |
+
+=== "Pro Tip" Phrases for Interviews ===
+
+- _"Ordering is guaranteed within a partition, not across partitions."_
+- _"The bootstrap server is just an initial contact point — the producer routes directly to the partition leader."_
+- _"Kafka scales throughput not by reading from followers, but by increasing partition count."_
+- _"Consumer groups allow fan-out — the same event is processed independently by multiple services."_
+- _"Replication factor ensures durability — if a leader fails, a follower is automatically elected."_
+- _"The maximum useful consumer parallelism in a group equals the number of partitions."_
+
+----
+
+_These notes cover: Event Streaming, Kafka Architecture, Topics, Partitions, Brokers, Leaders & Followers, Replication, Producers, Spring Boot Bootstrap, Consumer Groups, Kafka Connect, Partition Sizing, Topic CLI Commands, and KRaft mode._

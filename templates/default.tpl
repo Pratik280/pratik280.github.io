@@ -3,23 +3,10 @@
 <head>
 <link rel="stylesheet" href="style.css">
 <meta charset="UTF-8">
-<title>index</title>
+<title>%title%</title>
 </head>
 
 <body>
-
-<p>
-Hi Im Pratik :)
-</p>
-
-<p>
-Test
-By Vlog
-</p>
-
-<p>
-<a href="Kafka Notes.html">Kafka Notes</a>
-</p>
-
+%content%
 </body>
 </html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css"">
+<meta charset="UTF-8">
+<title>resume</title>
+</head>
+
+<body>
+
+<div id="Resume"><h1 id="Resume" class="header"><a href="#Resume">Resume</a></h1></div>
+
+<p>
+<a href="index.html">← Home</a>
+</p>
+
+<hr />
+
+<div id="Resume-Summary"><h2 id="Summary" class="header"><a href="#Resume-Summary">Summary</a></h2></div>
+
+<p>
+Software Engineer with ~4 years of experience building scalable microservices and event-driven systems using Java, Spring Boot, and Apache Kafka. Experienced in designing secure, high-performance REST APIs, multitenant architectures, and real-time transaction processing systems.
+</p>
+
+<hr />
+
+<div id="Resume-Experience"><h2 id="Experience" class="header"><a href="#Resume-Experience">Experience</a></h2></div>
+
+<div id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai"><h3 id="Software Engineer — In-Solution Global, Mumbai" class="header"><a href="#Resume-Experience-Software Engineer — In-Solution Global, Mumbai">Software Engineer — In-Solution Global, Mumbai</a></h3></div>
+<p>
+<em>Jun 2022 – Present</em>
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-Distributed Payment Processing Platform"></span><strong id="Distributed Payment Processing Platform">Distributed Payment Processing Platform</strong>
+Designed and built a distributed payment processing platform across multiple Spring Boot microservices — covering payment link creation, transaction management, and query APIs — using an event-driven Kafka pipeline where each service reacts independently to transaction events; multi-step payment workflows are coordinated via the Saga choreography pattern to maintain data consistency, and the Outbox pattern ensuring no events are lost between the database and Kafka.
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-Multi-Tenant Data Layer"></span><strong id="Multi-Tenant Data Layer">Multi-Tenant Data Layer</strong>
+Architected a multi-tenant data layer supporting multiple clients on a single application instance — isolating each client's data at the database schema level using Hibernate JPA; evaluated and chose schema-based multitenancy over database sharding after analyzing operational trade-offs.
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-Internal Monitoring Platform"></span><strong id="Internal Monitoring Platform">Internal Monitoring Platform</strong>
+Built an internal monitoring platform aggregating real-time health and transaction data across multiple datacenters — polling service health via Actuator, tracking Kafka consumer lag, and consuming transaction events to expose success rates and failure codes through a single dashboard API; data collected via scheduled aggregation and cached in Redis, separating collection from serving for fast, scalable responses.
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-Kafka KRaft Migration"></span><strong id="Kafka KRaft Migration">Kafka KRaft Migration</strong>
+Led the migration of the Kafka messaging infrastructure from a legacy ZooKeeper-based dual-cluster setup to a unified KRaft-mode 6-broker cluster spanning two datacenters — configured rack-aware replication, replication factor 6 with min.insync.replicas=4, and DNS-based client routing, ensuring zero message loss even if one datacenter goes down.
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-API Gateway"></span><strong id="API Gateway">API Gateway</strong>
+Designed and deployed the API gateway layer using a 3-node Spring Cloud Gateway cluster — handling request routing, RBAC token validation via custom filters, and Eureka-based service discovery, ensuring new services can be onboarded without any changes to the client-facing entry point.
+</p>
+
+<p>
+<span id="Resume-Experience-Software Engineer — In-Solution Global, Mumbai-CI/CD Pipeline"></span><strong id="CI/CD Pipeline">CI/CD Pipeline</strong>
+Partnered with DevOps to build a fully automated end-to-end CI/CD pipeline triggered by GitLab tags — pipeline spins up all microservices with dependencies (Kafka, Redis, PostgreSQL) using Docker Compose, runs the full integration test suite, and only on success builds and pushes Docker images to the registry, updates Helm chart values, which triggers Argo CD to deploy to Kubernetes; Prometheus and Grafana provide continuous observability post-deployment.
+</p>
+
+<p>
+Mentored junior engineers through code reviews and design discussions, contributed to architectural decisions, and actively participated in sprint planning and retrospectives within an Agile/Scrum delivery model.
+</p>
+
+<hr />
+
+<div id="Resume-Skills"><h2 id="Skills" class="header"><a href="#Resume-Skills">Skills</a></h2></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Category
+</th>
+<th>
+Technologies
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Resume-Skills-Languages"></span><strong id="Languages">Languages</strong>
+</td>
+<td>
+Java, JavaScript, TypeScript, SQL
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Backend"></span><strong id="Backend">Backend</strong>
+</td>
+<td>
+Spring Boot, Spring MVC, Spring Cloud, Spring Security, Hibernate/JPA, REST APIs, Maven
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Cloud &amp; DevOps"></span><strong id="Cloud &amp; DevOps">Cloud &amp; DevOps</strong>
+</td>
+<td>
+AWS (EC2, S3, IAM, Lambda), Azure, Docker, Kubernetes (AKS), GitLab CI/CD, Helm, Nexus, Nginx
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Databases &amp; Cache"></span><strong id="Databases &amp; Cache">Databases &amp; Cache</strong>
+</td>
+<td>
+PostgreSQL, MySQL, Redis
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Messaging"></span><strong id="Messaging">Messaging</strong>
+</td>
+<td>
+Apache Kafka (KRaft), Event-driven architecture, Saga Pattern, Outbox Pattern, Pub-Sub, Consumer groups
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Core Java"></span><strong id="Core Java">Core Java</strong>
+</td>
+<td>
+OOP, Collections, Exception Handling, Multithreading, SOLID Principles, J2EE
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Testing"></span><strong id="Testing">Testing</strong>
+</td>
+<td>
+JUnit, Unit Testing, Integration Testing
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Observability"></span><strong id="Observability">Observability</strong>
+</td>
+<td>
+ELK Stack, Prometheus, Grafana, Spring Boot Actuator
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-OS &amp; Tools"></span><strong id="OS &amp; Tools">OS &amp; Tools</strong>
+</td>
+<td>
+Linux, Bash, Git
+</td>
+</tr>
+<tr>
+<td>
+<span id="Resume-Skills-Practices"></span><strong id="Practices">Practices</strong>
+</td>
+<td>
+Agile/Scrum, SDLC
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr />
+
+<div id="Resume-Certifications"><h2 id="Certifications" class="header"><a href="#Resume-Certifications">Certifications</a></h2></div>
+
+<ul>
+<li>
+<a href="https://www.credly.com/badges/bee394d0-95b9-492f-bf05-17682aa871f6/linked_in_profile">AWS Certified Cloud Practitioner</a> — Jun 2024, valid till Jun 2027
+
+</ul>
+<hr />
+
+<div id="Resume-Education"><h2 id="Education" class="header"><a href="#Resume-Education">Education</a></h2></div>
+
+<p>
+<span id="Resume-Education-B.E. Computer Science — Mumbai University"></span><strong id="B.E. Computer Science — Mumbai University">B.E. Computer Science — Mumbai University</strong>
+2018 – 2022 | CGPA: 8.68
+</p>
+
+<hr />
+
+<p>
+<a href="index.html">Home</a> | <a href="about.html">About</a> | <a href="blogs/index.html">Blog</a> | <a href="notes/index.html">Notes</a>
+</p>
+
+</body>
+</html>

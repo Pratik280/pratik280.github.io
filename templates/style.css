@@ -9,18 +9,9 @@
     --text: #e7e5e4;
     --muted: #a8a29e;
 
-    /* gold */
-    /* --primary: #f6c177; */
-    /* --primary-soft: #ffd79a; */
-    /* --accent: #d4a15a; */
-
-    /* white */
-    /* --primary: #b8b2a8; */
-    /* --primary-soft: #ddd6ce; */
-    /* --accent: #9f937f; */
-
     --primary: #d7b98e;
     --primary-soft: #ead7bd;
+
     --accent: #c2a57a;
 
     --border: #2a2a2a;
@@ -66,7 +57,7 @@ body::before {
     background:
         radial-gradient(
             circle at top,
-            rgba(246, 193, 119, 0.06),
+            rgba(215, 185, 142, 0.06),
             transparent 35%
         );
 
@@ -90,13 +81,15 @@ h1 {
 h2 {
     color: var(--accent);
 
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     font-weight: 600;
 
     text-transform: uppercase;
-    letter-spacing: 1.8px;
+    letter-spacing: 1.4px;
 
     margin: 3rem 0 1rem;
+
+    opacity: 0.95;
 }
 
 h3 {
@@ -137,7 +130,7 @@ a {
 }
 
 a:hover {
-    color: #ffe2b8;
+    color: #f2e4cf;
 }
 
 /* separator */
@@ -322,7 +315,7 @@ img {
     }
 
     h2 {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
 
         margin-top: 2.5rem;
     }

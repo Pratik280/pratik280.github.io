@@ -1,0 +1,17 @@
+= Notes =
+
+[[../index|← Home]]
+
+----
+
+Technical reference notes. Things I keep coming back to.
+
+----
+
+== Index ==
+
+* [[kafka|Apache Kafka — Complete Guide]]
+
+----
+
+[[../index|Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]

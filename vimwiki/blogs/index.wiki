@@ -1,0 +1,17 @@
+= Blog =
+
+[[../index|← Home]]
+
+----
+
+Writing about backend engineering, distributed systems, Linux, and things I figure out at work.
+
+----
+
+== Posts ==
+
+* 2025-06-01 — [[how-i-think-about-kafka-partitions|How I Think About Kafka Partitions]]
+
+----
+
+[[../index|Home]] | [[../about|About]] | [[../resume|Resume]] | [[../notes/index|Notes]]

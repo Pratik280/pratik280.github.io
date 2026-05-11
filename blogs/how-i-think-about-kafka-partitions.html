@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>how-i-think-about-kafka-partitions</title>
+</head>
+
+<body>
+
+<div id="How I Think About Kafka Partitions"><h1 id="How I Think About Kafka Partitions" class="header"><a href="#How I Think About Kafka Partitions">How I Think About Kafka Partitions</a></h1></div>
+
+<p>
+2025-06-01 | <a href="index.html">← Blog</a>
+</p>
+
+<p>
+<em>Partitions are the most misunderstood part of Kafka. Here is how I actually think about sizing them.</em>
+</p>
+
+<hr />
+
+<p>
+When I first started working with Kafka, partition count felt like an arbitrary number you just picked.
+3 felt reasonable. 6 felt safer. Nobody really explained why.
+</p>
+
+<p>
+After running Kafka in production on a payment processing platform, here is how I actually think about it.
+</p>
+
+<hr />
+
+<div id="How I Think About Kafka Partitions-The One Rule That Matters"><h2 id="The One Rule That Matters" class="header"><a href="#How I Think About Kafka Partitions-The One Rule That Matters">The One Rule That Matters</a></h2></div>
+
+<p>
+<span id="How I Think About Kafka Partitions-The One Rule That Matters-Partition count = max consumer parallelism you will ever want."></span><strong id="Partition count = max consumer parallelism you will ever want.">Partition count = max consumer parallelism you will ever want.</strong>
+</p>
+
+<p>
+That is it. Everything else is secondary.
+</p>
+
+<p>
+If you have 3 partitions, you can have at most 3 active consumers in a group.
+A 4th consumer will sit idle. Kafka assigns one consumer per partition — no sharing.
+</p>
+
+<hr />
+
+<div id="How I Think About Kafka Partitions-Throughput Is Secondary"><h2 id="Throughput Is Secondary" class="header"><a href="#How I Think About Kafka Partitions-Throughput Is Secondary">Throughput Is Secondary</a></h2></div>
+
+<p>
+Most guides lead with throughput math. I find that misleading.
+</p>
+
+<p>
+For most backend services, consumer parallelism is the real bottleneck — not raw throughput.
+If your service needs to scale to 12 instances under load, you need at least 12 partitions.
+You probably won't hit per-partition throughput limits before you hit that.
+</p>
+
+<p>
+Where throughput does matter: high-volume data pipelines, analytics ingestion, log aggregation.
+For transactional microservices, think consumers first.
+</p>
+
+<hr />
+
+<div id="How I Think About Kafka Partitions-The Mistake I See Most Often"><h2 id="The Mistake I See Most Often" class="header"><a href="#How I Think About Kafka Partitions-The Mistake I See Most Often">The Mistake I See Most Often</a></h2></div>
+
+<p>
+Starting with 1 or 2 partitions "because it's simple".
+</p>
+
+<p>
+You can increase partitions later, but it breaks key-based ordering for existing keys.
+If your consumers depend on per-key ordering (common in payment systems), that is a painful migration.
+</p>
+
+<p>
+<span id="How I Think About Kafka Partitions-The Mistake I See Most Often-Over-partition slightly from the start."></span><strong id="Over-partition slightly from the start.">Over-partition slightly from the start.</strong> 6 partitions for a service you expect to scale to 3 instances is fine.
+</p>
+
+<hr />
+
+<div id="How I Think About Kafka Partitions-What I Actually Do"><h2 id="What I Actually Do" class="header"><a href="#How I Think About Kafka Partitions-What I Actually Do">What I Actually Do</a></h2></div>
+
+<p>
+For a new topic on our platform:
+</p>
+
+<ul>
+<li>
+How many consumer instances will this service run at peak? → that is my floor.
+
+<li>
+Is this topic keyed? If yes, am I relying on per-key ordering? → if yes, never change partitions later.
+
+<li>
+Is the partition count a multiple of my broker count? → keeps partition leaders evenly distributed.
+
+</ul>
+<p>
+For our 6-broker cluster spanning two datacenters, I default to 6 or 12 partitions per topic.
+</p>
+
+<hr />
+
+<div id="How I Think About Kafka Partitions-The Number Nobody Tells You"><h2 id="The Number Nobody Tells You" class="header"><a href="#How I Think About Kafka Partitions-The Number Nobody Tells You">The Number Nobody Tells You</a></h2></div>
+<pre><code>The maximum useful consumers in a group = number of partitions.
+</code></pre>
+
+<p>
+That is the hard ceiling. Extra consumers beyond partition count are wasted resources.
+Size your topics to your scaling targets, not to what feels comfortable today.
+</p>
+
+<hr />
+
+<p>
+<a href="index.html">← Blog</a> | <a href="../index.html">Home</a>
+</p>
+
+</body>
+</html>

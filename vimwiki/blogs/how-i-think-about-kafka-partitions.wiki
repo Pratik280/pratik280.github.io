@@ -1,0 +1,72 @@
+= How I Think About Kafka Partitions =
+
+2025-06-01 | [[index|← Blog]]
+
+_Partitions are the most misunderstood part of Kafka. Here is how I actually think about sizing them._
+
+----
+
+When I first started working with Kafka, partition count felt like an arbitrary number you just picked.
+3 felt reasonable. 6 felt safer. Nobody really explained why.
+
+After running Kafka in production on a payment processing platform, here is how I actually think about it.
+
+----
+
+== The One Rule That Matters ==
+
+*Partition count = max consumer parallelism you will ever want.*
+
+That is it. Everything else is secondary.
+
+If you have 3 partitions, you can have at most 3 active consumers in a group.
+A 4th consumer will sit idle. Kafka assigns one consumer per partition — no sharing.
+
+----
+
+== Throughput Is Secondary ==
+
+Most guides lead with throughput math. I find that misleading.
+
+For most backend services, consumer parallelism is the real bottleneck — not raw throughput.
+If your service needs to scale to 12 instances under load, you need at least 12 partitions.
+You probably won't hit per-partition throughput limits before you hit that.
+
+Where throughput does matter: high-volume data pipelines, analytics ingestion, log aggregation.
+For transactional microservices, think consumers first.
+
+----
+
+== The Mistake I See Most Often ==
+
+Starting with 1 or 2 partitions "because it's simple".
+
+You can increase partitions later, but it breaks key-based ordering for existing keys.
+If your consumers depend on per-key ordering (common in payment systems), that is a painful migration.
+
+*Over-partition slightly from the start.* 6 partitions for a service you expect to scale to 3 instances is fine.
+
+----
+
+== What I Actually Do ==
+
+For a new topic on our platform:
+
+# How many consumer instances will this service run at peak? → that is my floor.
+# Is this topic keyed? If yes, am I relying on per-key ordering? → if yes, never change partitions later.
+# Is the partition count a multiple of my broker count? → keeps partition leaders evenly distributed.
+
+For our 6-broker cluster spanning two datacenters, I default to 6 or 12 partitions per topic.
+
+----
+
+== The Number Nobody Tells You ==
+
+    The maximum useful consumers in a group = number of partitions.
+
+That is the hard ceiling. Extra consumers beyond partition count are wasted resources.
+Size your topics to your scaling targets, not to what feels comfortable today.
+
+----
+
+[[index|← Blog]] | [[../index|Home]]

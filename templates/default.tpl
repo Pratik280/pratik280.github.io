@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="%root_path%style.css"">
-<meta charset="UTF-8">
-<title>%title%</title>
+    <meta charset="UTF-8">
+    <title>%title%</title>
+
+    <link rel="stylesheet" href="%root_path%style.css">
 </head>
 
 <body>

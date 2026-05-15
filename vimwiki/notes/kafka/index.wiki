@@ -1,0 +1,9 @@
+= Kafka =
+
+[[../index|← Notes]]
+
+== Index ==
+
+* [[apache_kafka_complete_guide|Apache Kafka - Complete Guide]]
+
+[[../index|← Notes]] | [[../../index|Home]]

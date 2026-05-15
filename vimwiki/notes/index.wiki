@@ -2,16 +2,10 @@
 
 [[../index|← Home]]
 
-----
-
-Technical reference notes. Things I keep coming back to.
-
-----
-
 == Index ==
 
-* [[kafka|Apache Kafka — Complete Guide]]
+* [[java/index|Core Java]]
+* [[kafka/index|Kafka]]
 
-----
 
 [[../index|Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]

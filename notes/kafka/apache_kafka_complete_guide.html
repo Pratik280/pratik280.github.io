@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>apache_kafka_complete_guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+
+<div id="Apache Kafka — Complete Study Notes"><h1 id="Apache Kafka — Complete Study Notes" class="header"><a href="#Apache Kafka — Complete Study Notes">Apache Kafka — Complete Study Notes</a></h1></div>
+
+<p>
+<a href="index.html">← Kafka</a>
+</p>
+
+<hr />
+
+<p>
+<em>How to use these notes:</em> Read top to bottom. Each section builds on the previous one. By the end, you'll be able to explain Kafka in an interview, draw a whiteboard diagram, and know exactly how Spring Boot connects to a Kafka cluster.
+</p>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-Table of Contents"><h2 id="Table of Contents" class="header"><a href="#Apache Kafka — Complete Study Notes-Table of Contents">Table of Contents</a></h2></div>
+
+<ul>
+<li>
+<a href="apache_kafka_complete_guide.html#What is Kafka?">1. What is Kafka?</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Core Concepts &amp; Terminology">2. Core Concepts &amp; Terminology</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Topics">3. Topics</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Partitions">4. Partitions</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Brokers &amp; Clusters">5. Brokers &amp; Clusters</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Partition Leader &amp; Follower">6. Partition Leader &amp; Follower</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Replication Factor">7. Replication Factor</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Producers">8. Producers</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#How Spring Boot Bootstraps &amp; Routes Messages">9. How Spring Boot Bootstraps &amp; Routes Messages</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Consumers &amp; Consumer Groups">10. Consumers &amp; Consumer Groups</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Kafka Connect">11. Kafka Connect</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#How to Decide Partition Count">12. How to Decide Partition Count</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Creating a Topic — CLI Commands">13. Creating a Topic — CLI Commands</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Starting Kafka Locally (KRaft Mode)">14. Starting Kafka Locally (KRaft Mode)</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Real-World Architecture Example">15. Real-World Architecture Example</a>
+
+<li>
+<a href="apache_kafka_complete_guide.html#Interview Cheat Sheet">16. Interview Cheat Sheet</a>
+
+</ul>
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-1. What is Kafka?"><h2 id="1. What is Kafka?" class="header"><a href="#Apache Kafka — Complete Study Notes-1. What is Kafka?">1. What is Kafka?</a></h2></div>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Apache Kafka is an Event Streaming Platform."></span><strong id="Apache Kafka is an Event Streaming Platform.">Apache Kafka is an Event Streaming Platform.</strong>
+</p>
+
+<p>
+Event Streaming means:
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Capturing"></span><strong id="Capturing">Capturing</strong> data in real time from different sources, in the form of streams of events.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Storing"></span><strong id="Storing">Storing</strong> these event streams durably for later retrieval.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Processing / reacting"></span><strong id="Processing / reacting">Processing / reacting</strong> to event streams in real time <em>and</em> retrospectively.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities"><h3 id="Kafka's 3 Core Capabilities" class="header"><a href="#Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities">Kafka's 3 Core Capabilities</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+#
+</th>
+<th>
+Capability
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+1
+</td>
+<td>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities-Publish (write) and subscribe (read)"></span><strong id="Publish (write) and subscribe (read)">Publish (write) and subscribe (read)</strong> streams of events
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities-Store"></span><strong id="Store">Store</strong> streams of events durably and reliably for as long as you want
+</td>
+</tr>
+<tr>
+<td>
+3
+</td>
+<td>
+<span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities-Process"></span><strong id="Process">Process</strong> streams as they occur in real time or retrospectively
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+All of this is provided in a <span id="Apache Kafka — Complete Study Notes-1. What is Kafka?-Kafka's 3 Core Capabilities-distributed, fault-tolerant, elastic, and secure"></span><strong id="distributed, fault-tolerant, elastic, and secure">distributed, fault-tolerant, elastic, and secure</strong> manner.
+Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.
+</p>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology"><h2 id="2. Core Concepts &amp; Terminology" class="header"><a href="#Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology">2. Core Concepts &amp; Terminology</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events"><h3 id="Events" class="header"><a href="#Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events">Events</a></h3></div>
+
+<p>
+An <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-event"></span><strong id="event">event</strong> is "something that happened" — a record or message.
+</p>
+
+<p>
+When you read or write data to Kafka, you do it in the form of <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-events"></span><strong id="events">events</strong>.
+</p>
+
+<p>
+Every event conceptually has:
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-Key"></span><strong id="Key">Key</strong> — identifies the entity (e.g., <code>transactionId</code>, <code>userId</code>)
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-Value"></span><strong id="Value">Value</strong> — the actual payload (e.g., JSON data)
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-Timestamp"></span><strong id="Timestamp">Timestamp</strong> — when the event occurred
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Events-Optional metadata headers"></span><strong id="Optional metadata headers">Optional metadata headers</strong>
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Producers"><h3 id="Producers" class="header"><a href="#Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Producers">Producers</a></h3></div>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Producers-Producers"></span><strong id="Producers">Producers</strong> are client applications that <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Producers-publish (write) events"></span><strong id="publish (write) events">publish (write) events</strong> to Kafka.
+</p>
+
+<ul>
+<li>
+Producers are <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Producers-fully decoupled"></span><strong id="fully decoupled">fully decoupled</strong> from consumers.
+
+<li>
+A producer does not wait to know if or when an event is consumed.
+
+<li>
+This decoupling is one of Kafka's biggest design strengths.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers"><h3 id="Consumers" class="header"><a href="#Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers">Consumers</a></h3></div>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers-Consumers"></span><strong id="Consumers">Consumers</strong> are client applications that <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers-read and process events"></span><strong id="read and process events">read and process events</strong> from Kafka.
+</p>
+
+<ul>
+<li>
+Consumers are independent microservices.
+
+<li>
+Events in Kafka are <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers-not deleted after consumption"></span><strong id="not deleted after consumption">not deleted after consumption</strong> — they can be re-read as many times as needed.
+
+<li>
+You define how long events are retained using <span id="Apache Kafka — Complete Study Notes-2. Core Concepts &amp; Terminology-Consumers-per-topic configuration"></span><strong id="per-topic configuration">per-topic configuration</strong> (retention period).
+
+</ul>
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-3. Topics"><h2 id="3. Topics" class="header"><a href="#Apache Kafka — Complete Study Notes-3. Topics">3. Topics</a></h2></div>
+
+<p>
+A <span id="Apache Kafka — Complete Study Notes-3. Topics-Topic"></span><strong id="Topic">Topic</strong> is the fundamental way to organize data in Kafka.
+</p>
+<pre><code>Think of a topic like a <span id="Apache Kafka — Complete Study Notes-3. Topics-folder in a filesystem"></span><strong id="folder in a filesystem">folder in a filesystem</strong>, and events are the <span id="Apache Kafka — Complete Study Notes-3. Topics-files"></span><strong id="files">files</strong> inside that folder.
+</code></pre>
+
+<div id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic"><h3 id="Key Properties of a Topic" class="header"><a href="#Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic">Key Properties of a Topic</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Property
+</th>
+<th>
+Detail
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic-Multi-producer"></span><strong id="Multi-producer">Multi-producer</strong>
+</td>
+<td>
+One, two, or many producers can write to the same topic
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic-Multi-consumer"></span><strong id="Multi-consumer">Multi-consumer</strong>
+</td>
+<td>
+One, two, or many consumers can read from the same topic
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic-Events are not deleted on consumption"></span><strong id="Events are not deleted on consumption">Events are not deleted on consumption</strong>
+</td>
+<td>
+Consumers can re-read events at any time
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic-Retention is configurable"></span><strong id="Retention is configurable">Retention is configurable</strong>
+</td>
+<td>
+e.g., keep events for 7 days, or forever
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-3. Topics-Key Properties of a Topic-Topics are partitioned"></span><strong id="Topics are partitioned">Topics are partitioned</strong>
+</td>
+<td>
+For scalability and parallelism (see next section)
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-3. Topics-Naming Convention (Best Practice)"><h3 id="Naming Convention (Best Practice)" class="header"><a href="#Apache Kafka — Complete Study Notes-3. Topics-Naming Convention (Best Practice)">Naming Convention (Best Practice)</a></h3></div>
+
+<p>
+Use descriptive, hyphen-separated names. Examples:
+</p>
+<ul>
+<li>
+<code>payments-processed</code>
+
+<li>
+<code>user-signup-events</code>
+
+<li>
+<code>order-created</code>
+
+</ul>
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-4. Partitions"><h2 id="4. Partitions" class="header"><a href="#Apache Kafka — Complete Study Notes-4. Partitions">4. Partitions</a></h2></div>
+
+<p>
+A <span id="Apache Kafka — Complete Study Notes-4. Partitions-Partition"></span><strong id="Partition">Partition</strong> is the physical subdivision of a Kafka topic. This is the most important concept for scalability.
+</p>
+<pre><code>A Topic is <span id="Apache Kafka — Complete Study Notes-4. Partitions-logical"></span><strong id="logical">logical</strong>. A Partition is <span id="Apache Kafka — Complete Study Notes-4. Partitions-physical"></span><strong id="physical">physical</strong> (an actual append-only log on disk).
+</code></pre>
+
+<p>
+Instead of storing all events of a topic in one place, Kafka <span id="Apache Kafka — Complete Study Notes-4. Partitions-splits (shards)"></span><strong id="splits (shards)">splits (shards)</strong> the topic into multiple partitions spread across brokers.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist"><h3 id="Why Partitions Exist" class="header"><a href="#Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist">Why Partitions Exist</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Reason
+</th>
+<th>
+Explanation
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist-Scalability"></span><strong id="Scalability">Scalability</strong>
+</td>
+<td>
+Data is spread across multiple brokers; many producers/consumers work in parallel
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist-Throughput"></span><strong id="Throughput">Throughput</strong>
+</td>
+<td>
+Parallel reads and writes = higher throughput
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist-Ordering guarantee"></span><strong id="Ordering guarantee">Ordering guarantee</strong>
+</td>
+<td>
+Order is guaranteed <span id="Apache Kafka — Complete Study Notes-4. Partitions-Why Partitions Exist-within a partition"></span><strong id="within a partition">within a partition</strong>, not across partitions
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition"><h3 id="How Events Land in a Partition" class="header"><a href="#Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition">How Events Land in a Partition</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Scenario
+</th>
+<th>
+Behavior
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition-Message has a Key"></span><strong id="Message has a Key">Message has a Key</strong>
+</td>
+<td>
+Kafka hashes the key → same key always goes to the same partition (order preserved per key)
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition-No Key (default)"></span><strong id="No Key (default)">No Key (default)</strong>
+</td>
+<td>
+Kafka uses <span id="Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition-sticky partitioning"></span><strong id="sticky partitioning">sticky partitioning</strong> — picks a partition for a batch, then rotates
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-4. Partitions-How Events Land in a Partition-Manual override"></span><strong id="Manual override">Manual override</strong>
+</td>
+<td>
+Producer explicitly specifies partition number
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-4. Partitions-Visual: Partition as Append-Only Log"><h3 id="Visual: Partition as Append-Only Log" class="header"><a href="#Apache Kafka — Complete Study Notes-4. Partitions-Visual: Partition as Append-Only Log">Visual: Partition as Append-Only Log</a></h3></div>
+
+<pre>
+Topic: orders
+-----------------------------
+P0 → [event1] [event2] [event3]  ← appended in order
+P1 → [event4] [event5]
+P2 → [event6] [event7]
+</pre>
+
+<p>
+Events within a partition are ordered and immutable. New events are only ever <span id="Apache Kafka — Complete Study Notes-4. Partitions-Visual: Partition as Append-Only Log-appended to the end"></span><strong id="appended to the end">appended to the end</strong>.
+</p>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters"><h2 id="5. Brokers &amp; Clusters" class="header"><a href="#Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters">5. Brokers &amp; Clusters</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Broker"><h3 id="Broker" class="header"><a href="#Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Broker">Broker</a></h3></div>
+
+<p>
+A <span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Broker-broker"></span><strong id="broker">broker</strong> is a single Kafka server (a single running process/node).
+</p>
+
+<ul>
+<li>
+Each broker:
+
+<ul>
+<li>
+Stores partitions (data) on disk
+
+<li>
+Handles read/write requests from producers and consumers
+
+<li>
+Participates in replication
+
+</ul>
+</ul>
+<div id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Cluster"><h3 id="Cluster" class="header"><a href="#Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Cluster">Cluster</a></h3></div>
+
+<p>
+A <span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-Cluster-Kafka Cluster"></span><strong id="Kafka Cluster">Kafka Cluster</strong> is a group of multiple brokers working together.
+</p>
+
+<pre>
+Kafka Cluster
+┌───────────────────────────────────────┐
+│  Broker 1    Broker 2    Broker 3     │
+│  (Node 1)    (Node 2)    (Node 3)     │
+└───────────────────────────────────────┘
+</pre>
+
+<ul>
+<li>
+Clusters can span multiple data centers or cloud regions.
+
+<li>
+Brokers share partition leadership — each broker is the leader for some partitions and a follower for others.
+
+<li>
+Adding more brokers = horizontal scaling.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft"><h3 id="ZooKeeper vs KRaft" class="header"><a href="#Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft">ZooKeeper vs KRaft</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+&nbsp;
+</th>
+<th>
+ZooKeeper (old)
+</th>
+<th>
+KRaft (new, Kafka 3+)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft-Role"></span><strong id="Role">Role</strong>
+</td>
+<td>
+External service managing cluster metadata
+</td>
+<td>
+Built-in consensus, no external dependency
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft-Status"></span><strong id="Status">Status</strong>
+</td>
+<td>
+Deprecated
+</td>
+<td>
+Current standard
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft-Setup"></span><strong id="Setup">Setup</strong>
+</td>
+<td>
+Requires separate ZooKeeper cluster
+</td>
+<td>
+Self-contained — just start Kafka
+</td>
+</tr>
+</tbody>
+</table>
+<pre><code><span id="Apache Kafka — Complete Study Notes-5. Brokers &amp; Clusters-ZooKeeper vs KRaft-Use KRaft mode for all new setups."></span><strong id="Use KRaft mode for all new setups.">Use KRaft mode for all new setups.</strong> This is what the local setup commands below use.
+</code></pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower"><h2 id="6. Partition Leader &amp; Follower" class="header"><a href="#Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower">6. Partition Leader &amp; Follower</a></h2></div>
+
+<p>
+This is the most important concept for understanding how Kafka achieves both <span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-performance"></span><strong id="performance">performance</strong> and <span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-fault tolerance"></span><strong id="fault tolerance">fault tolerance</strong>.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-The Rule"><h3 id="The Rule" class="header"><a href="#Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-The Rule">The Rule</a></h3></div>
+
+<p>
+Every partition has:
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-The Rule-Exactly 1 Leader broker"></span><strong id="Exactly 1 Leader broker">Exactly 1 Leader broker</strong> — handles ALL reads and writes for that partition
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-The Rule-0 or more Follower brokers"></span><strong id="0 or more Follower brokers">0 or more Follower brokers</strong> — maintain replicas (copies) of the partition data
+<pre>
+Partition P1:
+┌──────────────────────────────────────┐
+│  Broker-2 (Leader)  ← ALL traffic   │
+│  Broker-1 (Follower) ← replica only │
+│  Broker-3 (Follower) ← replica only │
+└──────────────────────────────────────┘
+</pre>
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-Why One Leader?"><h3 id="Why One Leader?" class="header"><a href="#Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-Why One Leader?">Why One Leader?</a></h3></div>
+
+<ul>
+<li>
+Simpler consistency model — no risk of stale reads.
+
+<li>
+The leader is the single source of truth for a partition.
+
+<li>
+Followers only exist for <span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-Why One Leader?-replication and failover"></span><strong id="replication and failover">replication and failover</strong>.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-What Happens When a Leader Fails?"><h3 id="What Happens When a Leader Fails?" class="header"><a href="#Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-What Happens When a Leader Fails?">What Happens When a Leader Fails?</a></h3></div>
+
+<ul>
+<li>
+Kafka detects that the leader broker is down.
+
+<li>
+Kafka automatically <span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-What Happens When a Leader Fails?-elects a new leader"></span><strong id="elects a new leader">elects a new leader</strong> from the in-sync followers.
+
+<li>
+Producers and consumers automatically reconnect to the new leader.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-What Happens When a Leader Fails?-No manual intervention required."></span><strong id="No manual intervention required.">No manual intervention required.</strong>
+
+</ul>
+<p>
+This is how Kafka achieves <span id="Apache Kafka — Complete Study Notes-6. Partition Leader &amp; Follower-What Happens When a Leader Fails?-fault tolerance"></span><strong id="fault tolerance">fault tolerance</strong>.
+</p>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-7. Replication Factor"><h2 id="7. Replication Factor" class="header"><a href="#Apache Kafka — Complete Study Notes-7. Replication Factor">7. Replication Factor</a></h2></div>
+
+<p>
+The <span id="Apache Kafka — Complete Study Notes-7. Replication Factor-Replication Factor (RF)"></span><strong id="Replication Factor (RF)">Replication Factor (RF)</strong> defines how many copies of a partition exist across the cluster.
+</p>
+
+<pre>
+Replication Factor = 3
+  → 1 leader copy + 2 follower copies = 3 total replicas
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-7. Replication Factor-Example: Topic with RF=3 and 2 Partitions, 3 Brokers"><h3 id="Example: Topic with RF=3 and 2 Partitions, 3 Brokers" class="header"><a href="#Apache Kafka — Complete Study Notes-7. Replication Factor-Example: Topic with RF=3 and 2 Partitions, 3 Brokers">Example: Topic with RF=3 and 2 Partitions, 3 Brokers</a></h3></div>
+
+<pre>
+          Broker-1        Broker-2        Broker-3
+          --------        --------        --------
+          P0 (Leader)     P1 (Leader)     P0 (Follower)
+          P1 (Follower)   P0 (Follower)   P1 (Follower)
+</pre>
+
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-Example: Topic with RF=3 and 2 Partitions, 3 Brokers-Broker-1"></span><strong id="Broker-1">Broker-1</strong> is leader for P0
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-Example: Topic with RF=3 and 2 Partitions, 3 Brokers-Broker-2"></span><strong id="Broker-2">Broker-2</strong> is leader for P1
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-Example: Topic with RF=3 and 2 Partitions, 3 Brokers-Broker-3"></span><strong id="Broker-3">Broker-3</strong> only holds follower replicas
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-7. Replication Factor-What RF to Use in Production?"><h3 id="What RF to Use in Production?" class="header"><a href="#Apache Kafka — Complete Study Notes-7. Replication Factor-What RF to Use in Production?">What RF to Use in Production?</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Setting
+</th>
+<th>
+Meaning
+</th>
+<th>
+Use Case
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+RF = 1
+</td>
+<td>
+No replication — if broker dies, data is lost
+</td>
+<td>
+Dev/testing only
+</td>
+</tr>
+<tr>
+<td>
+RF = 2
+</td>
+<td>
+One backup copy
+</td>
+<td>
+Acceptable for non-critical data
+</td>
+</tr>
+<tr>
+<td>
+RF = 3
+</td>
+<td>
+Two backup copies
+</td>
+<td>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-What RF to Use in Production?-Standard for production"></span><strong id="Standard for production">Standard for production</strong>
+</td>
+</tr>
+</tbody>
+</table>
+<pre><code><span id="Apache Kafka — Complete Study Notes-7. Replication Factor-What RF to Use in Production?-Rule of thumb:"></span><strong id="Rule of thumb:">Rule of thumb:</strong> RF should never exceed the number of brokers.
+RF = 3 requires at least 3 brokers.
+</code></pre>
+
+<div id="Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)"><h3 id="How Replication Works (Step by Step)" class="header"><a href="#Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)">How Replication Works (Step by Step)</a></h3></div>
+
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)-Producer writes"></span><strong id="Producer writes">Producer writes</strong> to the partition <span id="Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)-leader"></span><strong id="leader">leader</strong>.
+
+<li>
+Leader writes to its local log.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)-Followers pull data"></span><strong id="Followers pull data">Followers pull data</strong> from the leader and replicate it.
+
+<li>
+Once followers have copied the data, they are considered <span id="Apache Kafka — Complete Study Notes-7. Replication Factor-How Replication Works (Step by Step)-in-sync"></span><strong id="in-sync">in-sync</strong> (part of the ISR — In-Sync Replica set).
+
+<li>
+Data is now durable.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-7. Replication Factor-Without vs With Replication"><h3 id="Without vs With Replication" class="header"><a href="#Apache Kafka — Complete Study Notes-7. Replication Factor-Without vs With Replication">Without vs With Replication</a></h3></div>
+
+<pre>
+WITHOUT replication:
+  Broker crashes → partition data gone forever ❌
+
+WITH replication (RF=3):
+  Broker crashes → follower becomes new leader → no data loss ✅
+</pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-8. Producers"><h2 id="8. Producers" class="header"><a href="#Apache Kafka — Complete Study Notes-8. Producers">8. Producers</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-8. Producers-How a Producer Routes a Message"><h3 id="How a Producer Routes a Message" class="header"><a href="#Apache Kafka — Complete Study Notes-8. Producers-How a Producer Routes a Message">How a Producer Routes a Message</a></h3></div>
+
+<ul>
+<li>
+Producer connects to any broker listed in <code>bootstrap-servers</code> (initial contact only).
+
+<li>
+Downloads cluster <span id="Apache Kafka — Complete Study Notes-8. Producers-How a Producer Routes a Message-metadata"></span><strong id="metadata">metadata</strong> — a map of which broker is the leader for each partition.
+
+<li>
+Determines target partition (via key hash, round-robin, or manual override).
+
+<li>
+Sends the message <span id="Apache Kafka — Complete Study Notes-8. Producers-How a Producer Routes a Message-directly to the leader broker"></span><strong id="directly to the leader broker">directly to the leader broker</strong> of that partition.
+
+<li>
+Leader replicates to followers.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-8. Producers-Producer `acks` Setting"><h3 id="Producer `acks` Setting" class="header"><a href="#Apache Kafka — Complete Study Notes-8. Producers-Producer `acks` Setting">Producer <code>acks</code> Setting</a></h3></div>
+
+<p>
+The <code>acks</code> setting controls <span id="Apache Kafka — Complete Study Notes-8. Producers-Producer <code>acks</code> Setting-durability guarantees"></span><strong id="durability guarantees">durability guarantees</strong>:
+</p>
+
+<table>
+<thead>
+<tr>
+<th>
+<code>acks</code> value
+</th>
+<th>
+Meaning
+</th>
+<th>
+Risk
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>acks=0</code>
+</td>
+<td>
+Fire and forget — no acknowledgment
+</td>
+<td>
+Possible data loss
+</td>
+</tr>
+<tr>
+<td>
+<code>acks=1</code>
+</td>
+<td>
+Leader writes to its log, then acks
+</td>
+<td>
+Data loss if leader crashes before replication
+</td>
+</tr>
+<tr>
+<td>
+<code>acks=all</code>
+</td>
+<td>
+Leader + all ISR followers must acknowledge
+</td>
+<td>
+<span id="Apache Kafka — Complete Study Notes-8. Producers-Producer <code>acks</code> Setting-Strongest guarantee — use in production"></span><strong id="Strongest guarantee — use in production">Strongest guarantee — use in production</strong>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages"><h2 id="9. How Spring Boot Bootstraps &amp; Routes Messages" class="header"><a href="#Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages">9. How Spring Boot Bootstraps &amp; Routes Messages</a></h2></div>
+
+<p>
+This is a very common interview question. Understanding this end-to-end is essential.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Configuration"><h3 id="Configuration" class="header"><a href="#Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Configuration">Configuration</a></h3></div>
+
+<pre class="properties">
+# application.properties
+spring.kafka.bootstrap-servers=broker1:9092,broker2:9092,broker3:9092
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+</pre>
+<pre><code><span id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Configuration-Common misconception:"></span><strong id="Common misconception:">Common misconception:</strong> "The producer only talks to the bootstrap server."
+<span id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Configuration-Reality:"></span><strong id="Reality:">Reality:</strong> Bootstrap servers are just the <span id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Configuration-initial contact point"></span><strong id="initial contact point">initial contact point</strong>. After the first handshake, the producer talks directly to whichever broker is the partition leader.
+</code></pre>
+
+<div id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Step-by-Step: What Happens When Spring Boot Sends a Message"><h3 id="Step-by-Step: What Happens When Spring Boot Sends a Message" class="header"><a href="#Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Step-by-Step: What Happens When Spring Boot Sends a Message">Step-by-Step: What Happens When Spring Boot Sends a Message</a></h3></div>
+
+<pre>
+Step 1: Bootstrap Connection
+      Spring Boot Producer
+             │
+             │ Initial connection (just for metadata)
+             ▼
+         Broker-1 (any broker in list)
+             │
+             │ Responds with cluster metadata:
+             │   "Partition 0 → Leader: Broker-1"
+             │   "Partition 1 → Leader: Broker-2"
+             │   "Partition 2 → Leader: Broker-3"
+             ▼
+
+Step 2: Partition Selection
+      Producer hashes the message key
+      → selects Partition 1
+
+Step 3: Direct Send to Leader
+      Producer sends message DIRECTLY to Broker-2
+      (leader of Partition 1)
+
+Step 4: Replication
+      Broker-2 (Leader)
+         │ replicates
+         ├──→ Broker-1 (Follower of P1)
+         └──→ Broker-3 (Follower of P1)
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Whiteboard Diagram"><h3 id="Whiteboard Diagram" class="header"><a href="#Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Whiteboard Diagram">Whiteboard Diagram</a></h3></div>
+
+<pre>
+        +----------------------+
+        |  Spring Boot Producer|
+        +----------+-----------+
+                   │
+                   │ (1) Bootstrap connection
+                   ▼
+        +----------------------+
+        |   Broker-1           |
+        | (Metadata request)   |
+        +----------+-----------+
+                   │
+                   │ (2) Metadata response:
+                   │     Partition → Leader mapping
+                   ▼
+
+     Topic: payments
+     -------------------------
+     Partition 0 → Broker-1
+     Partition 1 → Broker-2
+     Partition 2 → Broker-3
+
+                   │
+                   │ (3) Select partition (key hash / round-robin)
+                   ▼
+        +----------------------+
+        |   Broker-2           |  ← Leader of Partition 1
+        +----------+-----------+
+                   │
+                   │ (4) Replication
+         ──────────────────────────────
+         │                            │
+         ▼                            ▼
+  +-------------+           +-------------+
+  | Broker-1    |           | Broker-3    |
+  | (Follower)  |           | (Follower)  |
+  +-------------+           +-------------+
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Interview Answer (Crisp &amp; Complete)"><h3 id="Interview Answer (Crisp &amp; Complete)" class="header"><a href="#Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Interview Answer (Crisp &amp; Complete)">Interview Answer (Crisp &amp; Complete)</a></h3></div>
+<pre><code>"Producer connects to any bootstrap broker to fetch cluster metadata — topics, partitions, and their leader brokers. When sending a message, Kafka determines the target partition based on the message key (via hashing) or using round-robin if no key is provided. The producer then sends the message <span id="Apache Kafka — Complete Study Notes-9. How Spring Boot Bootstraps &amp; Routes Messages-Interview Answer (Crisp &amp; Complete)-directly to the leader broker"></span><strong id="directly to the leader broker">directly to the leader broker</strong> of that partition, not necessarily the bootstrap broker. After receiving the message, the leader replicates it to follower brokers. If a broker goes down, Kafka elects a new leader and the producer automatically updates its metadata and continues — no manual intervention needed."
+</code></pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups"><h2 id="10. Consumers &amp; Consumer Groups" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups">10. Consumers &amp; Consumer Groups</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer"><h3 id="Consumer" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer">Consumer</a></h3></div>
+
+<p>
+A consumer reads events from one or more partitions of a topic.
+</p>
+
+<ul>
+<li>
+Consumers track their position using <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer-offsets"></span><strong id="offsets">offsets</strong> — an incrementing number that marks which events have been read.
+
+<li>
+Offsets are committed to Kafka (in the <code>__consumer_offsets</code> internal topic).
+
+<li>
+A consumer can <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer-replay"></span><strong id="replay">replay</strong> events by resetting its offset.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer Group"><h3 id="Consumer Group" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer Group">Consumer Group</a></h3></div>
+
+<p>
+A <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer Group-Consumer Group"></span><strong id="Consumer Group">Consumer Group</strong> is a set of consumers that work together to consume a topic.
+</p>
+<pre><code><span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer Group-Core rule:"></span><strong id="Core rule:">Core rule:</strong> Within a consumer group, each partition is consumed by <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Consumer Group-at most one consumer"></span><strong id="at most one consumer">at most one consumer</strong>. But multiple consumer groups can each independently consume the same topic.
+</code></pre>
+
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Partition Assignment Within a Group"><h3 id="Partition Assignment Within a Group" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Partition Assignment Within a Group">Partition Assignment Within a Group</a></h3></div>
+
+<pre>
+Topic: orders (3 partitions)
+Consumer Group: payment-service
+
+P0 → Consumer-1
+P1 → Consumer-2
+P2 → Consumer-3
+</pre>
+
+<ul>
+<li>
+If you have <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Partition Assignment Within a Group-more consumers than partitions"></span><strong id="more consumers than partitions">more consumers than partitions</strong>, the extra consumers sit idle.
+
+<li>
+If you have <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Partition Assignment Within a Group-fewer consumers than partitions"></span><strong id="fewer consumers than partitions">fewer consumers than partitions</strong>, some consumers handle multiple partitions.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Scaling Consumers"><h3 id="Scaling Consumers" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Scaling Consumers">Scaling Consumers</a></h3></div>
+
+<pre>
+3 partitions, 3 consumers → perfect parallelism ✅
+
+         P0    P1    P2
+          │     │     │
+          C1    C2    C3
+
+
+3 partitions, 2 consumers → C1 handles 2 partitions
+
+         P0    P1    P2
+          │     │     │
+          C1   C1    C2
+
+
+3 partitions, 4 consumers → C4 is idle
+
+         P0    P1    P2   (nothing)
+          │     │     │      │
+          C1    C2    C3     C4 ← idle ❌
+</pre>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Scaling Consumers-Maximum useful parallelism = number of partitions"></span><strong id="Maximum useful parallelism = number of partitions">Maximum useful parallelism = number of partitions</strong>
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)"><h3 id="Multiple Consumer Groups (Fan-Out Pattern)" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)">Multiple Consumer Groups (Fan-Out Pattern)</a></h3></div>
+
+<p>
+This is where Kafka truly shines. The same data can be consumed independently by completely different services.
+</p>
+
+<pre>
+                Topic: payments (2 partitions)
+               ─────────────────────────────────
+                   P0                 P1
+
+
+Group A (Payment Service):    C1               C2
+
+Group B (Fraud Detection):    C3 ← reads both P0 and P1
+
+Group C (Analytics):          C4 ← reads both P0 and P1
+
+Group D (Audit Logging):      C5 ← reads both P0 and P1
+</pre>
+
+<ul>
+<li>
+Each group has its <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-own independent offset"></span><strong id="own independent offset">own independent offset</strong> — they read at their own pace.
+
+<li>
+One group lagging does not affect any other group.
+
+<li>
+This is the <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-fan-out"></span><strong id="fan-out">fan-out</strong> pattern — publish once, consume many times for different purposes.
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example"><h4 id="Real-World Example" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example">Real-World Example</a></h4></div>
+
+<p>
+Same payment event is consumed by:
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example-Payment Service"></span><strong id="Payment Service">Payment Service</strong> → processes and updates the database
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example-Fraud Detection"></span><strong id="Fraud Detection">Fraud Detection</strong> → checks for suspicious patterns
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example-Analytics Service"></span><strong id="Analytics Service">Analytics Service</strong> → aggregates revenue metrics
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Multiple Consumer Groups (Fan-Out Pattern)-Real-World Example-Audit Logger"></span><strong id="Audit Logger">Audit Logger</strong> → writes to compliance logs
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Interview Answer"><h3 id="Interview Answer" class="header"><a href="#Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Interview Answer">Interview Answer</a></h3></div>
+<pre><code>"If consumers belong to <span id="Apache Kafka — Complete Study Notes-10. Consumers &amp; Consumer Groups-Interview Answer-different consumer groups"></span><strong id="different consumer groups">different consumer groups</strong>, each group independently consumes the same data. The one-partition-per-consumer rule applies only <em>within</em> a consumer group. So multiple services can each receive every event, enabling fan-out patterns. Offsets are tracked per consumer group, so each group reads at its own pace without affecting others."
+</code></pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect"><h2 id="11. Kafka Connect" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect">11. Kafka Connect</a></h2></div>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Kafka Connect"></span><strong id="Kafka Connect">Kafka Connect</strong> is a framework for moving data into and out of Kafka without writing custom code.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Why It Exists"><h3 id="Why It Exists" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect-Why It Exists">Why It Exists</a></h3></div>
+
+<p>
+In enterprise systems, Kafka acts as a central data backbone. But you need to:
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Why It Exists-Import data INTO Kafka"></span><strong id="Import data INTO Kafka">Import data INTO Kafka</strong> from existing systems (databases, file systems, etc.)
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Why It Exists-Export data OUT OF Kafka"></span><strong id="Export data OUT OF Kafka">Export data OUT OF Kafka</strong> to downstream systems (search engines, data warehouses, etc.)
+
+</ul>
+<p>
+Writing this integration code manually is error-prone, repetitive, and fragile. Kafka Connect solves this with ready-made <span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Why It Exists-connectors"></span><strong id="connectors">connectors</strong>.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Import (Source Connectors)"><h3 id="Import (Source Connectors)" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect-Import (Source Connectors)">Import (Source Connectors)</a></h3></div>
+
+<p>
+Data flows <span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Import (Source Connectors)-into Kafka"></span><strong id="into Kafka">into Kafka</strong> from:
+</p>
+<ul>
+<li>
+SQL databases (MySQL, PostgreSQL, Oracle) — via CDC (Change Data Capture)
+
+<li>
+File systems (logs, CSV dumps)
+
+<li>
+Message queues (RabbitMQ, ActiveMQ)
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Export (Sink Connectors)"><h3 id="Export (Sink Connectors)" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect-Export (Sink Connectors)">Export (Sink Connectors)</a></h3></div>
+
+<p>
+Data flows <span id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Export (Sink Connectors)-out of Kafka"></span><strong id="out of Kafka">out of Kafka</strong> to:
+</p>
+<ul>
+<li>
+Elasticsearch (search)
+
+<li>
+Data warehouses (Snowflake, BigQuery, Redshift)
+
+<li>
+Object storage (AWS S3, GCS)
+
+<li>
+Other Kafka clusters
+
+</ul>
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Why Not Read Directly from the Database?"><h3 id="Why Not Read Directly from the Database?" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect-Why Not Read Directly from the Database?">Why Not Read Directly from the Database?</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Problem
+</th>
+<th>
+Why Kafka Connect Helps
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Database overload
+</td>
+<td>
+Kafka buffers data; downstream systems don't query DB directly
+</td>
+</tr>
+<tr>
+<td>
+Point-to-point integrations
+</td>
+<td>
+One Kafka topic can feed many consumers instead of N×M integrations
+</td>
+</tr>
+<tr>
+<td>
+No real-time streaming
+</td>
+<td>
+Kafka provides millisecond-latency event propagation
+</td>
+</tr>
+<tr>
+<td>
+No replay capability
+</td>
+<td>
+Kafka retains events; consumers can replay
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-11. Kafka Connect-Architecture Diagram"><h3 id="Architecture Diagram" class="header"><a href="#Apache Kafka — Complete Study Notes-11. Kafka Connect-Architecture Diagram">Architecture Diagram</a></h3></div>
+
+<pre>
+Source Systems         Kafka              Sink Systems
+─────────────     ──────────────     ──────────────────
+  MySQL DB    →   │            │  →    Elasticsearch
+  PostgreSQL  →   │   Kafka    │  →    Snowflake DW
+  File System →   │  Cluster   │  →    AWS S3
+  Oracle      →   │            │  →    Another Kafka
+─────────────     ──────────────     ──────────────────
+                  ↑ Source          ↑ Sink
+                  Connectors        Connectors
+</pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count"><h2 id="12. How to Decide Partition Count" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count">12. How to Decide Partition Count</a></h2></div>
+
+<p>
+Choosing the right number of partitions is a critical design decision. Too few = bottleneck. Too many = overhead.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Why Partition Count Matters"><h3 id="Why Partition Count Matters" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Why Partition Count Matters">Why Partition Count Matters</a></h3></div>
+
+<pre>
+BAD DESIGN (too few partitions — bottleneck):
+
+        Topic (1 Partition)
+                │
+                ▼
+           Broker-1 (Leader)
+        (ALL traffic hits here) ❌
+
+
+GOOD DESIGN (distributed load):
+
+        Topic (6 Partitions)
+
+   P0 → Broker-1      P3 → Broker-1
+   P1 → Broker-2      P4 → Broker-2
+   P2 → Broker-3      P5 → Broker-3
+
+   ✔ Load spread across all brokers
+   ✔ Parallel producers &amp; consumers
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count"><h3 id="Rules for Deciding Partition Count" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count">Rules for Deciding Partition Count</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Factor
+</th>
+<th>
+Guidance
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count-Max consumer parallelism"></span><strong id="Max consumer parallelism">Max consumer parallelism</strong>
+</td>
+<td>
+Partitions = max number of consumers you'll ever want in a group
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count-Throughput target"></span><strong id="Throughput target">Throughput target</strong>
+</td>
+<td>
+Measure throughput per partition, then divide target by that
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count-Number of brokers"></span><strong id="Number of brokers">Number of brokers</strong>
+</td>
+<td>
+Partitions should be a multiple of broker count for even distribution
+</td>
+</tr>
+<tr>
+<td>
+<span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Rules for Deciding Partition Count-Ordering requirements"></span><strong id="Ordering requirements">Ordering requirements</strong>
+</td>
+<td>
+If you need strict ordering for an entity (e.g., per user), all messages for that entity go to one partition via key
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Practical Formula"><h3 id="Practical Formula" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Practical Formula">Practical Formula</a></h3></div>
+
+<pre>
+Desired partition count ≈ max(
+    target throughput / throughput per partition,
+    max consumer instances you'll scale to
+)
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Real Example"><h3 id="Real Example" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Real Example">Real Example</a></h3></div>
+
+<ul>
+<li>
+Target: 600 MB/s throughput
+
+<li>
+Throughput per partition: ~100 MB/s
+
+<li>
+Max consumers you plan to scale to: 12
+
+</ul>
+<p>
+→ Use <span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Real Example-12 partitions"></span><strong id="12 partitions">12 partitions</strong> (covers both throughput and consumer parallelism)
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Important Caveat"><h3 id="Important Caveat" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Important Caveat">Important Caveat</a></h3></div>
+<pre><code>You can <span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Important Caveat-increase"></span><strong id="increase">increase</strong> partitions later, but you <span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Important Caveat-cannot decrease"></span><strong id="cannot decrease">cannot decrease</strong> them.
+Increasing partitions can also break key-based ordering for existing keys.
+So: <span id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-Important Caveat-over-partition slightly"></span><strong id="over-partition slightly">over-partition slightly</strong> rather than under-partition.
+</code></pre>
+
+<div id="Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-General Recommendations"><h3 id="General Recommendations" class="header"><a href="#Apache Kafka — Complete Study Notes-12. How to Decide Partition Count-General Recommendations">General Recommendations</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Cluster Size
+</th>
+<th>
+Recommendation
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Small / Dev
+</td>
+<td>
+3–6 partitions per topic
+</td>
+</tr>
+<tr>
+<td>
+Medium
+</td>
+<td>
+12–24 partitions for high-throughput topics
+</td>
+</tr>
+<tr>
+<td>
+Large / Enterprise
+</td>
+<td>
+50–100+ partitions, based on SLA and scaling targets
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands"><h2 id="13. Creating a Topic — CLI Commands" class="header"><a href="#Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands">13. Creating a Topic — CLI Commands</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Start Kafka Locally (KRaft Mode)"><h3 id="Start Kafka Locally (KRaft Mode)" class="header"><a href="#Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Start Kafka Locally (KRaft Mode)">Start Kafka Locally (KRaft Mode)</a></h3></div>
+
+<pre class="bash">
+# Step 1: Generate Cluster ID
+KAFKA_CLUSTER_ID="$(./bin/kafka-storage.sh random-uuid)"
+
+# Step 2: Format storage
+./bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
+
+# Step 3: Start the broker
+./bin/kafka-server-start.sh config/server.properties
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Topic Operations"><h3 id="Topic Operations" class="header"><a href="#Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Topic Operations">Topic Operations</a></h3></div>
+
+<pre class="bash">
+# Create a topic
+./bin/kafka-topics.sh \
+  --create \
+  --topic payments \
+  --partitions 3 \
+  --replication-factor 1 \
+  --bootstrap-server localhost:9092
+
+# Describe a topic (shows partition distribution, leaders, ISR)
+./bin/kafka-topics.sh \
+  --describe \
+  --topic payments \
+  --bootstrap-server localhost:9092
+
+# List all topics
+./bin/kafka-topics.sh \
+  --list \
+  --bootstrap-server localhost:9092
+
+# Delete a topic
+./bin/kafka-topics.sh \
+  --delete \
+  --topic payments \
+  --bootstrap-server localhost:9092
+</pre>
+
+<div id="Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Producer &amp; Consumer (CLI Testing)"><h3 id="Producer &amp; Consumer (CLI Testing)" class="header"><a href="#Apache Kafka — Complete Study Notes-13. Creating a Topic — CLI Commands-Producer &amp; Consumer (CLI Testing)">Producer &amp; Consumer (CLI Testing)</a></h3></div>
+
+<pre class="bash">
+# Start a console producer
+./bin/kafka-console-producer.sh \
+  --topic payments \
+  --bootstrap-server localhost:9092
+
+# Start a console consumer (read from beginning)
+./bin/kafka-console-consumer.sh \
+  --topic payments \
+  --from-beginning \
+  --bootstrap-server localhost:9092
+
+# Consumer in a group
+./bin/kafka-console-consumer.sh \
+  --topic payments \
+  --group payment-service \
+  --bootstrap-server localhost:9092
+</pre>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)"><h2 id="14. Starting Kafka Locally (KRaft Mode)" class="header"><a href="#Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)">14. Starting Kafka Locally (KRaft Mode)</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-What KRaft Mode Is"><h3 id="What KRaft Mode Is" class="header"><a href="#Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-What KRaft Mode Is">What KRaft Mode Is</a></h3></div>
+
+<p>
+Before Kafka 3.x, Kafka required <span id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-What KRaft Mode Is-ZooKeeper"></span><strong id="ZooKeeper">ZooKeeper</strong> as a separate service to manage cluster metadata (leader elections, broker registry, etc.).
+</p>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-What KRaft Mode Is-KRaft (Kafka Raft)"></span><strong id="KRaft (Kafka Raft)">KRaft (Kafka Raft)</strong> removes this dependency. Kafka now manages its own metadata internally using a built-in Raft consensus protocol.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-Process Roles in KRaft"><h3 id="Process Roles in KRaft" class="header"><a href="#Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-Process Roles in KRaft">Process Roles in KRaft</a></h3></div>
+
+<p>
+In <code>server.properties</code>:
+</p>
+
+<pre class="properties">
+# Combined mode (broker + controller in one process) — good for local dev
+process.roles=broker,controller
+
+# Recommended log directory configuration
+log.dirs=/path/to/kafka-broker-logs
+metadata.log.dir=/path/to/kafka-metadata-logs
+</pre>
+
+<p>
+For production, these directories should be on <span id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-Process Roles in KRaft-separate disks"></span><strong id="separate disks">separate disks</strong> for reliability.
+</p>
+
+<div id="Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-Why Two Log Directories?"><h3 id="Why Two Log Directories?" class="header"><a href="#Apache Kafka — Complete Study Notes-14. Starting Kafka Locally (KRaft Mode)-Why Two Log Directories?">Why Two Log Directories?</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Directory
+</th>
+<th>
+Purpose
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>log.dirs</code>
+</td>
+<td>
+Broker data logs — actual topic/partition event data
+</td>
+</tr>
+<tr>
+<td>
+<code>metadata.log.dir</code>
+</td>
+<td>
+KRaft controller metadata — cluster state, leader info
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Separating them ensures metadata writes (which need low latency) don't compete with data writes.
+</p>
+
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example"><h2 id="15. Real-World Architecture Example" class="header"><a href="#Apache Kafka — Complete Study Notes-15. Real-World Architecture Example">15. Real-World Architecture Example</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform"><h3 id="Payment Processing Platform" class="header"><a href="#Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform">Payment Processing Platform</a></h3></div>
+
+<p>
+This is a real architecture using Kafka to decouple services:
+</p>
+
+<pre>
+External        Config      Kafka          Middleware     Targets
+Sources         Manager    Cluster         Service        (3rd Party)
+─────────      ─────────  ─────────       ─────────      ─────────
+                          ┌─────────┐
+ Merchant  →  CM Service →│bin data │→ MW consumes →    Cache
+ Data                     │merchant │   merchant &amp;       (Redis)
+                          │ topic   │   bin data     →  Payment
+                          └─────────┘                   Processor A
+                                                    →  Payment
+                          ┌─────────┐                   Processor B
+ Transaction →  App      →│txn      │→ TLM consumes → DB (save txn)
+ Events                   │events   │
+                          │ topic   │
+                          └─────────┘
+                           Kafka Cluster
+</pre>
+
+<p>
+<span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-Flow:"></span><strong id="Flow:">Flow:</strong>
+</p>
+<ul>
+<li>
+<span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-CM (Config Manager)"></span><strong id="CM (Config Manager)">CM (Config Manager)</strong> publishes merchant and BIN data → Kafka topic.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-Middleware (MW)"></span><strong id="Middleware (MW)">Middleware (MW)</strong> consumes this data → stores in <span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-Redis cache"></span><strong id="Redis cache">Redis cache</strong>.
+
+<li>
+During a transaction, MW checks Redis first; if cache miss → falls back to CM API.
+
+<li>
+Transaction data is produced to a Kafka topic → <span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-TLM (Transaction Ledger Manager)"></span><strong id="TLM (Transaction Ledger Manager)">TLM (Transaction Ledger Manager)</strong> consumes → saves to DB.
+
+<li>
+<span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-Frontend dashboards"></span><strong id="Frontend dashboards">Frontend dashboards</strong> (merchants, transactions, monitoring) query the DB and cache.
+
+</ul>
+<p>
+<span id="Apache Kafka — Complete Study Notes-15. Real-World Architecture Example-Payment Processing Platform-Why Kafka here?"></span><strong id="Why Kafka here?">Why Kafka here?</strong>
+</p>
+<ul>
+<li>
+CM doesn't get hammered by MW polling it constantly — data is pushed via Kafka.
+
+<li>
+Multiple consumers (MW, analytics, audit) all independently read transaction events.
+
+<li>
+If MW goes down, events are retained in Kafka and processed when it recovers.
+
+</ul>
+<hr />
+
+<div id="Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet"><h2 id="16. Interview Cheat Sheet" class="header"><a href="#Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet">16. Interview Cheat Sheet</a></h2></div>
+
+<div id="Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-One-Line Answers"><h3 id="One-Line Answers" class="header"><a href="#Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-One-Line Answers">One-Line Answers</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Question
+</th>
+<th>
+One-Line Answer
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+What is Kafka?
+</td>
+<td>
+A distributed, fault-tolerant event streaming platform for publishing, storing, and processing real-time data streams.
+</td>
+</tr>
+<tr>
+<td>
+What is a topic?
+</td>
+<td>
+A logical category for organizing events, similar to a folder, split into partitions for scalability.
+</td>
+</tr>
+<tr>
+<td>
+What is a partition?
+</td>
+<td>
+A physical, ordered, append-only log that is the actual unit of storage and parallelism in Kafka.
+</td>
+</tr>
+<tr>
+<td>
+What is a broker?
+</td>
+<td>
+A single Kafka server that stores partitions and serves producer/consumer requests.
+</td>
+</tr>
+<tr>
+<td>
+What is a partition leader?
+</td>
+<td>
+The one broker responsible for all reads and writes for a given partition.
+</td>
+</tr>
+<tr>
+<td>
+What is replication factor?
+</td>
+<td>
+The number of copies of each partition across the cluster — ensures fault tolerance.
+</td>
+</tr>
+<tr>
+<td>
+How does Spring Boot connect to Kafka?
+</td>
+<td>
+It connects to bootstrap servers for initial metadata, then routes messages directly to the partition leader.
+</td>
+</tr>
+<tr>
+<td>
+What is a consumer group?
+</td>
+<td>
+A set of consumers that together consume a topic, with each partition assigned to exactly one consumer in the group.
+</td>
+</tr>
+<tr>
+<td>
+How does Kafka scale?
+</td>
+<td>
+By increasing partition count and adding brokers, distributing leader partitions across the cluster.
+</td>
+</tr>
+<tr>
+<td>
+Why can't consumers share a partition in a group?
+</td>
+<td>
+To guarantee ordering — only one consumer reads from a partition at a time within a group.
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-Key Numbers to Remember"><h3 id="Key Numbers to Remember" class="header"><a href="#Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-Key Numbers to Remember">Key Numbers to Remember</a></h3></div>
+
+<table>
+<thead>
+<tr>
+<th>
+Setting
+</th>
+<th>
+Common Value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Replication Factor (production)
+</td>
+<td>
+3
+</td>
+</tr>
+<tr>
+<td>
+Min brokers for RF=3
+</td>
+<td>
+3
+</td>
+</tr>
+<tr>
+<td>
+Default retention
+</td>
+<td>
+7 days
+</td>
+</tr>
+<tr>
+<td>
+Max consumers useful per topic
+</td>
+<td>
+= number of partitions
+</td>
+</tr>
+</tbody>
+</table>
+
+<div id="Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-&quot;Pro Tip&quot; Phrases for Interviews"><h3 id="&quot;Pro Tip&quot; Phrases for Interviews" class="header"><a href="#Apache Kafka — Complete Study Notes-16. Interview Cheat Sheet-&quot;Pro Tip&quot; Phrases for Interviews">"Pro Tip" Phrases for Interviews</a></h3></div>
+
+<ul>
+<li>
+<em>"Ordering is guaranteed within a partition, not across partitions."</em>
+
+<li>
+<em>"The bootstrap server is just an initial contact point — the producer routes directly to the partition leader."</em>
+
+<li>
+<em>"Kafka scales throughput not by reading from followers, but by increasing partition count."</em>
+
+<li>
+<em>"Consumer groups allow fan-out — the same event is processed independently by multiple services."</em>
+
+<li>
+<em>"Replication factor ensures durability — if a leader fails, a follower is automatically elected."</em>
+
+<li>
+<em>"The maximum useful consumer parallelism in a group equals the number of partitions."</em>
+
+</ul>
+<hr />
+
+<p>
+<em>These notes cover: Event Streaming, Kafka Architecture, Topics, Partitions, Brokers, Leaders &amp; Followers, Replication, Producers, Spring Boot Bootstrap, Consumer Groups, Kafka Connect, Partition Sizing, Topic CLI Commands, and KRaft mode.</em>
+</p>
+
+<hr />
+
+<p>
+<a href="index.html">← Kafka</a> | <a href="../index.html">Notes</a> | <a href="../../index.html">Home</a>
+</p>
+
+</body>
+</html>

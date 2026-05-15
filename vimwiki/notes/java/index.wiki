@@ -1,0 +1,9 @@
+= Core Java =
+
+[[../index|← Notes]]
+
+== Index ==
+
+* [[java_string|Java String]]
+
+[[../index|← Notes]] | [[../../index|Home]]

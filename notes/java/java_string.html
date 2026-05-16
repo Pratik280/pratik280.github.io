@@ -17,6 +17,55 @@
 
 <hr />
 
+<div id="Java String-1. String Literal"><h2 id="1. String Literal" class="header"><a href="#Java String-1. String Literal">1. String Literal</a></h2></div>
+
+<p>
+Type of a String Object which is mostly used. Declared directly using <code>String</code> keyword and actual string value in double quotes without using <code>new</code> keyword.
+</p>
+
+<pre Java>
+String s1 = "Hello";
+String s2 = "Hello";
+s1 == s2 // true
+</pre>
+
+<ol>
+<li>
+String literal object is stored in <span id="Java String-1. String Literal-String Constant Pool"></span><strong id="String Constant Pool">String Constant Pool</strong> insie heap memory.
+
+<li>
+If String object of same value already exists in the <span id="Java String-1. String Literal-String Constant Pool"></span><strong id="String Constant Pool">String Constant Pool</strong> JVM reuses it and hence it is memory efficient.
+
+<li>
+<code>==</code> returns true if two String literals have same value (ie same string) because both references to same object in memory.
+
+</ol>
+<hr />
+
+<div id="Java String-2. String Object"><h2 id="2. String Object" class="header"><a href="#Java String-2. String Object">2. String Object</a></h2></div>
+
+<p>
+String object created using <code>new</code> keyword.
+</p>
+
+<pre Java>
+String s1 = new String("Hello");
+String s2 = new String("Hello");
+s1 == s2 // false
+</pre>
+
+<ol>
+<li>
+It is store in heap memory outside String Constant Pool.
+
+<li>
+New Object is created everytime 
+
+</ol>
+<hr />
+
+<div id="Java String-Interview Questions"><h2 id="Interview Questions" class="header"><a href="#Java String-Interview Questions">Interview Questions</a></h2></div>
+
 <ol>
 <li>
 What is String Constant Pool?

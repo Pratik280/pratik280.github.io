@@ -4,7 +4,42 @@
 
 ----
 
+== 1. String Literal ==
+
+Type of a String Object which is mostly used. Declared directly using `String` keyword and actual string value in double quotes without using `new` keyword.
+
+{{{Java
+String s1 = "Hello";
+String s2 = "Hello";
+s1 == s2 // true
+}}}
+
+1. String literal object is stored in *String Constant Pool* insie heap memory.
+2. If String object of same value already exists in the *String Constant Pool* JVM reuses it and hence it is memory efficient.
+3. `==` returns true if two String literals have same value (ie same string) because both references to same object in memory.
+
+----
+
+== 2. String Object ==
+
+String object created using `new` keyword.
+
+{{{Java
+String s1 = new String("Hello");
+String s2 = new String("Hello");
+s1 == s2 // false
+}}}
+
+1. It is store in heap memory outside String Constant Pool.
+2. New Object is created everytime 
+
+
+----
+
+== Interview Questions ==
+
 1. What is String Constant Pool?
+
 
 ----
 

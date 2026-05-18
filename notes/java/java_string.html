@@ -12,7 +12,7 @@
 <div id="Java String"><h1 id="Java String" class="header"><a href="#Java String">Java String</a></h1></div>
 
 <p>
-<a href="index.html">← Core Java</a>
+<a href="index.html">← Core Java</a> | <a href="../index.html">Notes</a> | <a href="../../index.html">Home</a>
 </p>
 
 <hr />
@@ -62,6 +62,114 @@ It is store in heap memory outside String Constant Pool.
 New Object is created everytime 
 
 </ol>
+<hr />
+
+<div id="Java String-3. String Immutability"><h2 id="3. String Immutability" class="header"><a href="#Java String-3. String Immutability">3. String Immutability</a></h2></div>
+
+<ol>
+<li>
+Once a String literal or String Object is created, its value cannot be changed.
+
+<li>
+Any modifications (like concat(), replace(), etc) creates a new String Object instead of modifying the existing one.
+<pre java>
+String s1 = "Hello";
+s1.concat(" World");
+System.out.println(s1) // Hello
+</pre>
+
+</ol>
+<p>
+<code>because s1 reference to "Hello". concat() creates a new String Object, but the returned object is not assigned back to s1.</code>
+</p>
+
+<p>
+Reasons why String is immutable:
+</p>
+
+<ol>
+<li>
+Thread safety
+
+<li>
+Memory optimization through String Pool reuse
+
+<li>
+Security (important for class loading, URLs, file paths, etc)
+
+<li>
+Immutability is a foundation of functional programming
+
+</ol>
+<hr />
+
+<div id="Java String-4. StringBuilder and StringBuffer"><h2 id="4. StringBuilder and StringBuffer" class="header"><a href="#Java String-4. StringBuilder and StringBuffer">4. StringBuilder and StringBuffer</a></h2></div>
+
+<ol>
+<li>
+They are used to modify the same object in memory instead of creating new objects.
+
+<li>
+They use internal character array that grows dynamically when needed.
+<pre java>
+StringBuilder sb = new StringBuilder("Hello");
+sb.append(" World");
+System.out.println(sb) // Hello World
+</pre>
+
+</ol>
+<p>
+<code>append() modifies the same object instead of creating new one.</code>
+</p>
+
+<div id="Java String-4. StringBuilder and StringBuffer-StringBuilder"><h3 id="StringBuilder" class="header"><a href="#Java String-4. StringBuilder and StringBuffer-StringBuilder">StringBuilder</a></h3></div>
+<ol>
+<li>
+Not thread-safe
+
+<li>
+Faster because there is no synchronization overhead.
+
+<li>
+Used in single-threaded environment where performance is important.
+
+</ol>
+<div id="Java String-4. StringBuilder and StringBuffer-StringBuffer"><h3 id="StringBuffer" class="header"><a href="#Java String-4. StringBuilder and StringBuffer-StringBuffer">StringBuffer</a></h3></div>
+<ol>
+<li>
+Thread-safe
+
+<li>
+Slighty slower than StringBuilder because methods are synchronized
+
+<li>
+Used in multithreaded environment
+
+</ol>
+<div id="Java String-4. StringBuilder and StringBuffer-StringBuffer-How StringBuffer is thread-safe internally"><h4 id="How StringBuffer is thread-safe internally" class="header"><a href="#Java String-4. StringBuilder and StringBuffer-StringBuffer-How StringBuffer is thread-safe internally">How StringBuffer is thread-safe internally</a></h4></div>
+
+<ol>
+<li>
+Most methods in StringBuffer are synchronized.
+
+<li>
+Only one thread can execute synchronized methods on the same object at a time.
+
+<li>
+This prevents multiple threads from modifying the internal character array simultaneously.
+<pre java>
+public synchronized StringBuffer append(String str)
+</pre>
+
+</ol>
+<p>
+<code>Synchronization ensures thread safety but adds performance overhead.</code>
+</p>
+
+<p>
+<code>StringBuilder was introduced in Java 5 as a faster alternative to StringBuffer when thread safety is not required.</code>
+</p>
+
 <hr />
 
 <div id="Java String-Interview Questions"><h2 id="Interview Questions" class="header"><a href="#Java String-Interview Questions">Interview Questions</a></h2></div>

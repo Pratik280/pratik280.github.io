@@ -1,6 +1,6 @@
 = Core Java =
 
-[[../index|← Notes]]
+[[../index|← Notes]] | [[../../index|Home]]
 
 == Index ==
 

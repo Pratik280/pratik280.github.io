@@ -1,6 +1,6 @@
 = Java String =
 
-[[index|← Core Java]]
+[[index|← Core Java]] | [[../index|Notes]] | [[../../index|Home]]
 
 ----
 
@@ -33,6 +33,66 @@ s1 == s2 // false
 1. It is store in heap memory outside String Constant Pool.
 2. New Object is created everytime 
 
+----
+
+== 3. String Immutability ==
+
+1. Once a String literal or String Object is created, its value cannot be changed.
+2. Any modifications (like concat(), replace(), etc) creates a new String Object instead of modifying the existing one.
+
+{{{java
+String s1 = "Hello";
+s1.concat(" World");
+System.out.println(s1) // Hello
+}}}
+
+`because s1 reference to "Hello". concat() creates a new String Object, but the returned object is not assigned back to s1.`
+
+Reasons why String is immutable:
+
+1. Thread safety
+2. Memory optimization through String Pool reuse
+3. Security (important for class loading, URLs, file paths, etc)
+4. Immutability is a foundation of functional programming
+
+----
+
+== 4. StringBuilder and StringBuffer ==
+
+1. They are used to modify the same object in memory instead of creating new objects.
+2. They use internal character array that grows dynamically when needed.
+
+{{{java
+StringBuilder sb = new StringBuilder("Hello");
+sb.append(" World");
+System.out.println(sb) // Hello World
+}}}
+
+`append() modifies the same object instead of creating new one.`
+
+=== StringBuilder ===
+1. Not thread-safe
+2. Faster because there is no synchronization overhead.
+3. Used in single-threaded environment where performance is important.
+
+=== StringBuffer ===
+1. Thread-safe
+2. Slighty slower than StringBuilder because methods are synchronized
+3. Used in multithreaded environment
+
+==== How StringBuffer is thread-safe internally ====
+
+1. Most methods in StringBuffer are synchronized.
+2. Only one thread can execute synchronized methods on the same object at a time.
+3. This prevents multiple threads from modifying the internal character array simultaneously.
+
+{{{java
+public synchronized StringBuffer append(String str)
+}}}
+
+`Synchronization ensures thread safety but adds performance overhead.`
+
+`StringBuilder was introduced in Java 5 as a faster alternative to StringBuffer when thread safety is not required.`
 
 ----
 

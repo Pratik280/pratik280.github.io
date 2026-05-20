@@ -10,6 +10,7 @@ Interested in distributed systems, DevOps, and Linux.
 * [[resume|Resume]]
 * [[blogs/index|Blog]]
 * [[notes/index|Notes]]
+* [[principles|Principles]]
 
 ----
 

@@ -1,0 +1,127 @@
+= Principles =
+
+[[../index|← Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]
+
+== Why This Exists ==
+
+This website is primarily a long-term knowledge base for myself.
+
+The goal is not to create generic content or optimize for internet attention.
+
+The goal is to:
+
+* understand things deeply
+* retain knowledge longer
+* document practical lessons
+* improve clarity of thought
+* build a system that compounds over time
+
+
+== Avoid Generic Content ==
+
+The internet already has endless explanations of:
+
+* "What is Docker?"
+* "What is REST API?"
+* "Binary Search Explained"
+
+Repeating generic definitions adds little value.
+
+More useful things to write:
+
+* what confused me initially
+* mistakes I made
+* debugging stories
+* interview insights
+* edge cases
+* practical examples
+* mental models
+* things that finally made a concept click
+
+
+=== Bad ===
+
+"What is database indexing?"
+
+
+=== Better ===
+
+"Why database indexing finally made sense after analyzing slow queries."
+
+
+== Tier 1 — Personal Knowledge Base ==
+
+Purpose:
+
+* fast retrieval
+* revision
+* reinforcement
+* engineering reference
+
+Rules:
+
+* speed over polish
+* messy is acceptable
+* optimize for usefulness
+* write for future me
+
+Examples:
+
+* Linux commands
+* SQL tricks
+* JVM notes
+* Git fixes
+* concurrency pitfalls
+* debugging workflows
+* interview mistakes
+* useful snippets
+
+This section is primarily practical and personal.
+
+
+== Tier 2 — Public Articles ==
+
+Purpose:
+
+* improve communication
+* share useful insights
+* document deeper understanding
+* build credibility through clarity
+
+Rules:
+
+* publish only strong material
+* focus on clarity and originality
+* use practical examples
+* prefer experience over theory
+
+Examples:
+
+* "How I finally understood indexing"
+* "Lessons from 3 months of interview preparation"
+* "Why race conditions are difficult to debug"
+* "Common Redis misconceptions"
+* "Debugging a memory leak step by step"
+
+This section is curated and public-facing.
+
+
+== Core Reminder ==
+
+Do not optimize for:
+
+* perfect design
+* endless restructuring
+* productivity theater
+* writing for algorithms
+
+Optimize for:
+
+* clarity
+* consistency
+* usefulness
+* long-term compounding knowledge
+
+Simple systems survive longer.
+
+[[../index|Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]

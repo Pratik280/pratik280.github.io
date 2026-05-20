@@ -174,11 +174,62 @@ public synchronized StringBuffer append(String str)
 
 <div id="Java String-Interview Questions"><h2 id="Interview Questions" class="header"><a href="#Java String-Interview Questions">Interview Questions</a></h2></div>
 
-<ol>
-<li>
-What is String Constant Pool?
+<div id="Java String-Interview Questions-1. What is String Constant Pool?"><h3 id="1. What is String Constant Pool?" class="header"><a href="#Java String-Interview Questions-1. What is String Constant Pool?">1. What is String Constant Pool?</a></h3></div>
 
-</ol>
+<p>
+String Constant Pool (SCP) is a special memory in heap to store <code>String Literals</code>. 
+</p>
+
+<p>
+So when a new String Literal is is created, jvm checks SCP first :
+</p>
+
+<ul>
+<li>
+If the same value already exists in the pool, the existing String Object is reused, and the new reference variable points to that existing object.
+
+<li>
+Otherwise a new string object is created in the pool.
+
+</ul>
+ 
+<p>
+This reduces unnecessary object creation, saves memory, and improves performance because multiple references can point to the same immutable String Object.
+</p>
+
+<div id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?"><h3 id="2. What is difference String, StringBuilder and StringBuffer?" class="header"><a href="#Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?">2. What is difference String, StringBuilder and StringBuffer?</a></h3></div>
+
+<ul>
+<li>
+<span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>String</em>"></span><strong id="<em>String</em>"><em>String</em></strong> is immutable once created cannot be changed. If modified, new object is created.
+
+<li>
+<span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>StringBuffer</em>"></span><strong id="<em>StringBuffer</em>"><em>StringBuffer</em></strong> and <span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>StringBuiler</em>"></span><strong id="<em>StringBuiler</em>"><em>StringBuiler</em></strong> are used to create mutable string objects. If modified, the same object is updated instead of creating a new one.
+
+<li>
+<span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>StringBuilder</em>"></span><strong id="<em>StringBuilder</em>"><em>StringBuilder</em></strong> is not thread-safe and is faster compared to <em>StringBuffer</em> because it does not have synchronization.
+
+<li>
+<span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>StringBuffer</em>"></span><strong id="<em>StringBuffer</em>"><em>StringBuffer</em></strong> is thread-safe is slighty slower than <em>StringBuilder</em> because its methods are synchronized. It is mainly used in multithreaded environment.
+
+</ul>
+<div id="Java String-Interview Questions-Why is String Immutable?"><h3 id="Why is String Immutable?" class="header"><a href="#Java String-Interview Questions-Why is String Immutable?">Why is String Immutable?</a></h3></div>
+
+<p>
+Strings are immutable for security, thread-safety and performance reasons.
+</p>
+<ul>
+<li>
+Immutability prevents modifications of sentitive data like passwords, file paths, database URLs, etc.
+
+<li>
+Since strings cannot be changed, they can be safely shared across multiple threads without synchronization.
+
+<li>
+Immutability allows the JVM to use the String Constant Pool (SCP), where string literals with the same value are reused, resulting in better memory efficiency and performance.
+
+</ul>
+ 
 <hr />
 
 <p>

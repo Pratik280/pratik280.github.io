@@ -1,6 +1,6 @@
 = Notes =
 
-[[../index|← Home]]
+[[../index|← Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]
 
 == Index ==
 

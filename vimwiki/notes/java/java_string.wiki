@@ -98,9 +98,32 @@ public synchronized StringBuffer append(String str)
 
 == Interview Questions ==
 
-1. What is String Constant Pool?
+=== 1. What is String Constant Pool? ===
 
+String Constant Pool (SCP) is a special memory in heap to store `String Literals`. 
 
+So when a new String Literal is is created, jvm checks SCP first :
+
+* If the same value already exists in the pool, the existing String Object is reused, and the new reference variable points to that existing object.
+* Otherwise a new string object is created in the pool.
+ 
+This reduces unnecessary object creation, saves memory, and improves performance because multiple references can point to the same immutable String Object.
+
+=== 2. What is difference String, StringBuilder and StringBuffer? ===
+
+* *_String_* is immutable once created cannot be changed. If modified, new object is created.
+* *_StringBuffer_* and *_StringBuiler_* are used to create mutable string objects. If modified, the same object is updated instead of creating a new one.
+* *_StringBuilder_* is not thread-safe and is faster compared to _StringBuffer_ because it does not have synchronization.
+* *_StringBuffer_* is thread-safe is slighty slower than _StringBuilder_ because its methods are synchronized. It is mainly used in multithreaded environment.
+
+=== Why is String Immutable? ===
+
+Strings are immutable for security, thread-safety and performance reasons.
+* Immutability prevents modifications of sentitive data like passwords, file paths, database URLs, etc.
+* Since strings cannot be changed, they can be safely shared across multiple threads without synchronization.
+* Immutability allows the JVM to use the String Constant Pool (SCP), where string literals with the same value are reused, resulting in better memory efficiency and performance.
+
+ 
 ----
 
 [[index|← Core Java]] | [[../index|Notes]] | [[../../index|Home]]

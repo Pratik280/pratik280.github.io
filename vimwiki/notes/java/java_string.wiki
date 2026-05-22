@@ -8,22 +8,22 @@
 
 === Contents ===
 
-1. [[java-string#String Literal|String Literal]] — SCP, `==` comparison
-2. [[java-string#String Object|String Object]] — `new` keyword, heap memory
-3. [[java-string#String Immutability|String Immutability]] — thread safety, SCP, security
-4. [[java-string#StringBuilder and StringBuffer|StringBuilder & StringBuffer]] — mutable, synchronized, thread-safe
+1. [[#String Literal|String Literal]] — SCP, `==` comparison
+2. [[#String Object|String Object]] — `new` keyword, heap memory
+3. [[#String Immutability|String Immutability]] — thread safety, SCP, security
+4. [[#StringBuilder and StringBuffer|StringBuilder & StringBuffer]] — mutable, synchronized, thread-safe
 
 ----
 
 === Interview Questions ===
 
-- [[java-string#What is String Constant Pool?|Q1. What is String Constant Pool?]]
-- [[java-string#What is difference String, StringBuilder and StringBuffer?|Q2. String vs StringBuilder vs StringBuffer?]]
-- [[java-string#Why is String Immutable?|Q3. Why is String immutable?]]
-- [[java-string#String Literal vs String Object|Q4. String Literal vs String Object?]]
-- [[java-string#When is StringBuffer better than String?|Q5. When is StringBuffer better than String?]]
-- [[java-string#What does immutability mean|Q6. What does immutability mean?]]
-- [[java-string#How to create a immutable class?|Q7. How to create an immutable class?]]
+- [[#What is String Constant Pool?|Q1. What is String Constant Pool?]]
+- [[#What is difference String, StringBuilder and StringBuffer?|Q2. String vs StringBuilder vs StringBuffer?]]
+- [[#Why is String Immutable?|Q3. Why is String immutable?]]
+- [[#String Literal vs String Object|Q4. String Literal vs String Object?]]
+- [[#When is StringBuffer better than String?|Q5. When is StringBuffer better than String?]]
+- [[#What does immutability mean|Q6. What does immutability mean?]]
+- [[#How to create a immutable class?|Q7. How to create an immutable class?]]
 
 ----
 

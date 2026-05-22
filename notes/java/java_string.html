@@ -17,6 +17,57 @@
 
 <hr />
 
+<div id="Java String-Java String — Index"><h2 id="Java String — Index" class="header"><a href="#Java String-Java String — Index">Java String — Index</a></h2></div>
+
+<div id="Contents" class="toc"><h3 id="Contents" class="header"><a href="#Contents">Contents</a></h3></div>
+
+<ol>
+<li>
+<a href="java-string.html#String Literal">String Literal</a> — SCP, <code>==</code> comparison
+
+<li>
+<a href="java-string.html#String Object">String Object</a> — <code>new</code> keyword, heap memory
+
+<li>
+<a href="java-string.html#String Immutability">String Immutability</a> — thread safety, SCP, security
+
+<li>
+<a href="java-string.html#StringBuilder and StringBuffer">StringBuilder &amp; StringBuffer</a> — mutable, synchronized, thread-safe
+
+</ol>
+<hr />
+
+<div id="Java String-Java String — Index-Interview Questions"><h3 id="Interview Questions" class="header"><a href="#Java String-Java String — Index-Interview Questions">Interview Questions</a></h3></div>
+
+<ul>
+<li>
+<a href="java-string.html#What is String Constant Pool?">Q1. What is String Constant Pool?</a>
+
+<li>
+<a href="java-string.html#What is difference String, StringBuilder and StringBuffer?">Q2. String vs StringBuilder vs StringBuffer?</a>
+
+<li>
+<a href="java-string.html#Why is String Immutable?">Q3. Why is String immutable?</a>
+
+<li>
+<a href="java-string.html#String Literal vs String Object">Q4. String Literal vs String Object?</a>
+
+<li>
+<a href="java-string.html#When is StringBuffer better than String?">Q5. When is StringBuffer better than String?</a>
+
+<li>
+<a href="java-string.html#What does immutability mean">Q6. What does immutability mean?</a>
+
+<li>
+<a href="java-string.html#How to create a immutable class?">Q7. How to create an immutable class?</a>
+
+</ul>
+<hr />
+
+<p>
+<a href="../index.html">← Core Java</a> | <a href="../../index.html">Notes</a>
+</p>
+
 <div id="Java String-1. String Literal"><h2 id="1. String Literal" class="header"><a href="#Java String-1. String Literal">1. String Literal</a></h2></div>
 
 <p>
@@ -213,7 +264,7 @@ This reduces unnecessary object creation, saves memory, and improves performance
 <span id="Java String-Interview Questions-2. What is difference String, StringBuilder and StringBuffer?-<em>StringBuffer</em>"></span><strong id="<em>StringBuffer</em>"><em>StringBuffer</em></strong> is thread-safe is slighty slower than <em>StringBuilder</em> because its methods are synchronized. It is mainly used in multithreaded environment.
 
 </ul>
-<div id="Java String-Interview Questions-Why is String Immutable?"><h3 id="Why is String Immutable?" class="header"><a href="#Java String-Interview Questions-Why is String Immutable?">Why is String Immutable?</a></h3></div>
+<div id="Java String-Interview Questions-3. Why is String Immutable?"><h3 id="3. Why is String Immutable?" class="header"><a href="#Java String-Interview Questions-3. Why is String Immutable?">3. Why is String Immutable?</a></h3></div>
 
 <p>
 Strings are immutable for security, thread-safety and performance reasons.
@@ -229,7 +280,149 @@ Since strings cannot be changed, they can be safely shared across multiple threa
 Immutability allows the JVM to use the String Constant Pool (SCP), where string literals with the same value are reused, resulting in better memory efficiency and performance.
 
 </ul>
+<div id="Java String-Interview Questions-4. String Literal vs String Object"><h3 id="4. String Literal vs String Object" class="header"><a href="#Java String-Interview Questions-4. String Literal vs String Object">4. String Literal vs String Object</a></h3></div>
+
+<p>
+<span id="Java String-Interview Questions-4. String Literal vs String Object-String Literal"></span><strong id="String Literal">String Literal</strong> :
+</p>
+<ul>
+<li>
+String Literal is saved in String Constant Pool (SCP), which is located in heap memory. 
+
+<li>
+When a new String Literal is created, the jvm checks the SCP to see if an object with the same value already exists.If it exists, the existing object is reused and the new reference variable points to that existing object instead of creating a new one.
+<pre java>
+String s1 = "hello";
+String s2 = "hello";
+s1 == s2 // returns true because both references points to same object in SCP
+</pre>
+
+</ul>
+<p>
+<span id="Java String-Interview Questions-4. String Literal vs String Object-String Object"></span><strong id="String Object">String Object</strong> :
+</p>
+<ul>
+<li>
+Whereas String Object created using <code>new</code> keyword always creates a new object in heap memory, even if another object with same value already exist.
+<pre java>
+String s1 = new String("hello");
+String s2 = new String("hello");
+s1 == s2 // returns false because both references point to different objects.
+</pre>
+
+</ul>
+<p>
+Note : 
+<em>equals() compares content, whereas == compares references.</em>
+</p>
+
+<pre java>
+s1.equals(s2) // true .. even when == is false.
+</pre>
+
+<div id="Java String-Interview Questions-5. When is StringBuffer better than String?"><h3 id="5. When is StringBuffer better than String?" class="header"><a href="#Java String-Interview Questions-5. When is StringBuffer better than String?">5. When is StringBuffer better than String?</a></h3></div>
+
+<ul>
+<li>
+When frequent modifications to a string are required, since <em>StringBuffer</em> is mutable.
+
+<li>
+When same data is shared aross multiple threads concurrently in multithreaded environment.
+
+<li>
+When thread-safety is required, because the method of <em>StringBuffer</em> are synchronized.
+
+</ul>
+<div id="Java String-Interview Questions-6. What does immutability mean"><h3 id="6. What does immutability mean" class="header"><a href="#Java String-Interview Questions-6. What does immutability mean">6. What does immutability mean</a></h3></div>
+
+<ul>
+<li>
+In Java, immutability means an object's internal state cannot be changed after the object is created.
+
+<li>
+Any operation that appears to modify the object actually creates a new object with the modified value.
+
+<li>
+The original object remains unchanged in memory.
+<pre java>
+String s1 = "hello";
+s1.concat(" world");
+</pre>
+
+</ul>
+<p>
+<span id="Java String-Interview Questions-6. What does immutability mean-What Happens Here?"></span><strong id="What Happens Here?">What Happens Here?</strong>
+</p>
+
+<pre java>
+String s1 = "hello";
+s1.concat(" world");
+System.out.println(s1); // hello
+</pre>
+
+<ul>
+<li>
+<span id="Java String-Interview Questions-6. What does immutability mean-String"></span><strong id="String">String</strong> is immutable, so <span id="Java String-Interview Questions-6. What does immutability mean-concat()"></span><strong id="concat()">concat()</strong> does not modify the existing object.
+
+<li>
+A new String object <span id="Java String-Interview Questions-6. What does immutability mean-&quot;hello world&quot;"></span><strong id="&quot;hello world&quot;">"hello world"</strong> is created in memory.
+
+<li>
+Since the returned object is not assigned to any variable, it becomes eligible for garbage collection.
+
+<li>
+<span id="Java String-Interview Questions-6. What does immutability mean-s1"></span><strong id="s1">s1</strong> still points to <span id="Java String-Interview Questions-6. What does immutability mean-&quot;hello&quot;"></span><strong id="&quot;hello&quot;">"hello"</strong>.
+
+</ul>
  
+<ul>
+<li>
+Immutable objects are safer because their state cannot be accidentally changed.
+
+<li>
+<span id="Java String-Interview Questions-6. What does immutability mean-String"></span><strong id="String">String</strong>, <span id="Java String-Interview Questions-6. What does immutability mean-Integer"></span><strong id="Integer">Integer</strong>, and <span id="Java String-Interview Questions-6. What does immutability mean-LocalDate"></span><strong id="LocalDate">LocalDate</strong> are common immutable classes in Java.
+
+</ul>
+<div id="Java String-Interview Questions-7. How to create a immutable class?"><h3 id="7. How to create a immutable class?" class="header"><a href="#Java String-Interview Questions-7. How to create a immutable class?">7. How to create a immutable class?</a></h3></div>
+
+<ul>
+<li>
+Make the class <span id="Java String-Interview Questions-7. How to create a immutable class?-final"></span><strong id="final">final</strong> so it cannot be inherited.
+
+<li>
+Make all fields <span id="Java String-Interview Questions-7. How to create a immutable class?-private"></span><strong id="private">private</strong> and <span id="Java String-Interview Questions-7. How to create a immutable class?-final"></span><strong id="final">final</strong>.
+
+<li>
+Initialize fields using a constructor.
+
+<li>
+Do not provide setter methods.
+
+<li>
+For mutable fields like list, return defensive copies to prevent external modification.
+<pre java>
+final class Employee{
+
+    private final String name;
+    private final List&lt;String&gt; skills;
+    
+    public Employee(String name, List&lt;String&gt; skills){
+        this.name = name;
+        this.skills = List.copyOf(skills);
+    }
+    
+    // setters
+    public String getName() {
+        return name;
+    }
+    
+    public List&lt;String&gt; getSkills() {
+        return List.copyOf(skills);
+    }
+}
+</pre>
+
+</ul>
 <hr />
 
 <p>

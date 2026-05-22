@@ -4,6 +4,31 @@
 
 ----
 
+== Java String — Index ==
+
+=== Contents ===
+
+1. [[java-string#String Literal|String Literal]] — SCP, `==` comparison
+2. [[java-string#String Object|String Object]] — `new` keyword, heap memory
+3. [[java-string#String Immutability|String Immutability]] — thread safety, SCP, security
+4. [[java-string#StringBuilder and StringBuffer|StringBuilder & StringBuffer]] — mutable, synchronized, thread-safe
+
+----
+
+=== Interview Questions ===
+
+- [[java-string#What is String Constant Pool?|Q1. What is String Constant Pool?]]
+- [[java-string#What is difference String, StringBuilder and StringBuffer?|Q2. String vs StringBuilder vs StringBuffer?]]
+- [[java-string#Why is String Immutable?|Q3. Why is String immutable?]]
+- [[java-string#String Literal vs String Object|Q4. String Literal vs String Object?]]
+- [[java-string#When is StringBuffer better than String?|Q5. When is StringBuffer better than String?]]
+- [[java-string#What does immutability mean|Q6. What does immutability mean?]]
+- [[java-string#How to create a immutable class?|Q7. How to create an immutable class?]]
+
+----
+
+[[../index|← Core Java]] | [[../../index|Notes]]
+
 == 1. String Literal ==
 
 Type of a String Object which is mostly used. Declared directly using `String` keyword and actual string value in double quotes without using `new` keyword.
@@ -116,14 +141,101 @@ This reduces unnecessary object creation, saves memory, and improves performance
 * *_StringBuilder_* is not thread-safe and is faster compared to _StringBuffer_ because it does not have synchronization.
 * *_StringBuffer_* is thread-safe is slighty slower than _StringBuilder_ because its methods are synchronized. It is mainly used in multithreaded environment.
 
-=== Why is String Immutable? ===
+=== 3. Why is String Immutable? ===
 
 Strings are immutable for security, thread-safety and performance reasons.
 * Immutability prevents modifications of sentitive data like passwords, file paths, database URLs, etc.
 * Since strings cannot be changed, they can be safely shared across multiple threads without synchronization.
 * Immutability allows the JVM to use the String Constant Pool (SCP), where string literals with the same value are reused, resulting in better memory efficiency and performance.
 
+=== 4. String Literal vs String Object ===
+
+*String Literal* :
+* String Literal is saved in String Constant Pool (SCP), which is located in heap memory. 
+* When a new String Literal is created, the jvm checks the SCP to see if an object with the same value already exists.If it exists, the existing object is reused and the new reference variable points to that existing object instead of creating a new one.
+{{{java
+String s1 = "hello";
+String s2 = "hello";
+s1 == s2 // returns true because both references points to same object in SCP
+}}}
+*String Object* :
+* Whereas String Object created using `new` keyword always creates a new object in heap memory, even if another object with same value already exist.
+{{{java
+String s1 = new String("hello");
+String s2 = new String("hello");
+s1 == s2 // returns false because both references point to different objects.
+}}}
+
+Note : 
+_equals() compares content, whereas == compares references._
+
+{{{java
+s1.equals(s2) // true .. even when == is false.
+}}}
+
+=== 5. When is StringBuffer better than String? ===
+
+* When frequent modifications to a string are required, since _StringBuffer_ is mutable.
+* When same data is shared aross multiple threads concurrently in multithreaded environment.
+* When thread-safety is required, because the method of _StringBuffer_ are synchronized.
+
+=== 6. What does immutability mean ===
+
+* In Java, immutability means an object's internal state cannot be changed after the object is created.
+* Any operation that appears to modify the object actually creates a new object with the modified value.
+* The original object remains unchanged in memory.
+
+{{{java
+String s1 = "hello";
+s1.concat(" world");
+}}}
+
+*What Happens Here?*
+
+{{{java
+String s1 = "hello";
+s1.concat(" world");
+System.out.println(s1); // hello
+}}}
+
+* *String* is immutable, so *concat()* does not modify the existing object.
+* A new String object *"hello world"* is created in memory.
+* Since the returned object is not assigned to any variable, it becomes eligible for garbage collection.
+* *s1* still points to *"hello"*.
  
+* Immutable objects are safer because their state cannot be accidentally changed.
+* *String*, *Integer*, and *LocalDate* are common immutable classes in Java.
+
+=== 7. How to create a immutable class? ===
+
+* Make the class *final* so it cannot be inherited.
+* Make all fields *private* and *final*.
+* Initialize fields using a constructor.
+* Do not provide setter methods.
+* For mutable fields like list, return defensive copies to prevent external modification.
+
+{{{java
+final class Employee{
+
+    private final String name;
+    private final List<String> skills;
+    
+    public Employee(String name, List<String> skills){
+        this.name = name;
+        this.skills = List.copyOf(skills);
+    }
+    
+    // setters
+    public String getName() {
+        return name;
+    }
+    
+    public List<String> getSkills() {
+        return List.copyOf(skills);
+    }
+}
+}}}
+
 ----
 
 [[index|← Core Java]] | [[../index|Notes]] | [[../../index|Home]]

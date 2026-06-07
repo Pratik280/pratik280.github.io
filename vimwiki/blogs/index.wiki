@@ -11,6 +11,7 @@ Writing about backend engineering, distributed systems, Linux, and things I figu
 == Posts ==
 
 * 2025-06-01 — [[how-i-think-about-kafka-partitions|How I Think About Kafka Partitions]]
+* 2025-07-01 - [[day-1-github-copilot-what-is-it|Day 1 with GitHub Copilot: What Even Is This Thing?]]
 
 ----
 

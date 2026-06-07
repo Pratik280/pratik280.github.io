@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>day-1-github-copilot-what-is-it</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<div id="Day 1 with GitHub Copilot: What Even Is This Thing?"><h1 id="Day 1 with GitHub Copilot: What Even Is This Thing?" class="header"><a href="#Day 1 with GitHub Copilot: What Even Is This Thing?">Day 1 with GitHub Copilot: What Even Is This Thing?</a></h1></div>
+
+<p>
+2026-07-07 | <a href="index.html">← Blog</a>
+</p>
+
+<hr />
+
+<p>
+So today was the first time I actually sat down and <span id="Day 1 with GitHub Copilot: What Even Is This Thing?-used"></span><strong id="used">used</strong> GitHub Copilot properly.
+Actually opened VS Code, looked at it, and tried to understand what I
+was dealing with.
+</p>
+
+<p>
+Honest first impression? Slightly overwhelming. But also kind of fascinating.
+</p>
+
+<div id="Day 1 with GitHub Copilot: What Even Is This Thing?-The Three Chat Modes I Didn't Know Existed"><h2 id="The Three Chat Modes I Didn't Know Existed" class="header"><a href="#Day 1 with GitHub Copilot: What Even Is This Thing?-The Three Chat Modes I Didn't Know Existed">The Three Chat Modes I Didn't Know Existed</a></h2></div>
+
+<p>
+I always thought Copilot was just that ghost-text thing that appears when you're
+typing. You know, the grey suggestion that you hit Tab to accept. I had no idea
+there were three completely different ways to talk to it.
+</p>
+
+<p>
+There's a full sidebar chat (Ctrl+Alt+I) — basically like having ChatGPT docked
+inside your editor. Then there's inline chat (Ctrl+I) which opens right inside your
+code file, at your cursor, and the output lands as a diff you can accept or reject.
+That one genuinely surprised me. And then there's quick chat (Ctrl+Shift+Alt+L),
+a small floating bar for quick one-off questions that disappears after you're done.
+</p>
+
+<p>
+Each one is for a different situation. Sidebar for thinking and planning. Inline for
+actually writing or fixing code in place. Quick chat for the small doubts you'd
+otherwise Google.
+</p>
+
+<div id="Day 1 with GitHub Copilot: What Even Is This Thing?-Wait... Claude is Inside Copilot?"><h2 id="Wait... Claude is Inside Copilot?" class="header"><a href="#Day 1 with GitHub Copilot: What Even Is This Thing?-Wait... Claude is Inside Copilot?">Wait... Claude is Inside Copilot?</a></h2></div>
+
+<p>
+This one genuinely confused me for a few minutes.
+</p>
+
+<p>
+Inside the Copilot chat, there's a model selector dropdown. It lists GPT-5, GPT-4o,
+Claude Haiku 4.5, Gemini Flash, and a few others. By default it's set to "Auto."
+</p>
+
+<p>
+My immediate reaction was — how is Claude here? I never installed Claude. I never
+set up an Anthropic account. What is happening?
+</p>
+
+<p>
+Turns out Copilot is not an AI itself. It's a platform. GitHub has licensing deals
+with OpenAI, Anthropic, Google — and it routes your request to whichever model is
+selected. You're always inside Copilot. But the brain answering you could be from
+any of these companies depending on what's selected.
+</p>
+
+<p>
+The "Auto" mode just means Copilot decides on its own which model to use based on
+your query. Simple syntax lookup? Probably a fast cheap model. Complex reasoning?
+It'll route to something heavier.
+</p>
+
+<p>
+Once I understood this it made sense. It's like an aggregator. The platform is
+Copilot. The engines underneath are from different vendors.
+</p>
+
+<div id="Day 1 with GitHub Copilot: What Even Is This Thing?-What I Actually Learned Today"><h2 id="What I Actually Learned Today" class="header"><a href="#Day 1 with GitHub Copilot: What Even Is This Thing?-What I Actually Learned Today">What I Actually Learned Today</a></h2></div>
+
+<p>
+A few things stuck with me after just one session.
+</p>
+
+<p>
+Don't use <code>//</code> comments as prompts inside your code. It works, but it leaves a mess.
+Either use <code>Ctrl+I</code> inline chat which doesn't pollute your file, or if you must write
+a comment-style hint, use proper Javadoc format (<code>/** ... */</code>) because models are
+trained on that pattern and respond better to it.
+</p>
+
+<p>
+Slash commands are not just shortcuts — <code>/explain</code>, <code>/fix</code>, <code>/tests</code>, <code>/refactor</code>
+are pre-optimized prompt macros. Typing <code>/explain</code> is not the same as typing
+"explain this code." The model is primed differently. And combining them with context
+like <code>#file:SomeService.java</code> or <code>@workspace</code> makes it actually workspace-aware
+instead of guessing.
+</p>
+
+<p>
+And the model choice matters depending on what you're doing. For repetitive boilerplate
+or quick syntax questions, Auto or Haiku is fine. But if you're debugging something
+weird — a transaction propagation issue, a Spring context loading problem — manually
+switch to GPT-5 or Claude Sonnet. The difference in reasoning quality is noticeable.
+</p>
+
+<div id="Day 1 with GitHub Copilot: What Even Is This Thing?-First Impressions Overall"><h2 id="First Impressions Overall" class="header"><a href="#Day 1 with GitHub Copilot: What Even Is This Thing?-First Impressions Overall">First Impressions Overall</a></h2></div>
+
+<p>
+It feels less like an autocomplete tool and more like a second pair of eyes that lives
+inside your editor. One that doesn't get tired, doesn't judge you for asking obvious
+questions, and responds in seconds.
+</p>
+
+<p>
+I don't fully trust it yet — and I don't think you should on day one. But I can already
+see how, if used carefully, this changes how much time you spend on the mechanical parts
+of coding.
+</p>
+
+<p>
+I spent some time mapping out all the slash commands, @ agents, and # context
+variables properly — if you want the full reference I noted it down here:
+<a href="../notes/ai-assisted-coding/github-copilot-commands-context-and-how-to-use-them-together.html">Copilot Commands, Context and How to Use Them Together</a>
+</p>
+
+<p>
+More notes coming.
+</p>
+
+<hr />
+
+<p>
+<a href="index.html">← Blog</a> | <a href="../index.html">Home</a>
+</p>
+
+</body>
+</html>

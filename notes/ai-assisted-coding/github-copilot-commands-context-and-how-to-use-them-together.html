@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>github-copilot-commands-context-and-how-to-use-them-together</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together"><h1 id="GitHub Copilot: Commands, Context and How to Use Them Together" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together">GitHub Copilot: Commands, Context and How to Use Them Together</a></h1></div>
+
+<p>
+<a href="index.html">← AI Assisted Coding</a> | <a href="../index.html">Notes</a> | <a href="../../index.html">Home</a>
+</p>
+
+<hr />
+
+<p>
+A reference note on the three command types in GitHub Copilot Chat and how to
+combine them effectively for Java development.
+</p>
+
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-The Mental Model"><h2 id="The Mental Model" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-The Mental Model">The Mental Model</a></h2></div>
+
+<p>
+Three types of input control how Copilot understands your request:
+</p>
+
+<ul>
+<li>
+<code>/</code> slash commands — tell Copilot <span id="GitHub Copilot: Commands, Context and How to Use Them Together-The Mental Model-what to do"></span><strong id="what to do">what to do</strong>
+
+<li>
+<code>@</code> agents — tell Copilot <span id="GitHub Copilot: Commands, Context and How to Use Them Together-The Mental Model-where to look"></span><strong id="where to look">where to look</strong>
+
+<li>
+<code>#</code> context variables — tell Copilot <span id="GitHub Copilot: Commands, Context and How to Use Them Together-The Mental Model-what to focus on"></span><strong id="what to focus on">what to focus on</strong>
+
+</ul>
+<p>
+A strong prompt combines all three. Example:
+<code>@workspace /explain #file:PaymentService.java — how does this interact with the repo?</code>
+</p>
+
+<hr />
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-Slash Commands ( / )"><h2 id="Slash Commands ( / )" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-Slash Commands ( / )">Slash Commands ( / )</a></h2></div>
+
+<p>
+Used inside Copilot Chat sidebar or inline chat (Ctrl+I).
+These are pre-optimized prompt macros — not the same as typing the words manually.
+</p>
+
+<p>
+<code>/explain</code> — breaks down what code does, its logic and flow
+</p>
+<pre><code>Use when: reading unfamiliar code, onboarding, reviewing a PR
+Example: <code>/explain #file:ReconciliationService.java</code>
+</code></pre>
+
+<p>
+<code>/fix</code> — diagnoses and corrects a specific bug or error
+</p>
+<pre><code>Use when: you have a concrete error, not a vague "something is wrong"
+Example: <code>/fix #selection — @Transactional not rolling back on RuntimeException</code>
+</code></pre>
+
+<p>
+<code>/tests</code> — generates JUnit/Mockito test cases for a class or method
+</p>
+<pre><code>Use when: after writing a service method, before raising a PR
+Example: <code>/tests #file:PaymentService.java — cover nulls and exception paths</code>
+</code></pre>
+
+<p>
+<code>/refactor</code> — restructures code without changing behavior
+</p>
+<pre><code>Use when: method is too long, code is repetitive, SRP is being violated
+Example: <code>/refactor #selection — extract helper methods, keep behavior same</code>
+</code></pre>
+
+<p>
+<code>/doc</code> — writes Javadoc for selected class or method
+</p>
+<pre><code>Use when: documenting public API methods before committing
+Example: <code>/doc #editor — add @param, @return, @throws to all public methods</code>
+</code></pre>
+
+<p>
+<code>/new</code> — scaffolds a new Spring Boot component from a description
+</p>
+<pre><code>Use when: starting a new feature from scratch inside an existing project
+Example: <code>/new Spring Boot REST controller for /api/accounts</code>
+</code></pre>
+
+<hr />
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-Agent Scopes ( @ )"><h2 id="Agent Scopes ( @ )" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-Agent Scopes ( @ )">Agent Scopes ( @ )</a></h2></div>
+
+<p>
+These tell Copilot which environment or surface to pull context from.
+</p>
+
+<p>
+<code>@workspace</code> — scans the entire open project before answering
+</p>
+<pre><code>Use when: asking cross-cutting questions across multiple files
+Example: <code>@workspace where is datasource configuration defined?</code>
+</code></pre>
+
+<p>
+<code>@terminal</code> — reads your terminal, understands CLI output and errors
+</p>
+<pre><code>Use when: build failed, Maven error, test runner output is cryptic
+Example: <code>@terminal /fix #terminalLastCommand</code>
+</code></pre>
+
+<p>
+<code>@vscode</code> — answers questions about the IDE itself, not your code
+</p>
+<pre><code>Use when: setting up debugger, launch config, keybindings, extensions
+Example: <code>@vscode how do I set up launch.json for a Spring Boot app?</code>
+</code></pre>
+
+<p>
+<code>@github</code> — pulls in PR details, issues, commit history from GitHub
+</p>
+<pre><code>Use when: reviewing PRs, understanding what a commit changed
+Example: <code>@github summarize PR #142</code>
+</code></pre>
+
+<hr />
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-Context Variables ( # )"><h2 id="Context Variables ( # )" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-Context Variables ( # )">Context Variables ( # )</a></h2></div>
+
+<p>
+These pin specific content into the context window of your prompt.
+</p>
+
+<p>
+<code>#file:FileName.java</code> — attaches a specific file regardless of which tab is active
+</p>
+<pre><code>Use when: you want to focus on one file precisely
+Example: <code>/explain #file:AccountService.java</code>
+</code></pre>
+
+<p>
+<code>#editor</code> — attaches whichever file your cursor is currently active in
+</p>
+<pre><code>Use when: you are already inside the file you want to ask about
+Note: if you have multiple tabs open, #editor is only the active tab
+</code></pre>
+
+<p>
+<code>#selection</code> — attaches the code you have highlighted in the editor
+</p>
+<pre><code>Use when: asking about one method or block, not the whole file
+Example: <code>/fix #selection — null check missing before this call</code>
+</code></pre>
+
+<p>
+<code>#terminalLastCommand</code> — passes the last terminal command and its output
+</p>
+<pre><code>Use when: build or test just failed and you want instant diagnosis
+Example: <code>@terminal /fix #terminalLastCommand</code>
+</code></pre>
+
+<p>
+<code>#codebase</code> — semantic search across all indexed project files
+</p>
+<pre><code>Use when: you don't know which file contains what you're looking for
+Example: <code>which class handles Kafka error retry? #codebase</code>
+</code></pre>
+
+<hr />
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-#editor vs #file vs #selection — Quick Clarification"><h2 id="#editor vs #file vs #selection — Quick Clarification" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-#editor vs #file vs #selection — Quick Clarification">#editor vs #file vs #selection — Quick Clarification</a></h2></div>
+
+<table class='center'>
+<thead>
+<tr>
+<th>
+Situation
+</th>
+<th>
+Use
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+File your cursor is currently in
+</td>
+<td>
+#editor
+</td>
+</tr>
+<tr>
+<td>
+Specific file by name
+</td>
+<td>
+#file:X.java
+</td>
+</tr>
+<tr>
+<td>
+Highlighted block of code
+</td>
+<td>
+#selection
+</td>
+</tr>
+<tr>
+<td>
+Something spanning multiple files
+</td>
+<td>
+@workspace
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+You can stack multiple #file: references in one prompt:
+<code>/explain #file:AccountService.java #file:PaymentController.java — how do these interact?</code>
+</p>
+
+<p>
+<code>#editor</code> is just a lazy shorthand for the active tab. Useful when deep in one file.
+<code>#file:</code> is more explicit and reliable when jumping between multiple open tabs.
+</p>
+
+<hr />
+
+<div id="GitHub Copilot: Commands, Context and How to Use Them Together-Combination Patterns for Java"><h2 id="Combination Patterns for Java" class="header"><a href="#GitHub Copilot: Commands, Context and How to Use Them Together-Combination Patterns for Java">Combination Patterns for Java</a></h2></div>
+
+<p>
+Understand an unfamiliar service:
+</p>
+<pre><code><code>@workspace /explain #file:ReconciliationService.java — dependencies and responsibilities</code>
+</code></pre>
+
+<p>
+Fix a Maven build failure:
+</p>
+<pre><code><code>@terminal /fix #terminalLastCommand</code>
+</code></pre>
+
+<p>
+Write tests after implementing a method:
+</p>
+<pre><code><code>/tests #file:PaymentService.java — cover edge cases, nulls, exception paths using Mockito</code>
+</code></pre>
+
+<p>
+Refactor a long method:
+</p>
+<pre><code><code>/refactor #selection — extract helpers, apply SRP, keep behavior unchanged</code>
+</code></pre>
+
+<p>
+Document before committing:
+</p>
+<pre><code><code>/doc #editor — Javadoc on all public methods with @param @return @throws</code>
+</code></pre>
+
+<p>
+Debug a Spring transaction issue:
+</p>
+<pre><code><code>/fix #selection — @Transactional not rolling back, REQUIRES_NEW propagation</code>
+</code></pre>
+
+<p>
+Trace where a config is wired:
+</p>
+<pre><code><code>@workspace where is datasource configured? check application.yml and @Configuration classes #codebase</code>
+</code></pre>
+
+<p>
+Understand a pom.xml dependency:
+</p>
+<pre><code><code>@workspace /explain #file:pom.xml — what does the resilience4j dependency do here?</code>
+</code></pre>
+
+<hr />
+
+<p>
+<a href="index.html">← AI Assisted Coding</a> | <a href="../index.html">Notes</a> | <a href="../../index.html">Home</a>
+</p>
+
+</body>
+</html>

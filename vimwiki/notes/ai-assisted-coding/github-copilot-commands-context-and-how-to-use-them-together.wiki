@@ -1,0 +1,148 @@
+= GitHub Copilot: Commands, Context and How to Use Them Together =
+
+[[index|← AI Assisted Coding]] | [[../index|Notes]] | [[../../index|Home]]
+
+----
+
+A reference note on the three command types in GitHub Copilot Chat and how to
+combine them effectively for Java development.
+
+
+== The Mental Model ==
+
+Three types of input control how Copilot understands your request:
+
+- `/` slash commands — tell Copilot *what to do*
+- `@` agents — tell Copilot *where to look*
+- `#` context variables — tell Copilot *what to focus on*
+
+A strong prompt combines all three. Example:
+`@workspace /explain #file:PaymentService.java — how does this interact with the repo?`
+
+----
+
+== Slash Commands ( / ) ==
+
+Used inside Copilot Chat sidebar or inline chat (Ctrl+I).
+These are pre-optimized prompt macros — not the same as typing the words manually.
+
+`/explain` — breaks down what code does, its logic and flow
+    Use when: reading unfamiliar code, onboarding, reviewing a PR
+    Example: `/explain #file:ReconciliationService.java`
+
+`/fix` — diagnoses and corrects a specific bug or error
+    Use when: you have a concrete error, not a vague "something is wrong"
+    Example: `/fix #selection — @Transactional not rolling back on RuntimeException`
+
+`/tests` — generates JUnit/Mockito test cases for a class or method
+    Use when: after writing a service method, before raising a PR
+    Example: `/tests #file:PaymentService.java — cover nulls and exception paths`
+
+`/refactor` — restructures code without changing behavior
+    Use when: method is too long, code is repetitive, SRP is being violated
+    Example: `/refactor #selection — extract helper methods, keep behavior same`
+
+`/doc` — writes Javadoc for selected class or method
+    Use when: documenting public API methods before committing
+    Example: `/doc #editor — add @param, @return, @throws to all public methods`
+
+`/new` — scaffolds a new Spring Boot component from a description
+    Use when: starting a new feature from scratch inside an existing project
+    Example: `/new Spring Boot REST controller for /api/accounts`
+
+----
+
+== Agent Scopes ( @ ) ==
+
+These tell Copilot which environment or surface to pull context from.
+
+`@workspace` — scans the entire open project before answering
+    Use when: asking cross-cutting questions across multiple files
+    Example: `@workspace where is datasource configuration defined?`
+
+`@terminal` — reads your terminal, understands CLI output and errors
+    Use when: build failed, Maven error, test runner output is cryptic
+    Example: `@terminal /fix #terminalLastCommand`
+
+`@vscode` — answers questions about the IDE itself, not your code
+    Use when: setting up debugger, launch config, keybindings, extensions
+    Example: `@vscode how do I set up launch.json for a Spring Boot app?`
+
+`@github` — pulls in PR details, issues, commit history from GitHub
+    Use when: reviewing PRs, understanding what a commit changed
+    Example: `@github summarize PR #142`
+
+----
+
+== Context Variables ( # ) ==
+
+These pin specific content into the context window of your prompt.
+
+`#file:FileName.java` — attaches a specific file regardless of which tab is active
+    Use when: you want to focus on one file precisely
+    Example: `/explain #file:AccountService.java`
+
+`#editor` — attaches whichever file your cursor is currently active in
+    Use when: you are already inside the file you want to ask about
+    Note: if you have multiple tabs open, #editor is only the active tab
+
+`#selection` — attaches the code you have highlighted in the editor
+    Use when: asking about one method or block, not the whole file
+    Example: `/fix #selection — null check missing before this call`
+
+`#terminalLastCommand` — passes the last terminal command and its output
+    Use when: build or test just failed and you want instant diagnosis
+    Example: `@terminal /fix #terminalLastCommand`
+
+`#codebase` — semantic search across all indexed project files
+    Use when: you don't know which file contains what you're looking for
+    Example: `which class handles Kafka error retry? #codebase`
+
+----
+
+== #editor vs #file vs #selection — Quick Clarification ==
+
+    | Situation                              | Use              |
+    |----------------------------------------|------------------|
+    | File your cursor is currently in       | #editor          |
+    | Specific file by name                  | #file:X.java     |
+    | Highlighted block of code              | #selection       |
+    | Something spanning multiple files      | @workspace       |
+
+You can stack multiple #file: references in one prompt:
+`/explain #file:AccountService.java #file:PaymentController.java — how do these interact?`
+
+`#editor` is just a lazy shorthand for the active tab. Useful when deep in one file.
+`#file:` is more explicit and reliable when jumping between multiple open tabs.
+
+----
+
+== Combination Patterns for Java ==
+
+Understand an unfamiliar service:
+    `@workspace /explain #file:ReconciliationService.java — dependencies and responsibilities`
+
+Fix a Maven build failure:
+    `@terminal /fix #terminalLastCommand`
+
+Write tests after implementing a method:
+    `/tests #file:PaymentService.java — cover edge cases, nulls, exception paths using Mockito`
+
+Refactor a long method:
+    `/refactor #selection — extract helpers, apply SRP, keep behavior unchanged`
+
+Document before committing:
+    `/doc #editor — Javadoc on all public methods with @param @return @throws`
+
+Debug a Spring transaction issue:
+    `/fix #selection — @Transactional not rolling back, REQUIRES_NEW propagation`
+
+Trace where a config is wired:
+    `@workspace where is datasource configured? check application.yml and @Configuration classes #codebase`
+
+Understand a pom.xml dependency:
+    `@workspace /explain #file:pom.xml — what does the resilience4j dependency do here?`
+
+----
+
+[[index|← AI Assisted Coding]] | [[../index|Notes]] | [[../../index|Home]]

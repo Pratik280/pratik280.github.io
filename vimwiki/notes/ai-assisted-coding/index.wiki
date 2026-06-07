@@ -1,0 +1,9 @@
+= AI Assisted Coding =
+
+[[../index|← Notes]]
+
+== Index ==
+
+* [[github-copilot-commands-context-and-how-to-use-them-together|GitHub Copilot: Commands, Context and How to Use Them Together]]
+
+[[../index|← Notes]] | [[../../index|Home]]

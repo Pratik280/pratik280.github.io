@@ -6,6 +6,7 @@
 
 * [[java/index|Core Java]]
 * [[kafka/index|Kafka]]
+* [[ai-assisted-coding/index| AI Assisted Coding]]
 
 
 [[../index|Home]] | [[../about|About]] | [[../resume|Resume]] | [[../blogs/index|Blog]]

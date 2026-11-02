@@ -1,6 +1,6 @@
 = How I Think About Kafka Partitions =
 
-2025-06-01 | [[index|← Blog]]
+2025-06-01 | [[index|← Blogs]] | [[../../index|Home]]
 
 _Partitions are the most misunderstood part of Kafka. Here is how I actually think about sizing them._
 

@@ -1,6 +1,6 @@
 = Day 1 with GitHub Copilot: What Even Is This Thing? =
 
-2026-07-07 | [[index|← Blog]]
+07-07-2025 | [[index|← Blogs]] | [[../../index|Home]]
 
 ----
 

@@ -1,6 +1,6 @@
 = GitHub Copilot: Commands, Context and How to Use Them Together =
 
-07-07-2025 | [[index|← Blogs]] | [[../../index|Home]]
+[[index|← Blogs]] | [[../../index|Home]]
 
 ----
 

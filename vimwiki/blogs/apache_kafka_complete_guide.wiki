@@ -1,6 +1,6 @@
 = Apache Kafka — Complete Study Notes =
 
-01-06-2025 | [[index|← Blogs]] | [[../../index|Home]]
+[[index|← Blogs]]
 
 ----
 

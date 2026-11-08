@@ -49,27 +49,27 @@
 <p>Breaks down what code does, its logic and flow.</p>
 <p><strong>Use when:</strong> Reading unfamiliar code, onboarding, reviewing a PR.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:ReconciliationService.java</span></span></code></pre><h3 id="fix"><code>/fix</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:ReconciliationService.java</span></span></code></pre><h3 id="fix"><code>/fix</code></h3>
 <p>Diagnoses and corrects a specific bug or error.</p>
 <p><strong>Use when:</strong> You have a concrete error, not a vague "something is wrong".</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — @Transactional not rolling back on RuntimeException</span></span></code></pre><h3 id="tests"><code>/tests</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — @Transactional not rolling back on RuntimeException</span></span></code></pre><h3 id="tests"><code>/tests</code></h3>
 <p>Generates JUnit/Mockito test cases for a class or method.</p>
 <p><strong>Use when:</strong> After writing a service method, before raising a PR.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/tests #file:PaymentService.java — cover nulls and exception paths</span></span></code></pre><h3 id="refactor"><code>/refactor</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/tests #file:PaymentService.java — cover nulls and exception paths</span></span></code></pre><h3 id="refactor"><code>/refactor</code></h3>
 <p>Restructures code without changing behavior.</p>
 <p><strong>Use when:</strong> A method is too long, code is repetitive, or SRP is being violated.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/refactor #selection — extract helper methods, keep behavior same</span></span></code></pre><h3 id="doc"><code>/doc</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/refactor #selection — extract helper methods, keep behavior same</span></span></code></pre><h3 id="doc"><code>/doc</code></h3>
 <p>Writes Javadoc for a selected class or method.</p>
 <p><strong>Use when:</strong> Documenting public API methods before committing.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/doc #editor — add @param, @return, @throws to all public methods</span></span></code></pre><h3 id="new"><code>/new</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/doc #editor — add @param, @return, @throws to all public methods</span></span></code></pre><h3 id="new"><code>/new</code></h3>
 <p>Scaffolds a new Spring Boot component from a description.</p>
 <p><strong>Use when:</strong> Starting a new feature from scratch inside an existing project.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/new Spring Boot REST controller for /api/accounts</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/new Spring Boot REST controller for /api/accounts</span></span></code></pre>
 <hr />
 <h2 id="agent-scopes">Agent Scopes ( @ )</h2>
 <p>These tell Copilot which environment or surface to pull context from.</p>
@@ -77,19 +77,19 @@
 <p>Scans the entire open project before answering.</p>
 <p><strong>Use when:</strong> Asking cross-cutting questions across multiple files.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace where is datasource configuration defined?</span></span></code></pre><h3 id="terminal"><code>@terminal</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace where is datasource configuration defined?</span></span></code></pre><h3 id="terminal"><code>@terminal</code></h3>
 <p>Reads your terminal, understands CLI output and errors.</p>
 <p><strong>Use when:</strong> A build failed, Maven error, or test runner output is cryptic.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="vscode"><code>@vscode</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="vscode"><code>@vscode</code></h3>
 <p>Answers questions about the IDE itself, not your code.</p>
 <p><strong>Use when:</strong> Setting up debugger, launch config, keybindings, extensions.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@vscode how do I set up launch.json for a Spring Boot app?</span></span></code></pre><h3 id="github"><code>@github</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@vscode how do I set up launch.json for a Spring Boot app?</span></span></code></pre><h3 id="github"><code>@github</code></h3>
 <p>Pulls in PR details, issues, commit history from GitHub.</p>
 <p><strong>Use when:</strong> Reviewing PRs, understanding what a commit changed.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@github summarize PR #142</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@github summarize PR #142</span></span></code></pre>
 <hr />
 <h2 id="context-variables">Context Variables ( # )</h2>
 <p>These pin specific content into the context window of your prompt.</p>
@@ -97,7 +97,7 @@
 <p>Attaches a specific file regardless of which tab is active.</p>
 <p><strong>Use when:</strong> You want to focus on one file precisely.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:AccountService.java</span></span></code></pre><h3 id="editor"><code>#editor</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:AccountService.java</span></span></code></pre><h3 id="editor"><code>#editor</code></h3>
 <p>Attaches whichever file your cursor is currently active in.</p>
 <p><strong>Use when:</strong> You are already inside the file you want to ask about.</p>
 <p><strong>Note:</strong> If you have multiple tabs open, <code>#editor</code> is only the active tab.</p>
@@ -105,15 +105,15 @@
 <p>Attaches the code you have highlighted in the editor.</p>
 <p><strong>Use when:</strong> Asking about one method or block, not the whole file.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — null check missing before this call</span></span></code></pre><h3 id="terminallastcommand"><code>#terminalLastCommand</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — null check missing before this call</span></span></code></pre><h3 id="terminallastcommand"><code>#terminalLastCommand</code></h3>
 <p>Passes the last terminal command and its output.</p>
 <p><strong>Use when:</strong> A build or test just failed and you want instant diagnosis.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="codebase"><code>#codebase</code></h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="codebase"><code>#codebase</code></h3>
 <p>Semantic search across all indexed project files.</p>
 <p><strong>Use when:</strong> You don't know which file contains what you're looking for.</p>
 <p><strong>Example:</strong></p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>which class handles Kafka error retry? #codebase</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>which class handles Kafka error retry? #codebase</span></span></code></pre>
 <hr />
 <h2 id="editor-vs-file-vs-selection-quick-clarification">#editor vs #file vs #selection — Quick Clarification</h2>
 <table><thead><tr><th>Situation</th><th>Use</th></tr></thead><tbody>
@@ -123,20 +123,20 @@
 <tr><td>Something spanning multiple files</td><td><code>@workspace</code></td></tr>
 </tbody></table>
 <p>You can stack multiple <code>#file:</code> references in one prompt:</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:AccountService.java #file:PaymentController.java — how do these interact?</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/explain #file:AccountService.java #file:PaymentController.java — how do these interact?</span></span></code></pre>
 <p><code>#editor</code> is just a lazy shorthand for the active tab. Useful when deep in one file.</p>
 <p><code>#file:</code> is more explicit and reliable when jumping between multiple open tabs.</p>
 <hr />
 <h2 id="combination-patterns-for-java">Combination Patterns for Java</h2>
 <h3 id="understand-an-unfamiliar-service">Understand an unfamiliar service</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace /explain #file:ReconciliationService.java — dependencies and responsibilities</span></span></code></pre><h3 id="fix-a-maven-build-failure">Fix a Maven build failure</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="write-tests-after-implementing-a-method">Write tests after implementing a method</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/tests #file:PaymentService.java — cover edge cases, nulls, exception paths using Mockito</span></span></code></pre><h3 id="refactor-a-long-method">Refactor a long method</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/refactor #selection — extract helpers, apply SRP, keep behavior unchanged</span></span></code></pre><h3 id="document-before-committing">Document before committing</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/doc #editor — Javadoc on all public methods with @param @return @throws</span></span></code></pre><h3 id="debug-a-spring-transaction-issue">Debug a Spring transaction issue</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — @Transactional not rolling back, REQUIRES_NEW propagation</span></span></code></pre><h3 id="trace-where-a-config-is-wired">Trace where a config is wired</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace where is datasource configured? check application.yml and @Configuration classes #codebase</span></span></code></pre><h3 id="understand-a-pom-xml-dependency">Understand a pom.xml dependency</h3>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace /explain #file:pom.xml — what does the resilience4j dependency do here?</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace /explain #file:ReconciliationService.java — dependencies and responsibilities</span></span></code></pre><h3 id="fix-a-maven-build-failure">Fix a Maven build failure</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@terminal /fix #terminalLastCommand</span></span></code></pre><h3 id="write-tests-after-implementing-a-method">Write tests after implementing a method</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/tests #file:PaymentService.java — cover edge cases, nulls, exception paths using Mockito</span></span></code></pre><h3 id="refactor-a-long-method">Refactor a long method</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/refactor #selection — extract helpers, apply SRP, keep behavior unchanged</span></span></code></pre><h3 id="document-before-committing">Document before committing</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/doc #editor — Javadoc on all public methods with @param @return @throws</span></span></code></pre><h3 id="debug-a-spring-transaction-issue">Debug a Spring transaction issue</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>/fix #selection — @Transactional not rolling back, REQUIRES_NEW propagation</span></span></code></pre><h3 id="trace-where-a-config-is-wired">Trace where a config is wired</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace where is datasource configured? check application.yml and @Configuration classes #codebase</span></span></code></pre><h3 id="understand-a-pom-xml-dependency">Understand a pom.xml dependency</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>@workspace /explain #file:pom.xml — what does the resilience4j dependency do here?</span></span></code></pre>
 <hr />
 
 </main>

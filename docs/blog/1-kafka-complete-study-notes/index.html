@@ -99,7 +99,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <hr />
 <h1 id="3-topics">3. Topics</h1>
 <p>A <em>Topic</em> is the fundamental way to organize data in Kafka.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Think of a topic like a *folder in a filesystem*, and events are the *files* inside that folder.</span></span></code></pre><h2 id="key-properties-of-a-topic">Key Properties of a Topic</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Think of a topic like a *folder in a filesystem*, and events are the *files* inside that folder.</span></span></code></pre><h2 id="key-properties-of-a-topic">Key Properties of a Topic</h2>
 <table><thead><tr><th>Property</th><th>Detail</th></tr></thead><tbody>
 <tr><td><em>Multi-producer</em></td><td>One, two, or many producers can write to the same topic</td></tr>
 <tr><td><em>Multi-consumer</em></td><td>One, two, or many consumers can read from the same topic</td></tr>
@@ -117,7 +117,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <hr />
 <h1 id="4-partitions">4. Partitions</h1>
 <p>A <em>Partition</em> is the physical subdivision of a Kafka topic. This is the most important concept for scalability.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>A Topic is *logical*. A Partition is *physical* (an actual append-only log on disk).</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>A Topic is *logical*. A Partition is *physical* (an actual append-only log on disk).</span></span></code></pre>
 <p>Instead of storing all events of a topic in one place, Kafka <em>splits (shards)</em> the topic into multiple partitions spread across brokers.</p>
 <h2 id="why-partitions-exist">Why Partitions Exist</h2>
 <table><thead><tr><th>Reason</th><th>Explanation</th></tr></thead><tbody>
@@ -132,7 +132,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <tr><td><em>Manual override</em></td><td>Producer explicitly specifies partition number</td></tr>
 </tbody></table>
 <h2 id="visual-partition-as-append-only-log">Visual: Partition as Append-Only Log</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders</span></span>
 <span class="giallo-l"><span>-----------------------------</span></span>
 <span class="giallo-l"><span>P0 → [event1] [event2] [event3]  ← appended in order</span></span>
 <span class="giallo-l"><span>P1 → [event4] [event5]</span></span>
@@ -153,7 +153,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 </ul>
 <h2 id="cluster">Cluster</h2>
 <p>A <em>Kafka Cluster</em> is a group of multiple brokers working together.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Kafka Cluster</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Kafka Cluster</span></span>
 <span class="giallo-l"><span>┌───────────────────────────────────────┐</span></span>
 <span class="giallo-l"><span>│  Broker 1    Broker 2    Broker 3     │</span></span>
 <span class="giallo-l"><span>│  (Node 1)    (Node 2)    (Node 3)     │</span></span>
@@ -169,7 +169,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <tr><td><em>Status</em></td><td>Deprecated</td><td>Current standard</td></tr>
 <tr><td><em>Setup</em></td><td>Requires separate ZooKeeper cluster</td><td>Self-contained — just start Kafka</td></tr>
 </tbody></table>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Use KRaft mode for all new setups.* This is what the local setup commands below use.</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>*Use KRaft mode for all new setups.* This is what the local setup commands below use.</span></span></code></pre>
 <hr />
 <h1 id="6-partition-leader-follower">6. Partition Leader &amp; Follower</h1>
 <p>This is the most important concept for understanding how Kafka achieves both <em>performance</em> and <em>fault tolerance</em>.</p>
@@ -179,7 +179,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <li><em>Exactly 1 Leader broker</em> — handles ALL reads and writes for that partition</li>
 <li><em>0 or more Follower brokers</em> — maintain replicas (copies) of the partition data</li>
 </ul>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Partition P1:</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Partition P1:</span></span>
 <span class="giallo-l"><span>┌──────────────────────────────────────┐</span></span>
 <span class="giallo-l"><span>│  Broker-2 (Leader)  ← ALL traffic   │</span></span>
 <span class="giallo-l"><span>│  Broker-1 (Follower) ← replica only │</span></span>
@@ -199,9 +199,9 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <hr />
 <h1 id="7-replication-factor">7. Replication Factor</h1>
 <p>The <em>Replication Factor (RF)</em> defines how many copies of a partition exist across the cluster.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Replication Factor = 3</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Replication Factor = 3</span></span>
 <span class="giallo-l"><span>  → 1 leader copy + 2 follower copies = 3 total replicas</span></span></code></pre><h2 id="example-topic-with-rf-3-and-2-partitions-3-brokers">Example: Topic with RF=3 and 2 Partitions, 3 Brokers</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>          Broker-1        Broker-2        Broker-3</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>          Broker-1        Broker-2        Broker-3</span></span>
 <span class="giallo-l"><span>          --------        --------        --------</span></span>
 <span class="giallo-l"><span>          P0 (Leader)     P1 (Leader)     P0 (Follower)</span></span>
 <span class="giallo-l"><span>          P1 (Follower)   P0 (Follower)   P1 (Follower)</span></span></code></pre>
@@ -216,7 +216,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <tr><td>RF = 2</td><td>One backup copy</td><td>Acceptable for non-critical data</td></tr>
 <tr><td>RF = 3</td><td>Two backup copies</td><td><em>Standard for production</em></td></tr>
 </tbody></table>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Rule of thumb:* RF should never exceed the number of brokers.</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>*Rule of thumb:* RF should never exceed the number of brokers.</span></span>
 <span class="giallo-l"><span>RF = 3 requires at least 3 brokers.</span></span></code></pre><h2 id="how-replication-works-step-by-step">How Replication Works (Step by Step)</h2>
 <h1 id="producer-writes-to-the-partition-leader"><em>Producer writes</em> to the partition <em>leader</em>.</h1>
 <h1 id="leader-writes-to-its-local-log">Leader writes to its local log.</h1>
@@ -224,7 +224,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <h1 id="once-followers-have-copied-the-data-they-are-considered-in-sync-part-of-the-isr-in-sync-replica-set">Once followers have copied the data, they are considered <em>in-sync</em> (part of the ISR — In-Sync Replica set).</h1>
 <h1 id="data-is-now-durable">Data is now durable.</h1>
 <h2 id="without-vs-with-replication">Without vs With Replication</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>WITHOUT replication:</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>WITHOUT replication:</span></span>
 <span class="giallo-l"><span>  Broker crashes → partition data gone forever ❌</span></span>
 <span class="giallo-l"></span>
 <span class="giallo-l"><span>WITH replication (RF=3):</span></span>
@@ -248,12 +248,12 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <h1 id="9-how-spring-boot-bootstraps-routes-messages">9. How Spring Boot Bootstraps &amp; Routes Messages</h1>
 <p>This is a very common interview question. Understanding this end-to-end is essential.</p>
 <h2 id="configuration">Configuration</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># application.properties</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.bootstrap-servers</span><span style="color: #94E2D5;">=</span><span>broker1:9092,broker2:9092,broker3:9092</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.producer.key-serializer</span><span style="color: #94E2D5;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.producer.value-serializer</span><span style="color: #94E2D5;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span></code></pre><pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Common misconception:* &quot;The producer only talks to the bootstrap server.&quot;</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #928374;font-style: italic;"># application.properties</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">spring.kafka.bootstrap-servers</span><span style="color: #A89984;">=</span><span>broker1:9092,broker2:9092,broker3:9092</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">spring.kafka.producer.key-serializer</span><span style="color: #A89984;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">spring.kafka.producer.value-serializer</span><span style="color: #A89984;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>*Common misconception:* &quot;The producer only talks to the bootstrap server.&quot;</span></span>
 <span class="giallo-l"><span>*Reality:* Bootstrap servers are just the *initial contact point*. After the first handshake, the producer talks directly to whichever broker is the partition leader.</span></span></code></pre><h2 id="step-by-step-what-happens-when-spring-boot-sends-a-message">Step-by-Step: What Happens When Spring Boot Sends a Message</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Step 1: Bootstrap Connection</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Step 1: Bootstrap Connection</span></span>
 <span class="giallo-l"><span>      Spring Boot Producer</span></span>
 <span class="giallo-l"><span>             │</span></span>
 <span class="giallo-l"><span>             │ Initial connection (just for metadata)</span></span>
@@ -279,7 +279,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <span class="giallo-l"><span>         │ replicates</span></span>
 <span class="giallo-l"><span>         ├──→ Broker-1 (Follower of P1)</span></span>
 <span class="giallo-l"><span>         └──→ Broker-3 (Follower of P1)</span></span></code></pre><h2 id="whiteboard-diagram">Whiteboard Diagram</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>        +----------------------+</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>        +----------------------+</span></span>
 <span class="giallo-l"><span>        |  Spring Boot Producer|</span></span>
 <span class="giallo-l"><span>        +----------+-----------+</span></span>
 <span class="giallo-l"><span>                   │</span></span>
@@ -315,7 +315,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <span class="giallo-l"><span>  | Broker-1    |           | Broker-3    |</span></span>
 <span class="giallo-l"><span>  | (Follower)  |           | (Follower)  |</span></span>
 <span class="giallo-l"><span>  +-------------+           +-------------+</span></span></code></pre><h2 id="interview-answer-crisp-complete">Interview Answer (Crisp &amp; Complete)</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;Producer connects to any bootstrap broker to fetch cluster metadata — topics, partitions, and their leader brokers. When sending a message, Kafka determines the target partition based on the message key (via hashing) or using round-robin if no key is provided. The producer then sends the message *directly to the leader broker* of that partition, not necessarily the bootstrap broker. After receiving the message, the leader replicates it to follower brokers. If a broker goes down, Kafka elects a new leader and the producer automatically updates its metadata and continues — no manual intervention needed.&quot;</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;Producer connects to any bootstrap broker to fetch cluster metadata — topics, partitions, and their leader brokers. When sending a message, Kafka determines the target partition based on the message key (via hashing) or using round-robin if no key is provided. The producer then sends the message *directly to the leader broker* of that partition, not necessarily the bootstrap broker. After receiving the message, the leader replicates it to follower brokers. If a broker goes down, Kafka elects a new leader and the producer automatically updates its metadata and continues — no manual intervention needed.&quot;</span></span></code></pre>
 <hr />
 <h1 id="10-consumers-consumer-groups">10. Consumers &amp; Consumer Groups</h1>
 <h2 id="consumer">Consumer</h2>
@@ -327,8 +327,8 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 </ul>
 <h2 id="consumer-group">Consumer Group</h2>
 <p>A <em>Consumer Group</em> is a set of consumers that work together to consume a topic.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Core rule:* Within a consumer group, each partition is consumed by *at most one consumer*. But multiple consumer groups can each independently consume the same topic.</span></span></code></pre><h2 id="partition-assignment-within-a-group">Partition Assignment Within a Group</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders (3 partitions)</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>*Core rule:* Within a consumer group, each partition is consumed by *at most one consumer*. But multiple consumer groups can each independently consume the same topic.</span></span></code></pre><h2 id="partition-assignment-within-a-group">Partition Assignment Within a Group</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders (3 partitions)</span></span>
 <span class="giallo-l"><span>Consumer Group: payment-service</span></span>
 <span class="giallo-l"></span>
 <span class="giallo-l"><span>P0 → Consumer-1</span></span>
@@ -339,7 +339,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <li>If you have <em>fewer consumers than partitions</em>, some consumers handle multiple partitions.</li>
 </ul>
 <h2 id="scaling-consumers">Scaling Consumers</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>3 partitions, 3 consumers → perfect parallelism ✅</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>3 partitions, 3 consumers → perfect parallelism ✅</span></span>
 <span class="giallo-l"></span>
 <span class="giallo-l"><span>         P0    P1    P2</span></span>
 <span class="giallo-l"><span>          │     │     │</span></span>
@@ -361,7 +361,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <p><em>Maximum useful parallelism = number of partitions</em></p>
 <h2 id="multiple-consumer-groups-fan-out-pattern">Multiple Consumer Groups (Fan-Out Pattern)</h2>
 <p>This is where Kafka truly shines. The same data can be consumed independently by completely different services.</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>                Topic: payments (2 partitions)</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>                Topic: payments (2 partitions)</span></span>
 <span class="giallo-l"><span>               ─────────────────────────────────</span></span>
 <span class="giallo-l"><span>                   P0                 P1</span></span>
 <span class="giallo-l"></span>
@@ -387,7 +387,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <li><em>Audit Logger</em> → writes to compliance logs</li>
 </ul>
 <h2 id="interview-answer">Interview Answer</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;If consumers belong to *different consumer groups*, each group independently consumes the same data. The one-partition-per-consumer rule applies only _within_ a consumer group. So multiple services can each receive every event, enabling fan-out patterns. Offsets are tracked per consumer group, so each group reads at its own pace without affecting others.&quot;</span></span></code></pre>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;If consumers belong to *different consumer groups*, each group independently consumes the same data. The one-partition-per-consumer rule applies only _within_ a consumer group. So multiple services can each receive every event, enabling fan-out patterns. Offsets are tracked per consumer group, so each group reads at its own pace without affecting others.&quot;</span></span></code></pre>
 <hr />
 <h1 id="11-kafka-connect">11. Kafka Connect</h1>
 <p><em>Kafka Connect</em> is a framework for moving data into and out of Kafka without writing custom code.</p>
@@ -419,7 +419,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <tr><td>No replay capability</td><td>Kafka retains events; consumers can replay</td></tr>
 </tbody></table>
 <h2 id="architecture-diagram">Architecture Diagram</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Source Systems         Kafka              Sink Systems</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Source Systems         Kafka              Sink Systems</span></span>
 <span class="giallo-l"><span>─────────────     ──────────────     ──────────────────</span></span>
 <span class="giallo-l"><span>  MySQL DB    →   │            │  →    Elasticsearch</span></span>
 <span class="giallo-l"><span>  PostgreSQL  →   │   Kafka    │  →    Snowflake DW</span></span>
@@ -432,7 +432,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <h1 id="12-how-to-decide-partition-count">12. How to Decide Partition Count</h1>
 <p>Choosing the right number of partitions is a critical design decision. Too few = bottleneck. Too many = overhead.</p>
 <h2 id="why-partition-count-matters">Why Partition Count Matters</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>BAD DESIGN (too few partitions — bottleneck):</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>BAD DESIGN (too few partitions — bottleneck):</span></span>
 <span class="giallo-l"></span>
 <span class="giallo-l"><span>        Topic (1 Partition)</span></span>
 <span class="giallo-l"><span>                │</span></span>
@@ -458,7 +458,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <tr><td><em>Ordering requirements</em></td><td>If you need strict ordering for an entity (e.g., per user), all messages for that entity go to one partition via key</td></tr>
 </tbody></table>
 <h2 id="practical-formula">Practical Formula</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Desired partition count ≈ max(</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Desired partition count ≈ max(</span></span>
 <span class="giallo-l"><span>    target throughput / throughput per partition,</span></span>
 <span class="giallo-l"><span>    max consumer instances you&#39;ll scale to</span></span>
 <span class="giallo-l"><span>)</span></span></code></pre><h2 id="real-example">Real Example</h2>
@@ -469,7 +469,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 </ul>
 <p>→ Use <em>12 partitions</em> (covers both throughput and consumer parallelism)</p>
 <h2 id="important-caveat">Important Caveat</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>You can *increase* partitions later, but you *cannot decrease* them.</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>You can *increase* partitions later, but you *cannot decrease* them.</span></span>
 <span class="giallo-l"><span>Increasing partitions can also break key-based ordering for existing keys.</span></span>
 <span class="giallo-l"><span>So: *over-partition slightly* rather than under-partition.</span></span></code></pre><h2 id="general-recommendations">General Recommendations</h2>
 <table><thead><tr><th>Cluster Size</th><th>Recommendation</th></tr></thead><tbody>
@@ -480,54 +480,54 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <hr />
 <h1 id="13-creating-a-topic-cli-commands">13. Creating a Topic — CLI Commands</h1>
 <h2 id="start-kafka-locally-kraft-mode">Start Kafka Locally (KRaft Mode)</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 1: Generate Cluster ID</span></span>
-<span class="giallo-l"><span>KAFKA_CLUSTER_ID</span><span style="color: #94E2D5;">=</span><span style="color: #A6E3A1;">&quot;</span><span style="color: #9399B2;">$(</span><span style="color: #89B4FA;font-style: italic;">./bin/kafka-storage.sh</span><span style="color: #A6E3A1;"> random-uuid</span><span style="color: #9399B2;">)</span><span style="color: #A6E3A1;">&quot;</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #928374;font-style: italic;"># Step 1: Generate Cluster ID</span></span>
+<span class="giallo-l"><span style="color: #83A598;">KAFKA_CLUSTER_ID</span><span style="color: #8EC07C;">=</span><span style="color: #A89984;">&quot;$(</span><span style="color: #FABD2F;">./bin/kafka-storage.sh</span><span style="color: #B8BB26;"> random-uuid</span><span style="color: #A89984;">)&quot;</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 2: Format storage</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-storage.sh</span><span style="color: #A6E3A1;"> format --standalone -t</span><span> $KAFKA_CLUSTER_ID</span><span style="color: #A6E3A1;"> -c config/server.properties</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Step 2: Format storage</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-storage.sh</span><span style="color: #B8BB26;"> format</span><span style="color: #D3869B;"> --standalone -t</span><span style="color: #83A598;"> $KAFKA_CLUSTER_ID</span><span style="color: #D3869B;"> -c</span><span style="color: #B8BB26;"> config/server.properties</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 3: Start the broker</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-server-start.sh</span><span style="color: #A6E3A1;"> config/server.properties</span></span></code></pre><h2 id="topic-operations">Topic Operations</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Create a topic</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --create</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --partitions</span><span style="color: #FAB387;"> 3</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --replication-factor</span><span style="color: #FAB387;"> 1</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Step 3: Start the broker</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-server-start.sh</span><span style="color: #B8BB26;"> config/server.properties</span></span></code></pre><h2 id="topic-operations">Topic Operations</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #928374;font-style: italic;"># Create a topic</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-topics.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --create \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --partitions 3 \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --replication-factor 1 \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Describe a topic (shows partition distribution, leaders, ISR)</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --describe</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Describe a topic (shows partition distribution, leaders, ISR)</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-topics.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --describe \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># List all topics</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --list</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># List all topics</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-topics.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --list \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Delete a topic</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --delete</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span></code></pre><h2 id="producer-consumer-cli-testing">Producer &amp; Consumer (CLI Testing)</h2>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Start a console producer</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-producer.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Delete a topic</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-topics.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --delete \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span></code></pre><h2 id="producer-consumer-cli-testing">Producer &amp; Consumer (CLI Testing)</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #928374;font-style: italic;"># Start a console producer</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-console-producer.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Start a console consumer (read from beginning)</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-consumer.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --from-beginning</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Start a console consumer (read from beginning)</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-console-consumer.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --from-beginning \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Consumer in a group</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-consumer.sh</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --group payment-service</span><span style="color: #F5C2E7;"> \</span></span>
-<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span></code></pre>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Consumer in a group</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">./bin/kafka-console-consumer.sh</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --topic</span><span style="color: #B8BB26;"> payments</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --group</span><span style="color: #B8BB26;"> payment-service</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">  --bootstrap-server</span><span style="color: #B8BB26;"> localhost:9092</span></span></code></pre>
 <hr />
 <h1 id="14-starting-kafka-locally-kraft-mode">14. Starting Kafka Locally (KRaft Mode)</h1>
 <h2 id="what-kraft-mode-is">What KRaft Mode Is</h2>
@@ -535,12 +535,12 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <p><em>KRaft (Kafka Raft)</em> removes this dependency. Kafka now manages its own metadata internally using a built-in Raft consensus protocol.</p>
 <h2 id="process-roles-in-kraft">Process Roles in KRaft</h2>
 <p>In <code>server.properties</code>:</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Combined mode (broker + controller in one process) — good for local dev</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">process.roles</span><span style="color: #94E2D5;">=</span><span>broker,controller</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #928374;font-style: italic;"># Combined mode (broker + controller in one process) — good for local dev</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">process.roles</span><span style="color: #A89984;">=</span><span>broker,controller</span></span>
 <span class="giallo-l"></span>
-<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Recommended log directory configuration</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">log.dirs</span><span style="color: #94E2D5;">=</span><span>/path/to/kafka-broker-logs</span></span>
-<span class="giallo-l"><span style="color: #89B4FA;">metadata.log.dir</span><span style="color: #94E2D5;">=</span><span>/path/to/kafka-metadata-logs</span></span></code></pre>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;"># Recommended log directory configuration</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">log.dirs</span><span style="color: #A89984;">=</span><span>/path/to/kafka-broker-logs</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">metadata.log.dir</span><span style="color: #A89984;">=</span><span>/path/to/kafka-metadata-logs</span></span></code></pre>
 <p>For production, these directories should be on <em>separate disks</em> for reliability.</p>
 <h2 id="why-two-log-directories">Why Two Log Directories?</h2>
 <table><thead><tr><th>Directory</th><th>Purpose</th></tr></thead><tbody>
@@ -552,7 +552,7 @@ Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
 <h1 id="15-real-world-architecture-example">15. Real-World Architecture Example</h1>
 <h2 id="payment-processing-platform">Payment Processing Platform</h2>
 <p>This is a real architecture using Kafka to decouple services:</p>
-<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>External        Config      Kafka          Middleware     Targets</span></span>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>External        Config      Kafka          Middleware     Targets</span></span>
 <span class="giallo-l"><span>Sources         Manager    Cluster         Service        (3rd Party)</span></span>
 <span class="giallo-l"><span>─────────      ─────────  ─────────       ─────────      ─────────</span></span>
 <span class="giallo-l"><span>                          ┌─────────┐</span></span>

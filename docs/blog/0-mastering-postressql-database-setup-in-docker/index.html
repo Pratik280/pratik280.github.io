@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Mastering PostgreSQL Database Setup in Docker: Persistent Volumes, User Creation, Backup, and Restoration</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Mastering PostgreSQL Database Setup in Docker: Persistent Volumes, User Creation, Backup, and Restoration</h1>
+    
+    <p class="secondary small">
+        25 June, 2023
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<h2 id="introduction">Introduction</h2>
+<p>Welcome to my blog where I dive into the world of PostgreSQL and Docker! In this article, I will guide you through the process of setting up a PostgreSQL database using Docker, leveraging volumes for data persistence. We will explore creating users and databases, and I will walk you through the steps of backing up and restoring your database using the powerful pg_dump utility. By the end of this blog, you'll have a solid understanding of how to work with PostgreSQL and Docker, ensuring data persistence and efficient management of your database environment. Let's get started on this exciting journey!</p>
+<h2 id="using-docker-for-postgres-databse">Using docker for postgres databse.</h2>
+<p>We will be using the <a rel="external" href="https://hub.docker.com/_/postgres">Dockerhub official postgresql image</a> to run our postgres database server.</p>
+<p>To pull the image locally run the following command:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> pull postgres</span></span></code></pre>
+<p>Start the postgres database container using the following command:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> run</span><span style="color: #D3869B;"> -d \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> --name</span><span style="color: #B8BB26;"> postgres-container</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> -e</span><span style="color: #B8BB26;"> POSTGRES_PASSWORD=mysecretpassword</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> -v</span><span style="color: #B8BB26;"> postgres-container-data:/var/lib/postgresql/data</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #B8BB26;"> postgres</span></span></code></pre>
+<p>Let's break down the command and its options:</p>
+<ul>
+<li><code>--name postgres-container</code> sets the name of the container as "postgres-container".</li>
+<li><code>-e POSTGRES_PASSWORD=mysecretpassword</code> is an environment variable which is used to set the password for the PostgreSQL instance running inside the container.</li>
+<li><code>-d</code> runs the container in the background (detached mode), so it doesn't occupy the terminal session.</li>
+<li><code>-v postgres-container-data:/var/lib/postgresql/data</code> is a option that creates a volume named "postgres-container-data" and mounts it to the directory /var/lib/postgresql/data within the container. Volumes allow persistent storage, so the data stored in that directory will be preserved even if the container is stopped or removed. This is commonly used to store the database files and ensure data persistence.</li>
+<li><code>postgres</code> is the docker image(pulled locally earlier) which will be used to create the container.</li>
+</ul>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -it</span><span style="color: #B8BB26;"> postgres-container /bin/bash</span></span></code></pre>
+<p>Let's break down the command and its options:</p>
+<ul>
+<li><code>docker exec</code>: This is the command to execute a command within a running Docker container.</li>
+<li><code>-it</code>: These options allow for an interactive session with the container. It combines the -i (interactive) and -t (pseudo-TTY) options.</li>
+<li><code>postgres-container</code>: This is the name or ID of the Docker container where you want to execute the command.</li>
+<li><code>/bin/bash</code>: This is the command you want to run inside the container. In this case, it starts a Bash shell within the container.</li>
+</ul>
+<p>The prompt will change and our shell we will be inside the container:</p>
+<p>Now run the following command to switch to the <code>postgres</code> user:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">su</span><span style="color: #B8BB26;"> - postgres</span></span></code></pre>
+<p>The psql command is used to interact with a PostgreSQL database from the command line. It provides an interactive terminal-based interface for executing SQL queries and managing the PostgreSQL server.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">psql</span></span></code></pre><h3 id="some-basic-psql-commands-that-are-necessary-to-know-before-working-with-psql">Some basic psql commands that are necessary to know before working with psql:</h3>
+<ul>
+<li>
+<p><code>\l</code>: Lists all available databases.</p>
+</li>
+<li>
+<p><code>\c &lt;database_name&gt;</code>: Connects to a specific database.</p>
+</li>
+<li>
+<p><code>\dt</code>: Lists all tables in the current database.</p>
+</li>
+<li>
+<p><code>\d &lt;table_name&gt;</code>: Shows the structure of a specific table.</p>
+</li>
+</ul>
+<p>Now we will create a user using <code>CREATE USER</code> command in PostgreSQL which is used to create a new user account with specified attributes, including an encrypted password.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">CREATE USER</span><span style="color: #FABD2F;"> dbuser</span><span style="color: #FB4934;"> WITH ENCRYPTED PASSWORD</span><span style="color: #A89984;"> &#39;</span><span style="color: #B8BB26;">dbuser123</span><span style="color: #A89984;">&#39;</span><span>;</span></span></code></pre>
+<p>Let's break down the CREATE USER command:</p>
+<ul>
+<li><code>CREATE USER</code>: This is the command used to create a new user in PostgreSQL.</li>
+<li><code>dbuser</code>: This is the username we have assigned to the new user.</li>
+<li><code>WITH ENCRYPTED PASSWORD</code>: This clause specifies that you are providing an encrypted password for the user.</li>
+<li><code>'dbuser123'</code>: This is the encrypted password for the user.</li>
+</ul>
+<p>Let's proceed with creating a new database and designating <code>dbuser</code> as its owner.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">CREATE DATABASE</span><span style="color: #FABD2F;"> employeedb</span><span style="color: #FB4934;"> OWNER</span><span> dbuser;</span></span></code></pre>
+<p>Use the following command to list all databases:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>\l</span></span></code></pre>
+<p>Now connect to the <code>employeedb</code> database as user <code>dbuser</code>:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>\c employeedb dbuser</span></span></code></pre><h3 id="creation-of-tables-and-the-insertion-of-values-into-them">Creation of tables and the insertion of values into them.</h3>
+<p>For the purpose of demonstration, we will proceed to create a few tables in the <code>employeedb</code> database.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">CREATE TABLE</span><span style="color: #FABD2F;"> employees</span><span> (</span></span>
+<span class="giallo-l"><span>  emp_id </span><span style="color: #FE8019;">INT PRIMARY KEY</span><span>,</span></span>
+<span class="giallo-l"><span>  emp_name </span><span style="color: #FE8019;">VARCHAR</span><span>(</span><span style="color: #D3869B;">255</span><span>)</span></span>
+<span class="giallo-l"><span>);</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">CREATE TABLE</span><span style="color: #FABD2F;"> designations</span><span> (</span></span>
+<span class="giallo-l"><span>  designation_id </span><span style="color: #FE8019;">INT PRIMARY KEY</span><span>,</span></span>
+<span class="giallo-l"><span>  designation_name </span><span style="color: #FE8019;">VARCHAR</span><span>(</span><span style="color: #D3869B;">255</span><span>)</span></span>
+<span class="giallo-l"><span>);</span></span></code></pre>
+<p>Adding few rows in the tables</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">INSERT INTO</span><span> employees (emp_id, emp_name)</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">VALUES</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">1</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">John Doe</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">2</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Jane Smith</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">3</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">David Johnson</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">4</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Emily Brown</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">5</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Michael Davis</span><span style="color: #A89984;">&#39;</span><span>);</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">INSERT INTO</span><span> designations (designation_id, designation_name)</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">VALUES</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">1</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Manager</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">2</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Engineer</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">3</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Analyst</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">4</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Developer</span><span style="color: #A89984;">&#39;</span><span>),</span></span>
+<span class="giallo-l"><span>  (</span><span style="color: #D3869B;">5</span><span>, </span><span style="color: #A89984;">&#39;</span><span style="color: #B8BB26;">Administrator</span><span style="color: #A89984;">&#39;</span><span>);</span></span></code></pre>
+<p>To retrieve all the rows stored in the table and display them:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">SELECT</span><span style="color: #8EC07C;"> *</span><span style="color: #FB4934;"> FROM</span><span> employees;</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">SELECT</span><span style="color: #8EC07C;"> *</span><span style="color: #FB4934;"> FROM</span><span> designations;</span></span></code></pre><h3 id="working-with-pg-dump-to-create-a-database-backup">Working with pg_dump to Create a Database Backup</h3>
+<p>To create a dump file of a PostgreSQL database, you can use the following command:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">pg_dump</span><span style="color: #D3869B;"> -U</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">usernam</span><span>e</span><span style="color: #8EC07C;">&gt;</span><span style="color: #D3869B;"> -d</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">database_nam</span><span>e</span><span style="color: #8EC07C;">&gt;</span><span style="color: #D3869B;"> -f</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">dump.sq</span><span>l</span><span style="color: #8EC07C;">&gt;</span></span></code></pre>
+<p>As we are running PostgreSQL inside a Docker container, we need to modify the command accordingly.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -t</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">container-name/container-i</span><span>d</span><span style="color: #8EC07C;">&gt;</span><span style="color: #B8BB26;"> pg_dump</span><span style="color: #D3869B;"> -U</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">db-use</span><span>r</span><span style="color: #8EC07C;">&gt;</span><span style="color: #D3869B;"> -d</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">db-nam</span><span>e</span><span style="color: #8EC07C;">&gt; &gt; &lt;</span><span style="color: #B8BB26;">output-fil</span><span>e</span><span style="color: #8EC07C;">&gt;</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -t</span><span style="color: #B8BB26;"> postgres-container pg_dump</span><span style="color: #D3869B;"> -U</span><span style="color: #B8BB26;"> dbuser</span><span style="color: #D3869B;"> -d</span><span style="color: #B8BB26;"> employeedb</span><span style="color: #8EC07C;"> &gt;</span><span style="color: #B8BB26;"> dump.sql</span></span></code></pre>
+<p>We will now proceed to delete the employeedb database and then recreate it using the previously created dump file.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">DROP</span><span style="color: #B8BB26;"> DATABASE employeedb</span><span style="color: #A89984;">;</span></span></code></pre>
+<p>To recreate a database using a dump file, it is necessary to first create the database that is referenced within the dump file.
+Please note that before creating the database from the dump file, it is necessary to add the user specified within the dump file.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">CREATE DATABASE</span><span style="color: #FABD2F;"> employeedb</span><span>;</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">GRANT</span><span> ALL PRIVILEGES </span><span style="color: #FB4934;">ON SCHEMA</span><span> public </span><span style="color: #FB4934;">TO</span><span> dbuser;</span></span></code></pre>
+<p>The command below is utilized to import/recreate a database by utilizing a dump file.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">psql</span><span style="color: #D3869B;"> -U</span><span style="color: #B8BB26;"> your_username</span><span style="color: #D3869B;"> -d</span><span style="color: #B8BB26;"> your_database_name</span><span style="color: #D3869B;"> -f</span><span style="color: #B8BB26;"> your_dump_file.sql</span></span></code></pre>
+<p>As we are running PostgreSQL inside a Docker container, we need to modify the command accordingly.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -i</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">CONTAINER_I</span><span>D</span><span style="color: #8EC07C;">&gt;</span><span style="color: #B8BB26;"> psql</span><span style="color: #D3869B;"> -U</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">db-usernam</span><span>e</span><span style="color: #8EC07C;">&gt;</span><span style="color: #D3869B;"> -d</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">db-nam</span><span>e</span><span style="color: #8EC07C;">&gt; &lt;</span><span style="color: #B8BB26;"> dump.sql</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -i</span><span style="color: #B8BB26;"> postgres-container psql</span><span style="color: #D3869B;"> -U</span><span style="color: #B8BB26;"> dbuser</span><span style="color: #D3869B;"> -d</span><span style="color: #B8BB26;"> employeedb</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;"> dump.sql</span></span></code></pre>
+<p>Once the database has been created using the dump file, you can verify its creation by examining the rows within the table.</p>
+<p>To begin, establish a connection to the database using the following command:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -it</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">CONTAINER_NAME_OR_I</span><span>D</span><span style="color: #8EC07C;">&gt;</span><span style="color: #B8BB26;"> psql</span><span style="color: #D3869B;"> -U</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">USERNAM</span><span>E</span><span style="color: #8EC07C;">&gt;</span><span style="color: #D3869B;"> -d</span><span style="color: #8EC07C;"> &lt;</span><span style="color: #B8BB26;">DATABASE_NAM</span><span>E</span><span style="color: #8EC07C;">&gt;</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -it</span><span style="color: #B8BB26;"> postgres-container psql</span><span style="color: #D3869B;"> -U</span><span style="color: #B8BB26;"> dbuser</span><span style="color: #D3869B;"> -d</span><span style="color: #B8BB26;"> employeedb</span></span></code></pre>
+<p>Subsequently, execute SELECT queries to verify the consistency of tables and their respective rows following the recreation of the database using the dump file.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="sql"><span class="giallo-l"><span style="color: #FB4934;">SELECT</span><span style="color: #8EC07C;"> *</span><span style="color: #FB4934;"> FROM</span><span> employees;</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">SELECT</span><span style="color: #8EC07C;"> *</span><span style="color: #FB4934;"> FROM</span><span> designations;</span></span></code></pre><h3 id="deleting-the-postgres-container-and-recreating-it-with-the-same-volume-to-verify-data-persistence">Deleting the postgres-container and Recreating It with the Same Volume to Verify Data Persistence</h3>
+<p>First stop the running docker container:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> stop postgres-container</span></span></code></pre>
+<p>Now delete the running docker container:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> rm postgres-container</span></span></code></pre>
+<p>To ensure data persistence and verify the presence of all data (databases, users, tables, and rows), let's start a new container using the same named volume, <code>postgres-container-data</code>, that was utilized by the previous container.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> run</span><span style="color: #D3869B;"> -d \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> --name</span><span style="color: #B8BB26;"> postgres-container</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> -e</span><span style="color: #B8BB26;"> POSTGRES_PASSWORD=mysecretpassword</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #D3869B;"> -v</span><span style="color: #B8BB26;"> postgres-container-data:/var/lib/postgresql/data</span><span style="color: #D3869B;"> \</span></span>
+<span class="giallo-l"><span style="color: #B8BB26;"> postgres</span></span></code></pre>
+<p>Now connect to the same database <code>employeedb</code> with the same user <code>db user</code>:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #FABD2F;">docker</span><span style="color: #B8BB26;"> exec</span><span style="color: #D3869B;"> -it</span><span style="color: #B8BB26;"> postgres-container psql</span><span style="color: #D3869B;"> -U</span><span style="color: #B8BB26;"> dbuser</span><span style="color: #D3869B;"> -d</span><span style="color: #B8BB26;"> employeedb</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #83A598;">employeedb</span><span style="color: #8EC07C;">=&gt;</span><span style="color: #FABD2F;"> SELECT</span><span style="color: #83A598;"> *</span><span style="color: #B8BB26;"> FROM public.employees</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;"> emp_id</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;">   emp_name</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">--------+---------------</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">      1</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;"> John</span><span style="color: #B8BB26;"> Doe</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">      2</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;"> Jane</span><span style="color: #B8BB26;"> Smith</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">      3</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;"> David</span><span style="color: #B8BB26;"> Johnson</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">      4</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;"> Emily</span><span style="color: #B8BB26;"> Brown</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">      5</span><span style="color: #8EC07C;"> |</span><span style="color: #FABD2F;"> Michael</span><span style="color: #B8BB26;"> Davis</span></span>
+<span class="giallo-l"><span style="color: #A89984;">(</span><span style="color: #FABD2F;">5</span><span style="color: #B8BB26;"> rows</span><span style="color: #A89984;">)</span></span></code></pre>
+<p>The data persistence of our container is demonstrated by the fact that even after deleting and recreating it with the same volume, all our previously created databases, users, tables, and rows remain intact. This confirms that Docker volumes effectively preserve our data across container lifecycles.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In conclusion, we have explored the process of setting up a PostgreSQL database in a Docker container, utilizing volumes to ensure data persistence. We learned how to create users and databases within the PostgreSQL environment, enabling efficient data management. Additionally, we delved into the powerful pg_dump utility, which allows us to create backups of our databases and restore them as needed. By following these steps, you now have the knowledge and tools to confidently work with PostgreSQL in a Dockerized environment, ensuring the integrity and availability of your data. Docker and PostgreSQL make a powerful combination, providing flexibility, scalability, and ease of use. I hope this blog has been informative and helpful in your journey of working with PostgreSQL and Docker.</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

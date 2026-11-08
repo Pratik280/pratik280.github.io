@@ -10,6 +10,10 @@
         <loc>https://pratik280.github.io/blog/</loc>
     </url>
     <url>
+        <loc>https://pratik280.github.io/blog/0-mastering-postressql-database-setup-in-docker/</loc>
+        <lastmod>2023-06-25</lastmod>
+    </url>
+    <url>
         <loc>https://pratik280.github.io/blog/1-kafka-complete-study-notes/</loc>
         <lastmod>2025-06-27</lastmod>
     </url>

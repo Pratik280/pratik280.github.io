@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Production-Grade Spring Boot APIs — Part 3: Production-Grade Folder Structure &amp; Layered Implementation</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Production-Grade Spring Boot APIs — Part 3: Production-Grade Folder Structure &amp; Layered Implementation</h1>
+    
+    <p class="secondary small">
+        27 January, 2026
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<p>A practical guide to production-grade Spring Boot folder structure and layered architecture, covering controllers, services, repositories, DTOs, entities, BaseResponse usage, and global exception handling.</p>
+<p>This is Part 3 of the <strong>Production-Grade Spring Boot API Design series</strong>.</p>
+<p>Code Gihub Repo: <a rel="external" href="https://github.com/Pratik280/order-system/tree/develop">https://github.com/Pratik280/order-system/tree/develop</a></p>
+<p>In production Spring Boot applications, <strong>folder structure is not cosmetic</strong>.<br />
+It enforces separation of concerns, improves readability, and allows teams to scale safely.</p>
+<p>Below is a <strong>typical production-ready package structure</strong> used for REST APIs.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>com.example.orderservice</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── controller</span></span>
+<span class="giallo-l"><span>│ └── OrderController.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── entity</span></span>
+<span class="giallo-l"><span>│ └── OrderEntity.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── dto</span></span>
+<span class="giallo-l"><span>│ ├── OrderRequest.java</span></span>
+<span class="giallo-l"><span>│ └── OrderResponse.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── repository</span></span>
+<span class="giallo-l"><span>│ └── OrderRepository.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── service</span></span>
+<span class="giallo-l"><span>│ ├── OrderService.java</span></span>
+<span class="giallo-l"><span>│ └── impl</span></span>
+<span class="giallo-l"><span>│ └── OrderServiceImpl.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── exception</span></span>
+<span class="giallo-l"><span>│ ├── BusinessException.java</span></span>
+<span class="giallo-l"><span>│ └── ResourceNotFoundException.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>├── common</span></span>
+<span class="giallo-l"><span>│ ├── BaseResponse.java</span></span>
+<span class="giallo-l"><span>│ └── ResponseBuilder.java</span></span>
+<span class="giallo-l"><span>│</span></span>
+<span class="giallo-l"><span>└── handler</span></span>
+<span class="giallo-l"><span>└── GlobalExceptionHandler.java</span></span></code></pre>
+<p>Each layer has <strong>one clear responsibility</strong> and does not leak concerns into other layers.</p>
+<hr />
+<h2 id="controller-layer-api-entry-point">Controller Layer — API Entry Point</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">RestController</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">RequestMapping</span><span style="color: #A89984;">(&quot;</span><span style="color: #B8BB26;">/orders</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderController</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> OrderService</span><span> orderService</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> OrderController</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">OrderService</span><span style="color: #83A598;"> orderService</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>orderService</span><span style="color: #8EC07C;"> =</span><span> orderService</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">GetMapping</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">List</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;&gt;&gt;</span><span style="color: #FABD2F;"> getAllOrders</span><span style="color: #A89984;">(){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> ResponseBuilder</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">success</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span>                HttpStatus</span><span style="color: #A89984;">.</span><span>OK</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                &quot;</span><span style="color: #B8BB26;">All orders fetch successfully</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span>                orderService</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getAllOrders</span><span style="color: #A89984;">()</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        );</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">GetMapping</span><span style="color: #A89984;">(&quot;</span><span style="color: #B8BB26;">/{id}</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;&gt;</span><span style="color: #FABD2F;"> getOrderById</span><span style="color: #A89984;">(@</span><span style="color: #83A598;font-weight: bold;">PathVariable</span><span style="color: #FABD2F;"> Long</span><span style="color: #83A598;"> id</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> ResponseBuilder</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">success</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span>                HttpStatus</span><span style="color: #A89984;">.</span><span>OK</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                &quot;</span><span style="color: #B8BB26;">Order fetch successfully</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span>                orderService</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getOrderById</span><span style="color: #A89984;">(</span><span>id</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        );</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">PostMapping</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;&gt;</span><span style="color: #FABD2F;"> createOrder</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">            @</span><span style="color: #83A598;font-weight: bold;">Valid</span><span style="color: #A89984;"> @</span><span style="color: #83A598;font-weight: bold;">RequestBody</span><span style="color: #FABD2F;"> OrderRequest</span><span style="color: #83A598;"> orderRequest</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> ResponseBuilder</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">success</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span>                HttpStatus</span><span style="color: #A89984;">.</span><span>OK</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                &quot;</span><span style="color: #B8BB26;">Order created successfully</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span>                orderService</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">createOrder</span><span style="color: #A89984;">(</span><span>orderRequest</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        );</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span></code></pre>
+<p><strong>Annotations Explained</strong></p>
+<ul>
+<li>
+<p>@RestController</p>
+<p>Marks the class as a REST API controller and automatically serializes responses to JSON.</p>
+</li>
+<li>
+<p>@RequestMapping("/orders")</p>
+<p>Defines a base URL for all endpoints in this controller.</p>
+</li>
+<li>
+<p>@GetMapping</p>
+<p>Handles HTTP GET requests.</p>
+</li>
+<li>
+<p>@PostMapping</p>
+<p>Handles HTTP POST requests.</p>
+</li>
+<li>
+<p>@PathVariable</p>
+<p>Extracts values from the URL path.</p>
+</li>
+<li>
+<p>@RequestBody</p>
+<p>Converts incoming JSON into a Java object.</p>
+</li>
+<li>
+<p>@Valid</p>
+<p>Triggers validation on request DTOs.</p>
+</li>
+</ul>
+<p>Controllers <strong>do not contain business logic</strong>. They only orchestrate requests and responses.</p>
+<hr />
+<h2 id="entity-layer-database-representation">Entity Layer — Database Representation</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Entity</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Table</span><span style="color: #A89984;">(</span><span style="color: #D3869B;">name</span><span style="color: #8EC07C;"> =</span><span style="color: #A89984;"> &quot;</span><span style="color: #B8BB26;">orders</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Getter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Setter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">NoArgsConstructor</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderEntity</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">Id</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">GeneratedValue</span><span style="color: #A89984;">(</span><span style="color: #D3869B;">strategy</span><span style="color: #8EC07C;"> =</span><span> GenerationType</span><span style="color: #A89984;">.</span><span>IDENTITY</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private long</span><span> id</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> String</span><span> productName</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>Entities:</p>
+<ul>
+<li>Represent database tables</li>
+<li>Are used only in the persistence layer</li>
+<li>Are never exposed directly to API clients</li>
+</ul>
+<hr />
+<h2 id="dto-layer-api-contracts">DTO Layer — API Contracts</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Getter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Setter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">NoArgsConstructor</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderRequest</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">NotBlank</span><span style="color: #A89984;">(</span><span style="color: #D3869B;">message</span><span style="color: #8EC07C;"> =</span><span style="color: #A89984;"> &quot;</span><span style="color: #B8BB26;">productName is mandatory</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> String</span><span> productName</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Getter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Setter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">NoArgsConstructor</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderResponse</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> Long</span><span> id</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> String</span><span> productName</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>DTOs:</p>
+<ul>
+<li>Protect internal entity structure</li>
+<li>Allow validation rules</li>
+<li>Decouple API contracts from database design</li>
+</ul>
+<hr />
+<h2 id="repository-layer-data-access">Repository Layer — Data Access</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public interface</span><span style="color: #FABD2F;"> OrderRepository</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">        extends</span><span> JpaRepository</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderEntity</span><span style="color: #A89984;">,</span><span style="color: #FE8019;"> Long</span><span style="color: #A89984;">&gt; { }</span></span></code></pre>
+<p>Repositories:</p>
+<ul>
+<li>Abstract database access</li>
+<li>Provide CRUD operations automatically</li>
+<li>Remove the need for DAOs and JDBC code</li>
+</ul>
+<hr />
+<h2 id="service-layer-business-logic-contract">Service Layer — Business Logic Contract</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public interface</span><span style="color: #FABD2F;"> OrderService</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">    List</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;</span><span style="color: #FABD2F;"> getAllOrders</span><span style="color: #A89984;">();</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">    OrderResponse getOrderById</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">Long</span><span style="color: #83A598;"> id</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">    OrderResponse createOrder</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">OrderRequest</span><span style="color: #83A598;"> orderRequest</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>The service interface defines what the system can do, not how.</p>
+<hr />
+<h2 id="service-implementation-business-logic-execution">Service Implementation — Business Logic Execution</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Service</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderServiceImpl</span><span style="color: #FE8019;"> implements</span><span> OrderService</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> OrderRepository</span><span> orderRepository</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> ModelMapper</span><span> modelMapper</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> OrderServiceImpl</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">OrderRepository</span><span style="color: #83A598;"> orderRepository</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">                            ModelMapper</span><span style="color: #83A598;"> modelMapper</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>orderRepository</span><span style="color: #8EC07C;"> =</span><span> orderRepository</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>modelMapper</span><span style="color: #8EC07C;"> =</span><span> modelMapper</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">Override</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> List</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;</span><span style="color: #FABD2F;"> getAllOrders</span><span style="color: #A89984;">(){</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">        List</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderResponse</span><span style="color: #A89984;">&gt;</span><span> orders</span><span style="color: #8EC07C;"> =</span><span> orderRepository</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">findAll</span><span style="color: #A89984;">()</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">stream</span><span style="color: #A89984;">()</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderEntity </span><span style="color: #FE8019;">-&gt;</span></span>
+<span class="giallo-l"><span>                        modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderEntity</span><span style="color: #A89984;">,</span><span> OrderResponse</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">))</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">toList</span><span style="color: #A89984;">();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">        if</span><span style="color: #A89984;">(</span><span>orders</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">isEmpty</span><span style="color: #A89984;">()){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">            throw new</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #A89984;">(&quot;</span><span style="color: #B8BB26;">No orders found</span><span style="color: #A89984;">&quot;);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        }</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> orders</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">Override</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> OrderResponse getOrderById</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">Long</span><span style="color: #83A598;"> id</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> orderRepository</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">findById</span><span style="color: #A89984;">(</span><span>id</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderEntity </span><span style="color: #FE8019;">-&gt;</span></span>
+<span class="giallo-l"><span>                        modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderEntity</span><span style="color: #A89984;">,</span><span> OrderResponse</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">))</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">orElseThrow</span><span style="color: #A89984;">(()</span><span style="color: #FE8019;"> -&gt;</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">                        new</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                                &quot;</span><span style="color: #B8BB26;">Order not found with id </span><span style="color: #A89984;">&quot;</span><span style="color: #8EC07C;"> +</span><span> id</span><span style="color: #A89984;">));</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">Override</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> OrderResponse createOrder</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">OrderRequest</span><span style="color: #83A598;"> orderRequest</span><span style="color: #A89984;">) {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FABD2F;">        OrderEntity</span><span> orderEntity</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        try</span><span style="color: #A89984;">{</span></span>
+<span class="giallo-l"><span>            orderEntity </span><span style="color: #8EC07C;">=</span><span> modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderRequest</span><span style="color: #A89984;">,</span><span> OrderEntity</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        }</span><span style="color: #FB4934;"> catch</span><span style="color: #A89984;"> (</span><span style="color: #FABD2F;">Exception</span><span style="color: #83A598;"> e</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">            throw new</span><span style="color: #FABD2F;"> BusinessException</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">MAPPING_ERROR</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">Failed to map order request</span><span style="color: #A89984;">&quot;);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">        try</span><span style="color: #A89984;">{</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">            OrderEntity</span><span> saved</span><span style="color: #8EC07C;"> =</span><span> orderRepository</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">save</span><span style="color: #A89984;">(</span><span>orderEntity</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">            return</span><span> modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>saved</span><span style="color: #A89984;">,</span><span> OrderResponse</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        }</span><span style="color: #FB4934;"> catch</span><span style="color: #A89984;"> (</span><span style="color: #FABD2F;">Exception</span><span style="color: #83A598;"> e</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">            throw new</span><span style="color: #FABD2F;"> BusinessException</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">DATA_INTEGRITY_VIOLATION</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">Invalid Order Data</span><span style="color: #A89984;">&quot;);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>Service layer:</p>
+<ul>
+<li>Contains all business rules</li>
+<li>Throws domain-specific exceptions</li>
+<li>Never returns ResponseEntity</li>
+<li>Never handles HTTP concerns</li>
+</ul>
+<hr />
+<h2 id="modelmapper-clean-entity-dto-mapping">ModelMapper — Clean Entity ↔ DTO Mapping</h2>
+<p>In production systems, <strong>entities should never be exposed directly to APIs</strong>.<br />
+Entities represent database structure, while APIs should expose stable, client-friendly contracts using DTOs.</p>
+<p>This is where <strong>ModelMapper</strong> is used.</p>
+<h3 id="what-modelmapper-does">What ModelMapper Does</h3>
+<p>ModelMapper automatically maps data between objects with similar structures, such as:</p>
+<ul>
+<li><code>OrderEntity</code> → <code>OrderResponse</code></li>
+<li><code>OrderRequest</code> → <code>OrderEntity</code></li>
+</ul>
+<p>It eliminates manual field-by-field mapping code.</p>
+<hr />
+<h3 id="how-modelmapper-is-used-in-this-project">How ModelMapper Is Used in This Project</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span>modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderEntity</span><span style="color: #A89984;">,</span><span> OrderResponse</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span>modelMapper</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">map</span><span style="color: #A89984;">(</span><span>orderRequest</span><span style="color: #A89984;">,</span><span> OrderEntity</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">);</span></span></code></pre>
+<p>In this implementation:</p>
+<ul>
+<li>Incoming API requests (OrderRequest) are mapped to persistence entities (OrderEntity)</li>
+<li>Saved entities are mapped back to response DTOs (OrderResponse)</li>
+<li>Controllers never deal with entities</li>
+<li>Services control all mapping logic</li>
+</ul>
+<hr />
+<h2 id="modelmapper-why-we-use-it">ModelMapper — Why We Use It</h2>
+<ul>
+<li><strong>Reduces boilerplate:</strong> Removes repetitive manual mapping code and prevents missing fields.</li>
+<li><strong>Decouples layers:</strong> Keeps API DTOs independent from persistence entities.</li>
+<li><strong>Improves maintainability:</strong> Makes refactoring DTOs or entities easier without breaking business logic.</li>
+<li><strong>Right layer responsibility:</strong> Mapping lives in the service layer where business logic and data transformation belong, keeping controllers and repositories clean.</li>
+</ul>
+<hr />
+<h2 id="custom-business-exceptions">Custom Business Exceptions</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> BusinessException</span><span style="color: #FE8019;"> extends</span><span> RuntimeException</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private final</span><span style="color: #FABD2F;"> String</span><span> errorCode</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> BusinessException</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        super</span><span style="color: #A89984;">(</span><span>message</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>errorCode</span><span style="color: #8EC07C;"> =</span><span style="color: #A89984;"> &quot;</span><span style="color: #B8BB26;">BUSINESS_ERROR</span><span style="color: #A89984;">&quot;;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> BusinessException</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">String</span><span style="color: #83A598;"> errorCode</span><span style="color: #A89984;">,</span><span style="color: #FABD2F;"> String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">) {</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        super</span><span style="color: #A89984;">(</span><span>message</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>errorCode</span><span style="color: #8EC07C;"> =</span><span> errorCode</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> String getErrorCode</span><span style="color: #A89984;">() {</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> errorCode</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre><pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #FE8019;"> extends</span><span> RuntimeException</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        super</span><span style="color: #A89984;">(</span><span>message</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<hr />
+<h2 id="how-this-integrates-with-baseresponse-globalexceptionhandler">How This Integrates with BaseResponse &amp; GlobalExceptionHandler</h2>
+<p>Refer <a rel="external" href="https://pratik280.github.io/blog/0.production-grade-spring-boot-apis-part-2-consistent-responses-global-exception-handling/">Part 2</a> focuses on clean code structure, controllers, services, DTOs, and dependency injection.</p>
+<ul>
+<li>Controllers always return BaseResponse using ResponseBuilder</li>
+<li>Services throw meaningful domain exceptions</li>
+<li>@RestControllerAdvice catches exceptions globally</li>
+<li>One consistent response format across the entire application</li>
+</ul>
+<h2 id="final-result">Final Result</h2>
+<ul>
+<li>Clean folder structure</li>
+<li>Clear separation of responsibilities</li>
+<li>Consistent API responses</li>
+<li>Centralized error handling</li>
+<li>Production-ready Spring Boot API design</li>
+</ul>
+<hr />
+<blockquote>
+<p>This concludes the Production-Grade Spring Boot API Design series — based on real project experience and refined personal notes.</p>
+</blockquote>
+<blockquote>
+<p>The goal was simple:
+APIs that are clean, consistent, scalable, and interview-ready.</p>
+</blockquote>
+<hr />
+<p>📌 <em>This blog is based on real project experience and refined personal notes.</em></p>
+<hr />
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

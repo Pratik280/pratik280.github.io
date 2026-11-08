@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Production-Grade Spring Boot APIs — Part 1: Web, JPA &amp; What Really Happens at Startup</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Production-Grade Spring Boot APIs — Part 1: Web, JPA &amp; What Really Happens at Startup</h1>
+    
+    <p class="secondary small">
+        25 January, 2026
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<p>Most Spring Boot tutorials teach you <em>how to build an API</em>.<br />
+Very few explain <strong>what actually happens when a production Spring Boot application starts</strong> — and why those internals matter when systems grow.</p>
+<p>This article documents how we <strong>actually understand and use Spring Boot foundations in real projects</strong>, not demo apps.</p>
+<p>This is <strong>Part 1</strong> of a 3-part series on <strong>Production-Grade Spring Boot API Design</strong> written from real backend experience.</p>
+<p><strong>What this post covers</strong></p>
+<ul>
+<li>
+<p>Why spring-boot-starter-web exists</p>
+</li>
+<li>
+<p>starter vs starter-web</p>
+</li>
+<li>
+<p>ORM, JPA, Hibernate — without confusion</p>
+</li>
+<li>
+<p>Why Spring Data JPA removes DAOs &amp; JDBC</p>
+</li>
+<li>
+<p>Spring Boot application lifecycle (startup to request handling)</p>
+</li>
+<li>
+<p>How DispatcherServlet fits into the picture</p>
+</li>
+</ul>
+<p><code>spring-boot-starter-web</code> is the dependency that turns a plain Java application into a <strong>web‑ready REST API server</strong>.</p>
+<p>It provides:</p>
+<ul>
+<li>
+<p>Spring MVC</p>
+</li>
+<li>
+<p>Embedded web server (Tomcat by default)</p>
+</li>
+<li>
+<p><code>DispatcherServlet</code></p>
+</li>
+<li>
+<p>JSON serialization / deserialization</p>
+</li>
+</ul>
+<p>You <strong>do not configure servlets, servers, or JSON converters manually</strong>.</p>
+<blockquote>
+<p>In production systems, this starter removes boilerplate and enforces convention over configuration.</p>
+</blockquote>
+<h3 id="spring-boot-starter-vs-spring-boot-starter-web"><code>spring-boot-starter</code> vs <code>spring-boot-starter-web</code></h3>
+<ul>
+<li>
+<p><code>spring-boot-starter</code></p>
+<ul>
+<li>
+<p>Core Spring features</p>
+</li>
+<li>
+<p>Dependency Injection</p>
+</li>
+<li>
+<p>Auto‑configuration</p>
+</li>
+<li>
+<p>Logging (SLF4J + Logback)</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>spring-boot-starter-web</code></p>
+<ul>
+<li>
+<p>Everything above <strong>plus</strong></p>
+</li>
+<li>
+<p>Spring MVC</p>
+</li>
+<li>
+<p>Embedded server</p>
+</li>
+<li>
+<p>REST API support</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>In short:</strong></p>
+<blockquote>
+<p><code>starter-web</code> = <code>starter</code> + web capabilities</p>
+</blockquote>
+<hr />
+<h2 id="2-orm-jpa-hibernate-production-clarity">2. ORM, JPA &amp; Hibernate (Production clarity)</h2>
+<h3 id="what-is-orm">What is ORM?</h3>
+<p><strong>ORM (Object Relational Mapping)</strong> is a technique that maps:</p>
+<blockquote>
+<p>Java objects ⇄ Database tables</p>
+</blockquote>
+<p>So instead of writing SQL, you work with Java objects.</p>
+<hr />
+<h3 id="jpa-vs-hibernate-interview-safe-explanation">JPA vs Hibernate (Interview‑safe explanation)</h3>
+<ul>
+<li>
+<p><strong>JPA</strong></p>
+<ul>
+<li>
+<p>A <strong>specification</strong> (set of rules)</p>
+</li>
+<li>
+<p>Defines annotations and interfaces</p>
+</li>
+<li>
+<p>Does <strong>not</strong> generate SQL</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Hibernate</strong></p>
+<ul>
+<li>
+<p>An <strong>implementation</strong> of JPA</p>
+</li>
+<li>
+<p>Generates SQL</p>
+</li>
+<li>
+<p>Talks to the database</p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>In Spring Boot, we write code using <strong>JPA</strong>, while <strong>Hibernate</strong> does the heavy lifting.</p>
+</blockquote>
+<hr />
+<h3 id="why-spring-boot-starter-data-jpa-is-critical">Why <code>spring-boot-starter-data-jpa</code> is critical</h3>
+<p>We never use JDBC directly in modern Spring Boot microservices.</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="xml"><span class="giallo-l"><span style="color: #83A598;">&lt;</span><span style="color: #8EC07C;">dependency</span><span style="color: #83A598;">&gt;</span></span>
+<span class="giallo-l"><span style="color: #83A598;">  &lt;</span><span style="color: #8EC07C;">groupId</span><span style="color: #83A598;">&gt;</span><span>org.springframework.boot</span><span style="color: #83A598;">&lt;/</span><span style="color: #8EC07C;">groupId</span><span style="color: #83A598;">&gt;</span></span>
+<span class="giallo-l"><span style="color: #83A598;">  &lt;</span><span style="color: #8EC07C;">artifactId</span><span style="color: #83A598;">&gt;</span><span>spring-boot-starter-data-jpa</span><span style="color: #83A598;">&lt;/</span><span style="color: #8EC07C;">artifactId</span><span style="color: #83A598;">&gt;</span></span>
+<span class="giallo-l"><span style="color: #83A598;">&lt;/</span><span style="color: #8EC07C;">dependency</span><span style="color: #83A598;">&gt;</span></span></code></pre>
+<p>This starter:</p>
+<ul>
+<li>
+<p>Integrates Spring Data with JPA</p>
+</li>
+<li>
+<p>Uses Hibernate internally</p>
+</li>
+<li>
+<p>Provides repository abstractions</p>
+</li>
+<li>
+<p>Handles transactions automatically</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Result:</strong> We persist Java objects without writing SQL or DAO classes.</p>
+</blockquote>
+<hr />
+<h3 id="repository-abstraction-no-dao-no-sql">Repository abstraction (No DAO, No SQL)</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public interface</span><span style="color: #FABD2F;"> OrderRepository</span><span style="color: #FE8019;"> extends</span><span> JpaRepository</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">OrderEntity</span><span style="color: #A89984;">,</span><span style="color: #FE8019;"> Long</span><span style="color: #A89984;">&gt; {}</span></span></code></pre>
+<p>What this line really means:</p>
+<blockquote>
+<p>“Spring, create a ready‑made database layer for this entity.”</p>
+</blockquote>
+<p>Spring Data JPA:</p>
+<ul>
+<li>
+<p>Generates implementation at runtime</p>
+</li>
+<li>
+<p>Provides CRUD, pagination, sorting</p>
+</li>
+<li>
+<p>Manages transactions</p>
+</li>
+</ul>
+<p>This is <strong>production‑grade abstraction</strong>, not magic.</p>
+<hr />
+<h2 id="3-spring-boot-application-lifecycle-what-really-happens">3. Spring Boot Application Lifecycle (What really happens)</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│        main() method        │</span></span>
+<span class="giallo-l"><span>│ SpringApplication.run()     │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│   ApplicationContext        │</span></span>
+<span class="giallo-l"><span>│        created              │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│     Component Scan          │</span></span>
+<span class="giallo-l"><span>│  (@Service, @Controller)    │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│        Bean Creation        │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│   Dependency Injection      │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│   Embedded Server Starts    │</span></span>
+<span class="giallo-l"><span>└──────────────┬──────────────┘</span></span>
+<span class="giallo-l"><span>               ↓</span></span>
+<span class="giallo-l"><span>┌─────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│ DispatcherServlet Ready 🚀  │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────┘</span></span></code></pre><h3 id="what-matters-in-production">What matters in production</h3>
+<ul>
+<li>
+<p>Spring controls object creation (<strong>IoC</strong>)</p>
+</li>
+<li>
+<p>Dependencies are injected before usage</p>
+</li>
+<li>
+<p>Controllers are mapped <strong>after server startup</strong></p>
+</li>
+</ul>
+<blockquote>
+<p>Developers write business logic — Spring handles infrastructure.</p>
+</blockquote>
+<p>This is Part 1 of a 3-part series on <strong>Production-Grade Spring Boot API Design</strong>.</p>
+<p>👉 <a rel="external" href="https://pratik280.github.io/blog/0.production-grade-spring-boot-apis-part-2-consistent-responses-global-exception-handling/">Part 2</a> focuses on clean code structure, controllers, services, DTOs, and dependency injection.</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

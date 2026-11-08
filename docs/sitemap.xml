@@ -14,6 +14,18 @@
         <lastmod>2023-06-25</lastmod>
     </url>
     <url>
+        <loc>https://pratik280.github.io/blog/0-production-grade-spring-boot-apis-part-1-web-jpa-what-really-happens-at-startup/</loc>
+        <lastmod>2026-01-25</lastmod>
+    </url>
+    <url>
+        <loc>https://pratik280.github.io/blog/0-production-grade-spring-boot-apis-part-2-consistent-responses-global-exception-handling/</loc>
+        <lastmod>2026-01-26</lastmod>
+    </url>
+    <url>
+        <loc>https://pratik280.github.io/blog/0-production-grade-spring-boot-apis-part-3-production-grade-folder-structure-layer-implementation/</loc>
+        <lastmod>2026-01-27</lastmod>
+    </url>
+    <url>
         <loc>https://pratik280.github.io/blog/1-kafka-complete-study-notes/</loc>
         <lastmod>2025-06-27</lastmod>
     </url>

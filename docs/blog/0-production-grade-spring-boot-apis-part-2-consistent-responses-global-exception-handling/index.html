@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Production-Grade Spring Boot APIs — Part 2: Consistent Responses &amp; Global Exception Handling</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Production-Grade Spring Boot APIs — Part 2: Consistent Responses &amp; Global Exception Handling</h1>
+    
+    <p class="secondary small">
+        26 January, 2026
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<p>In real systems, APIs don’t fail gracefully by default.</p>
+<p>Without discipline, you end up with:</p>
+<ul>
+<li>Different response formats per endpoint</li>
+<li>Unclear error messages</li>
+<li>Controllers full of try-catch blocks</li>
+</ul>
+<p>This article explains how we design predictable, consistent API responses using a common response wrapper and centralized exception handling.</p>
+<p>This is Part 2 of the <strong>Production-Grade Spring Boot API Design series</strong>.</p>
+<p>Code Gihub Repo: <a rel="external" href="https://github.com/Pratik280/order-system/tree/develop">https://github.com/Pratik280/order-system/tree/develop</a></p>
+<hr />
+<p><strong>What this post covers</strong></p>
+<ul>
+<li>Why API response consistency matters in microservices</li>
+<li>Designing a generic BaseResponse<T></li>
+<li>Builder pattern in API responses</li>
+<li>ResponseEntity and real HTTP semantics</li>
+<li>Global exception handling with @RestControllerAdvice</li>
+<li>Translating domain exceptions into HTTP responses</li>
+</ul>
+<hr />
+<h2 id="why-we-need-a-common-response-format">Why we need a common response format</h2>
+<p>In microservices:</p>
+<ul>
+<li>APIs must look identical</li>
+<li>Errors must be predictable</li>
+<li>Clients must not guess formats</li>
+</ul>
+<hr />
+<h2 id="baseresponse-a-single-contract-for-all-apis">BaseResponse — A Single Contract for All APIs</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Getter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Setter</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">AllArgsConstructor</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">NoArgsConstructor</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Builder</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt; {</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private int</span><span> status</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> String</span><span> message</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;">    // success payload</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> T</span><span> data</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;">    // error details</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private</span><span style="color: #FABD2F;"> List</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">Map</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">String</span><span style="color: #A89984;">,</span><span style="color: #FE8019;"> Object</span><span style="color: #A89984;">&gt;&gt;</span><span> errors</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p><strong>Why this structure works</strong></p>
+<ul>
+<li>Generic (<T>) — supports any response payload</li>
+<li>Clear separation:
+<ul>
+<li>data → success responses</li>
+<li>errors → failure responses</li>
+</ul>
+</li>
+<li>Consistent fields across all endpoints</li>
+<li>Easy for clients to consume and validate</li>
+</ul>
+<p><strong>Success vs Error clarity</strong></p>
+<ul>
+<li>Success response → data is filled, errors is null</li>
+<li>Error response → errors is filled, data is null</li>
+</ul>
+<h2 id="this-eliminates-ambiguity-for-api-consumers">This eliminates ambiguity for API consumers.</h2>
+<h2 id="builder-pattern-for-clean-response-creation">Builder Pattern for Clean Response Creation</h2>
+<p>Instead of manually constructing responses everywhere, we centralize response creation.</p>
+<p>ResponseBuilder.java</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> ResponseBuilder</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public static</span><span style="color: #A89984;"> &lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt;</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt;&gt;</span><span style="color: #FABD2F;"> success</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">            HttpStatus</span><span style="color: #83A598;"> status</span><span style="color: #A89984;">,</span><span style="color: #FABD2F;"> String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">,</span><span style="color: #FABD2F;"> T</span><span style="color: #83A598;"> data</span><span style="color: #A89984;"> ){</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FABD2F;">        BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt;</span><span> baseResponse</span><span style="color: #8EC07C;"> =</span><span style="color: #FB4934;"> new</span><span style="color: #FABD2F;"> BaseResponse</span><span style="color: #A89984;">&lt;&gt;(</span></span>
+<span class="giallo-l"><span>                status</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">value</span><span style="color: #A89984;">(),</span></span>
+<span class="giallo-l"><span>                message</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span>                data</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #D3869B;">                null</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> ResponseEntity</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">status</span><span style="color: #A89984;">(</span><span>status</span><span style="color: #A89984;">).</span><span style="color: #FABD2F;">body</span><span style="color: #A89984;">(</span><span>baseResponse</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public static</span><span style="color: #A89984;"> &lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt;</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">T</span><span style="color: #A89984;">&gt;&gt;</span><span style="color: #FABD2F;"> error</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">            HttpStatus</span><span style="color: #83A598;"> status</span><span style="color: #A89984;">,</span><span style="color: #FABD2F;"> String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">,</span><span style="color: #FABD2F;"> List</span><span style="color: #A89984;">&lt;</span><span style="color: #FABD2F;">Map</span><span style="color: #A89984;">&lt;</span><span style="color: #FE8019;">String</span><span style="color: #A89984;">,</span><span style="color: #FE8019;"> Object</span><span style="color: #A89984;">&gt;&gt;</span><span style="color: #83A598;"> errors</span><span style="color: #A89984;"> ){</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> ResponseEntity</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">status</span><span style="color: #A89984;">(</span><span>status</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                .</span><span style="color: #FABD2F;">body</span><span style="color: #A89984;">(</span><span>BaseResponse</span><span style="color: #A89984;">.</span><span style="color: #8EC07C;">&lt;</span><span>T</span><span style="color: #8EC07C;">&gt;</span><span style="color: #FABD2F;">builder</span><span style="color: #A89984;">()</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                        .</span><span style="color: #FABD2F;">status</span><span style="color: #A89984;">(</span><span>status</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">value</span><span style="color: #A89984;">())</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                        .</span><span style="color: #FABD2F;">message</span><span style="color: #A89984;">(</span><span>message</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                        .</span><span style="color: #FABD2F;">errors</span><span style="color: #A89984;">(</span><span>errors</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                        .</span><span style="color: #FABD2F;">build</span><span style="color: #A89984;">());</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p><strong>Why a ResponseBuilder?</strong></p>
+<ul>
+<li>Prevents duplication across controllers</li>
+<li>Enforces one response format everywhere</li>
+<li>Reduces mistakes in status codes and payloads</li>
+<li>Makes controllers thin and readable</li>
+</ul>
+<blockquote>
+<p>Controllers should orchestrate requests, not construct response objects.</p>
+</blockquote>
+<hr />
+<h2 id="why-controllers-should-not-handle-exceptions">Why Controllers Should NOT Handle Exceptions</h2>
+<p>A common beginner mistake is this:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FB4934;">try</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;">   // business logic</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span><span style="color: #FB4934;"> catch</span><span style="color: #A89984;"> (</span><span style="color: #FABD2F;">Exception</span><span style="color: #83A598;"> e</span><span style="color: #A89984;">) {</span></span>
+<span class="giallo-l"><span style="color: #928374;font-style: italic;">   // return error response</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>In production, this leads to:</p>
+<ul>
+<li>Repeated try-catch blocks</li>
+<li>Inconsistent error responses</li>
+<li>Bloated controllers</li>
+<li>Hard-to-maintain code</li>
+</ul>
+<hr />
+<h2 id="global-exception-handling-with-restcontrolleradvice">Global Exception Handling with @RestControllerAdvice</h2>
+<p>GlobalExceptionHandler.java</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">RestControllerAdvice</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> GlobalExceptionHandler</span><span style="color: #A89984;"> {</span></span></code></pre>
+<p>What <strong>@RestControllerAdvice</strong> does</p>
+<ul>
+<li>Applies to all controllers</li>
+<li>Automatically returns JSON responses</li>
+<li>Centralizes exception-to-response translation</li>
+</ul>
+<blockquote>
+<p>It is the REST equivalent of a global error boundary.</p>
+</blockquote>
+<hr />
+<h2 id="handling-domain-exceptions-with-exceptionhandler">Handling Domain Exceptions with @ExceptionHandler</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">ExceptionHandler</span><span style="color: #A89984;">(</span><span>ResourceNotFoundException</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public</span><span style="color: #FABD2F;"> ResponseEntity</span><span style="color: #8EC07C;">&lt;</span><span style="color: #FABD2F;">BaseResponse</span><span style="color: #8EC07C;">&lt;</span><span>Object</span><span style="color: #8EC07C;">&gt;&gt;</span><span style="color: #FABD2F;"> handleResourceNotfound</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">        ResourceNotFoundException</span><span> exception</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span style="color: #FABD2F;">        HttpServletRequest</span><span> request </span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">    return</span><span> ResponseBuilder</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">error</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span>            HttpStatus</span><span style="color: #A89984;">.</span><span>NOT_FOUND</span><span style="color: #A89984;">,</span></span>
+<span class="giallo-l"><span>            exception</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getMessage</span><span style="color: #A89984;">(),</span></span>
+<span class="giallo-l"><span>            List</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">of</span><span style="color: #A89984;">(</span><span>Map</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">of</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">code</span><span style="color: #A89984;">&quot;, &quot;</span><span style="color: #B8BB26;">RESOURCENOTFOUND</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">message</span><span style="color: #A89984;">&quot;,</span><span> exception</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getMessage</span><span style="color: #A89984;">(),</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                    &quot;</span><span style="color: #B8BB26;">path</span><span style="color: #A89984;">&quot;,</span><span> request</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getRequestURI</span><span style="color: #A89984;">()</span></span>
+<span class="giallo-l"><span style="color: #A89984;">            ))</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    );</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p><strong>Why this is production-grade</strong></p>
+<ul>
+<li>Services throw domain-specific exceptions</li>
+<li>Controllers remain clean</li>
+<li>HTTP status codes are correct</li>
+<li>Error payloads are structured and informative</li>
+</ul>
+<p>Each error includes:</p>
+<ul>
+<li>Error code (for frontend / monitoring)</li>
+<li>Human-readable message</li>
+<li>Request path (debugging)</li>
+</ul>
+<hr />
+<h2 id="custom-exceptions-represent-business-failures">Custom Exceptions Represent Business Failures</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #FE8019;"> extends</span><span> RuntimeException</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> ResourceNotFoundException</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">String</span><span style="color: #83A598;"> message</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        super</span><span style="color: #A89984;">(</span><span>message</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p><strong>Why custom exceptions matter</strong></p>
+<ul>
+<li>Express business meaning, not technical failure</li>
+<li>Decouple service logic from HTTP concerns</li>
+<li>Make error handling explicit and readable</li>
+</ul>
+<blockquote>
+<p>Services should throw what went wrong, not how to respond.</p>
+</blockquote>
+<hr />
+<h2 id="the-end-result">The End Result</h2>
+<p><strong>With this approach:</strong></p>
+<ul>
+<li>Every API response looks the same</li>
+<li>Error handling is centralized</li>
+<li>Controllers stay lean</li>
+<li>APIs are predictable and client-friendly</li>
+<li>The system scales across teams</li>
+</ul>
+<blockquote>
+<p>This is the difference between APIs that merely work and APIs that survive production.</p>
+</blockquote>
+<hr />
+<p>This is Part 2 of a 3-part series on <strong>Production-Grade Spring Boot API Design</strong>.</p>
+<p>👉 <a rel="external" href="https://pratik280.github.io/blog/0.production-grade-spring-boot-apis-part-3-production-grade-folder-structure-layer-implementation">Part 3 focuses on production-Grade Folder Structure &amp; layered Implementation.</a></p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

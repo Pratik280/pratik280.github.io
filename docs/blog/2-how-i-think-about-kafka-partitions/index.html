@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | How I Think About Kafka Partitions</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>How I Think About Kafka Partitions</h1>
+    
+    <p class="secondary small">
+        28 June, 2025
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<p><em>Partitions are the most misunderstood part of Kafka. Here is how I actually think about sizing them.</em></p>
+<hr />
+<p>When I first started working with Kafka, partition count felt like an arbitrary number you just picked.<br />
+3 felt reasonable. 6 felt safer. Nobody really explained why.</p>
+<p>After running Kafka in production on a payment processing platform, here is how I actually think about it.</p>
+<hr />
+<h2 id="the-one-rule-that-matters">The One Rule That Matters</h2>
+<p><strong>Partition count = max consumer parallelism you will ever want.</strong></p>
+<p>That is it. Everything else is secondary.</p>
+<p>If you have 3 partitions, you can have at most 3 active consumers in a group.<br />
+A 4th consumer will sit idle. Kafka assigns one consumer per partition — no sharing.</p>
+<hr />
+<h2 id="throughput-is-secondary">Throughput Is Secondary</h2>
+<p>Most guides lead with throughput math. I find that misleading.</p>
+<p>For most backend services, consumer parallelism is the real bottleneck — not raw throughput.<br />
+If your service needs to scale to 12 instances under load, you need at least 12 partitions.<br />
+You probably won't hit per-partition throughput limits before you hit that.</p>
+<p>Where throughput does matter: high-volume data pipelines, analytics ingestion, log aggregation.<br />
+For transactional microservices, think consumers first.</p>
+<hr />
+<h2 id="the-mistake-i-see-most-often">The Mistake I See Most Often</h2>
+<p>Starting with 1 or 2 partitions "because it's simple".</p>
+<p>You can increase partitions later, but it breaks key-based ordering for existing keys.<br />
+If your consumers depend on per-key ordering (common in payment systems), that is a painful migration.</p>
+<p><strong>Over-partition slightly from the start.</strong> 6 partitions for a service you expect to scale to 3 instances is fine.</p>
+<hr />
+<h2 id="what-i-actually-do">What I Actually Do</h2>
+<p>For a new topic on our platform:</p>
+<ol>
+<li>How many consumer instances will this service run at peak? → that is my floor.</li>
+<li>Is this topic keyed? If yes, am I relying on per-key ordering? → if yes, never change partitions later.</li>
+<li>Is the partition count a multiple of my broker count? → keeps partition leaders evenly distributed.</li>
+</ol>
+<p>For our 6-broker cluster spanning two datacenters, I default to 6 or 12 partitions per topic.</p>
+<hr />
+<h2 id="the-number-nobody-tells-you">The Number Nobody Tells You</h2>
+<blockquote>
+<p>The maximum useful consumers in a group = number of partitions.</p>
+</blockquote>
+<p>That is the hard ceiling. Extra consumers beyond partition count are wasted resources.<br />
+Size your topics to your scaling targets, not to what feels comfortable today.</p>
+<hr />
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Snapshot of my work, skills, and growth.">
+    <title> | Resume</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Resume</h1>
+    
+    <div class="space"></div>
+    <h1 id="software-engineer">Software Engineer</h1>
+<h2 id="summary">Summary</h2>
+<p>Software Engineer with ~4 years of experience building scalable microservices and event-driven systems using Java, Spring Boot, and Apache Kafka. Experienced in designing secure, high-performance REST APIs, multitenant architectures, and real-time transaction processing systems.</p>
+<hr />
+<h2 id="experience">Experience</h2>
+<h3 id="software-engineer-in-solution-global-mumbai">Software Engineer — In-Solution Global, Mumbai</h3>
+<p><em>Jun 2022 – Present</em></p>
+<ul>
+<li>
+<p><strong>Designed and built a distributed payment processing platform across multiple Spring Boot microservices</strong> — covering payment link creation, transaction management, and query APIs — using an event-driven Kafka pipeline where each service reacts independently to transaction events. Multi-step payment workflows are coordinated via the Saga choreography pattern to maintain data consistency, and the Outbox pattern ensures no events are lost between the database and Kafka.</p>
+</li>
+<li>
+<p><strong>Architected a multi-tenant data layer supporting multiple clients on a single application instance</strong> — isolating each client's data at the database schema level using Hibernate JPA; evaluated and chose schema-based multitenancy over database sharding after analyzing operational trade-offs.</p>
+</li>
+<li>
+<p><strong>Built an internal monitoring platform aggregating real-time health and transaction data across multiple datacenters</strong> — polling service health via Actuator, tracking Kafka consumer lag, and consuming transaction events to expose success rates and failure codes through a single dashboard API. Data is collected via scheduled aggregation and cached in Redis, separating collection from serving for fast, scalable responses.</p>
+</li>
+<li>
+<p><strong>Led the migration of the Kafka messaging infrastructure from a legacy ZooKeeper-based dual-cluster setup to a unified KRaft-mode 6-broker cluster spanning two datacenters</strong> — configured rack-aware replication, replication factor 6 with <code>min.insync.replicas=4</code>, and DNS-based client routing, ensuring zero message loss even if one datacenter goes down.</p>
+</li>
+<li>
+<p><strong>Designed and deployed the API gateway layer for the microservices platform using a 3-node Spring Cloud Gateway cluster</strong> — handling request routing, RBAC token validation via custom filters, and Eureka-based service discovery, ensuring new services can be onboarded without any changes to the client-facing entry point.</p>
+</li>
+<li>
+<p><strong>Partnered with DevOps to build a fully automated end-to-end CI/CD pipeline triggered by GitLab tags</strong> — on trigger, the pipeline spins up all microservices with their dependencies (Kafka, Redis, PostgreSQL) using Docker Compose, runs the full integration test suite, and only on success builds and pushes Docker images to the registry and updates Helm chart values in the repository, triggering Argo CD to automatically deploy updated services to the Kubernetes cluster. Prometheus and Grafana dashboards provide continuous observability post-deployment.</p>
+</li>
+<li>
+<p>Mentored junior engineers through code reviews and design discussions, contributed to architectural decisions, and actively participated in sprint planning and retrospectives within an Agile/Scrum delivery model.</p>
+</li>
+</ul>
+<hr />
+<h2 id="skills">Skills</h2>
+<table><thead><tr><th>Category</th><th>Technologies</th></tr></thead><tbody>
+<tr><td><strong>Languages</strong></td><td>Java, JavaScript, TypeScript, SQL</td></tr>
+<tr><td><strong>Backend</strong></td><td>Spring Boot, Spring MVC, Spring Cloud, Spring Security, Hibernate/JPA, REST APIs, Maven</td></tr>
+<tr><td><strong>Cloud &amp; DevOps</strong></td><td>AWS (EC2, S3, IAM, Lambda), Azure, Docker, Kubernetes (AKS), GitLab CI/CD, Helm, Nexus, Nginx</td></tr>
+<tr><td><strong>Databases &amp; Cache</strong></td><td>PostgreSQL, MySQL, Redis</td></tr>
+<tr><td><strong>Messaging</strong></td><td>Apache Kafka (KRaft), Event-driven architecture, Saga Pattern, Outbox Pattern, Pub-Sub, Consumer groups</td></tr>
+<tr><td><strong>Core Java</strong></td><td>OOP, Collections, Exception Handling, Multithreading, SOLID Principles, J2EE</td></tr>
+<tr><td><strong>Testing</strong></td><td>JUnit, Unit Testing, Integration Testing</td></tr>
+<tr><td><strong>Observability</strong></td><td>ELK Stack, Prometheus, Grafana, Spring Boot Actuator</td></tr>
+<tr><td><strong>OS &amp; Tools</strong></td><td>Linux, Bash, Git</td></tr>
+<tr><td><strong>Practices</strong></td><td>Agile/Scrum, SDLC</td></tr>
+</tbody></table>
+<hr />
+<h2 id="certifications">Certifications</h2>
+<ul>
+<li><a rel="external" href="https://www.credly.com/badges/bee394d0-95b9-492f-bf05-17682aa871f6/linked_in_profile">AWS Certified Cloud Practitioner</a> — Jun 2024, valid till Jun 2027</li>
+</ul>
+<hr />
+<h2 id="education">Education</h2>
+<p><strong>B.E. Computer Science — Mumbai University</strong><br />
+2018 – 2022 | CGPA: 8.68</p>
+<hr />
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

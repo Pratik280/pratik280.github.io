@@ -1,0 +1,22 @@
+base_url = "https://pratik280.github.io/"
+base_url = "https://pratik280.github.io/myblog"
+output_dir = "docs"
+
+compile_sass = true
+build_search_index = true
+
+# Activate installed Zola theme
+theme = "hook"
+
+[markdown]
+
+[markdown.highlighting]
+theme = "catppuccin-mocha"
+
+[extra]
+# Your custom variables go her
+links = [
+    { title = "About", href = "/about/" },
+    { title = "Resume", href = "/resume/" },
+    { title = "Blog", href = "/blog/" },
+]

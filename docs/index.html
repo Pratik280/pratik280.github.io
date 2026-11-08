@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Software engineering notes, Java, distributed systems and backend development.">
+    <title></title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+    <header class="space">
+        <h1></h1>
+        
+        
+        <nav class="header-links">
+            
+            <a href="/about/">About</a>
+            
+            <a href="/resume/">Resume</a>
+            
+            <a href="/blog/">Blog</a>
+            
+            
+        </nav>
+        
+    </header>
+    
+    
+    
+    
+    <main>
+        
+        <div class="space">
+            <h1 id="hi-i-m-pratik">Hi, I'm Pratik.</h1>
+<blockquote>
+<h3 id="software-engineer-mumbai-india">Software Engineer | Mumbai, India.</h3>
+</blockquote>
+<p>Building backend systems with Java, Spring Boot, and Kafka, exploring distributed systems, event-driven architecture, DevOps, and cloud infrastructure while documenting my journey in software engineering.</p>
+<p><a rel="external" href="https://github.com/Pratik280">Github</a>
+| <a rel="external" href="https://www.linkedin.com/in/pratik280/">LinkedIn</a>
+| [mailto:pratikchandlekar280@gmail.com email]</p>
+
+        </div>
+        
+        
+        <h2>Recent posts</h2>
+        <ul>
+            
+            <li><a href="https://pratik280.github.io/blog/4-github-copilot-commands-context-and-how-to-use-them-together/">GitHub Copilot: Commands, Context and How to Use Them Together</a></li>
+            
+            <li><a href="https://pratik280.github.io/blog/3-day-1-github-copilot-what-is-it/">Day 1 with GitHub Copilot: What Even Is This Thing?</a></li>
+            
+            <li><a href="https://pratik280.github.io/blog/2-how-i-think-about-kafka-partitions/">How I Think About Kafka Partitions</a></li>
+            
+            <li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/">Apache Kafka — Complete Study Notes</a></li>
+            
+        </ul>
+        <p><a href="https://pratik280.github.io/blog/">Archive</a></p>
+        
+    </main>
+    
+    
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

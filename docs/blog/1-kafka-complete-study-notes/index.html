@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Apache Kafka — Complete Study Notes</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=736b3c0fd89436522cd4">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Apache Kafka — Complete Study Notes</h1>
+    
+    <p class="secondary small">
+        27 June, 2025
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<p><em>How to use these notes:</em> Read top to bottom. Each section builds on the previous one. By the end, you'll be able to explain Kafka in an interview, draw a whiteboard diagram, and know exactly how Spring Boot connects to a Kafka cluster.</p>
+<hr />
+<h1 id="table-of-contents">Table of Contents</h1>
+<ul>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#1-what-is-kafka">1. What is Kafka?</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#2-core-concepts-terminology">2. Core Concepts &amp; Terminology</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#3-topics">3. Topics</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#4-partitions">4. Partitions</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#5-brokers-clusters">5. Brokers &amp; Clusters</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#6-partition-leader-follower">6. Partition Leader &amp; Follower</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#7-replication-factor">7. Replication Factor</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#8-producers">8. Producers</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#9-how-spring-boot-bootstraps-routes-messages">9. How Spring Boot Bootstraps &amp; Routes Messages</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#10-consumers-consumer-groups">10. Consumers &amp; Consumer Groups</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#11-kafka-connect">11. Kafka Connect</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#12-how-to-decide-partition-count">12. How to Decide Partition Count</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#13-creating-a-topic-cli-commands">13. Creating a Topic — CLI Commands</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#14-starting-kafka-locally-kraft-mode">14. Starting Kafka Locally (KRaft Mode)</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#15-real-world-architecture-example">15. Real-World Architecture Example</a></li>
+<li><a href="https://pratik280.github.io/blog/1-kafka-complete-study-notes/#16-interview-cheat-sheet">16. Interview Cheat Sheet</a></li>
+</ul>
+<hr />
+<h1 id="1-what-is-kafka">1. What is Kafka?</h1>
+<p><em>Apache Kafka is an Event Streaming Platform.</em></p>
+<p>Event Streaming means:</p>
+<ul>
+<li><em>Capturing</em> data in real time from different sources, in the form of streams of events.</li>
+<li><em>Storing</em> these event streams durably for later retrieval.</li>
+<li><em>Processing / reacting</em> to event streams in real time <em>and</em> retrospectively.</li>
+</ul>
+<h2 id="kafka-s-3-core-capabilities">Kafka's 3 Core Capabilities</h2>
+<table><thead><tr><th>#</th><th>Capability</th></tr></thead><tbody>
+<tr><td>1</td><td><em>Publish (write) and subscribe (read)</em> streams of events</td></tr>
+<tr><td>2</td><td><em>Store</em> streams of events durably and reliably for as long as you want</td></tr>
+<tr><td>3</td><td><em>Process</em> streams as they occur in real time or retrospectively</td></tr>
+</tbody></table>
+<p>All of this is provided in a <em>distributed, fault-tolerant, elastic, and secure</em> manner.
+Kafka can be deployed on bare metal, VMs, on-premises, or in the cloud.</p>
+<hr />
+<h1 id="2-core-concepts-terminology">2. Core Concepts &amp; Terminology</h1>
+<h2 id="events">Events</h2>
+<p>An <em>event</em> is "something that happened" — a record or message.</p>
+<p>When you read or write data to Kafka, you do it in the form of <em>events</em>.</p>
+<p>Every event conceptually has:</p>
+<ul>
+<li><em>Key</em> — identifies the entity (e.g., <code>transactionId</code>, <code>userId</code>)</li>
+<li><em>Value</em> — the actual payload (e.g., JSON data)</li>
+<li><em>Timestamp</em> — when the event occurred</li>
+<li><em>Optional metadata headers</em></li>
+</ul>
+<h2 id="producers">Producers</h2>
+<p><em>Producers</em> are client applications that <em>publish (write) events</em> to Kafka.</p>
+<ul>
+<li>Producers are <em>fully decoupled</em> from consumers.</li>
+<li>A producer does not wait to know if or when an event is consumed.</li>
+<li>This decoupling is one of Kafka's biggest design strengths.</li>
+</ul>
+<h2 id="consumers">Consumers</h2>
+<p><em>Consumers</em> are client applications that <em>read and process events</em> from Kafka.</p>
+<ul>
+<li>Consumers are independent microservices.</li>
+<li>Events in Kafka are <em>not deleted after consumption</em> — they can be re-read as many times as needed.</li>
+<li>You define how long events are retained using <em>per-topic configuration</em> (retention period).</li>
+</ul>
+<hr />
+<h1 id="3-topics">3. Topics</h1>
+<p>A <em>Topic</em> is the fundamental way to organize data in Kafka.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Think of a topic like a *folder in a filesystem*, and events are the *files* inside that folder.</span></span></code></pre><h2 id="key-properties-of-a-topic">Key Properties of a Topic</h2>
+<table><thead><tr><th>Property</th><th>Detail</th></tr></thead><tbody>
+<tr><td><em>Multi-producer</em></td><td>One, two, or many producers can write to the same topic</td></tr>
+<tr><td><em>Multi-consumer</em></td><td>One, two, or many consumers can read from the same topic</td></tr>
+<tr><td><em>Events are not deleted on consumption</em></td><td>Consumers can re-read events at any time</td></tr>
+<tr><td><em>Retention is configurable</em></td><td>e.g., keep events for 7 days, or forever</td></tr>
+<tr><td><em>Topics are partitioned</em></td><td>For scalability and parallelism (see next section)</td></tr>
+</tbody></table>
+<h2 id="naming-convention-best-practice">Naming Convention (Best Practice)</h2>
+<p>Use descriptive, hyphen-separated names. Examples:</p>
+<ul>
+<li><code>payments-processed</code></li>
+<li><code>user-signup-events</code></li>
+<li><code>order-created</code></li>
+</ul>
+<hr />
+<h1 id="4-partitions">4. Partitions</h1>
+<p>A <em>Partition</em> is the physical subdivision of a Kafka topic. This is the most important concept for scalability.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>A Topic is *logical*. A Partition is *physical* (an actual append-only log on disk).</span></span></code></pre>
+<p>Instead of storing all events of a topic in one place, Kafka <em>splits (shards)</em> the topic into multiple partitions spread across brokers.</p>
+<h2 id="why-partitions-exist">Why Partitions Exist</h2>
+<table><thead><tr><th>Reason</th><th>Explanation</th></tr></thead><tbody>
+<tr><td><em>Scalability</em></td><td>Data is spread across multiple brokers; many producers/consumers work in parallel</td></tr>
+<tr><td><em>Throughput</em></td><td>Parallel reads and writes = higher throughput</td></tr>
+<tr><td><em>Ordering guarantee</em></td><td>Order is guaranteed <em>within a partition</em>, not across partitions</td></tr>
+</tbody></table>
+<h2 id="how-events-land-in-a-partition">How Events Land in a Partition</h2>
+<table><thead><tr><th>Scenario</th><th>Behavior</th></tr></thead><tbody>
+<tr><td><em>Message has a Key</em></td><td>Kafka hashes the key → same key always goes to the same partition (order preserved per key)</td></tr>
+<tr><td><em>No Key (default)</em></td><td>Kafka uses <em>sticky partitioning</em> — picks a partition for a batch, then rotates</td></tr>
+<tr><td><em>Manual override</em></td><td>Producer explicitly specifies partition number</td></tr>
+</tbody></table>
+<h2 id="visual-partition-as-append-only-log">Visual: Partition as Append-Only Log</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders</span></span>
+<span class="giallo-l"><span>-----------------------------</span></span>
+<span class="giallo-l"><span>P0 → [event1] [event2] [event3]  ← appended in order</span></span>
+<span class="giallo-l"><span>P1 → [event4] [event5]</span></span>
+<span class="giallo-l"><span>P2 → [event6] [event7]</span></span></code></pre>
+<p>Events within a partition are ordered and immutable. New events are only ever <em>appended to the end</em>.</p>
+<hr />
+<h1 id="5-brokers-clusters">5. Brokers &amp; Clusters</h1>
+<h2 id="broker">Broker</h2>
+<p>A <em>broker</em> is a single Kafka server (a single running process/node).</p>
+<ul>
+<li>Each broker:
+<ul>
+<li>Stores partitions (data) on disk</li>
+<li>Handles read/write requests from producers and consumers</li>
+<li>Participates in replication</li>
+</ul>
+</li>
+</ul>
+<h2 id="cluster">Cluster</h2>
+<p>A <em>Kafka Cluster</em> is a group of multiple brokers working together.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Kafka Cluster</span></span>
+<span class="giallo-l"><span>┌───────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│  Broker 1    Broker 2    Broker 3     │</span></span>
+<span class="giallo-l"><span>│  (Node 1)    (Node 2)    (Node 3)     │</span></span>
+<span class="giallo-l"><span>└───────────────────────────────────────┘</span></span></code></pre>
+<ul>
+<li>Clusters can span multiple data centers or cloud regions.</li>
+<li>Brokers share partition leadership — each broker is the leader for some partitions and a follower for others.</li>
+<li>Adding more brokers = horizontal scaling.</li>
+</ul>
+<h2 id="zookeeper-vs-kraft">ZooKeeper vs KRaft</h2>
+<table><thead><tr><th></th><th>ZooKeeper (old)</th><th>KRaft (new, Kafka 3+)</th></tr></thead><tbody>
+<tr><td><em>Role</em></td><td>External service managing cluster metadata</td><td>Built-in consensus, no external dependency</td></tr>
+<tr><td><em>Status</em></td><td>Deprecated</td><td>Current standard</td></tr>
+<tr><td><em>Setup</em></td><td>Requires separate ZooKeeper cluster</td><td>Self-contained — just start Kafka</td></tr>
+</tbody></table>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Use KRaft mode for all new setups.* This is what the local setup commands below use.</span></span></code></pre>
+<hr />
+<h1 id="6-partition-leader-follower">6. Partition Leader &amp; Follower</h1>
+<p>This is the most important concept for understanding how Kafka achieves both <em>performance</em> and <em>fault tolerance</em>.</p>
+<h2 id="the-rule">The Rule</h2>
+<p>Every partition has:</p>
+<ul>
+<li><em>Exactly 1 Leader broker</em> — handles ALL reads and writes for that partition</li>
+<li><em>0 or more Follower brokers</em> — maintain replicas (copies) of the partition data</li>
+</ul>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Partition P1:</span></span>
+<span class="giallo-l"><span>┌──────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│  Broker-2 (Leader)  ← ALL traffic   │</span></span>
+<span class="giallo-l"><span>│  Broker-1 (Follower) ← replica only │</span></span>
+<span class="giallo-l"><span>│  Broker-3 (Follower) ← replica only │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────┘</span></span></code></pre><h2 id="why-one-leader">Why One Leader?</h2>
+<ul>
+<li>Simpler consistency model — no risk of stale reads.</li>
+<li>The leader is the single source of truth for a partition.</li>
+<li>Followers only exist for <em>replication and failover</em>.</li>
+</ul>
+<h2 id="what-happens-when-a-leader-fails">What Happens When a Leader Fails?</h2>
+<h1 id="kafka-detects-that-the-leader-broker-is-down">Kafka detects that the leader broker is down.</h1>
+<h1 id="kafka-automatically-elects-a-new-leader-from-the-in-sync-followers">Kafka automatically <em>elects a new leader</em> from the in-sync followers.</h1>
+<h1 id="producers-and-consumers-automatically-reconnect-to-the-new-leader">Producers and consumers automatically reconnect to the new leader.</h1>
+<h1 id="no-manual-intervention-required"><em>No manual intervention required.</em></h1>
+<p>This is how Kafka achieves <em>fault tolerance</em>.</p>
+<hr />
+<h1 id="7-replication-factor">7. Replication Factor</h1>
+<p>The <em>Replication Factor (RF)</em> defines how many copies of a partition exist across the cluster.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Replication Factor = 3</span></span>
+<span class="giallo-l"><span>  → 1 leader copy + 2 follower copies = 3 total replicas</span></span></code></pre><h2 id="example-topic-with-rf-3-and-2-partitions-3-brokers">Example: Topic with RF=3 and 2 Partitions, 3 Brokers</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>          Broker-1        Broker-2        Broker-3</span></span>
+<span class="giallo-l"><span>          --------        --------        --------</span></span>
+<span class="giallo-l"><span>          P0 (Leader)     P1 (Leader)     P0 (Follower)</span></span>
+<span class="giallo-l"><span>          P1 (Follower)   P0 (Follower)   P1 (Follower)</span></span></code></pre>
+<ul>
+<li><em>Broker-1</em> is leader for P0</li>
+<li><em>Broker-2</em> is leader for P1</li>
+<li><em>Broker-3</em> only holds follower replicas</li>
+</ul>
+<h2 id="what-rf-to-use-in-production">What RF to Use in Production?</h2>
+<table><thead><tr><th>Setting</th><th>Meaning</th><th>Use Case</th></tr></thead><tbody>
+<tr><td>RF = 1</td><td>No replication — if broker dies, data is lost</td><td>Dev/testing only</td></tr>
+<tr><td>RF = 2</td><td>One backup copy</td><td>Acceptable for non-critical data</td></tr>
+<tr><td>RF = 3</td><td>Two backup copies</td><td><em>Standard for production</em></td></tr>
+</tbody></table>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Rule of thumb:* RF should never exceed the number of brokers.</span></span>
+<span class="giallo-l"><span>RF = 3 requires at least 3 brokers.</span></span></code></pre><h2 id="how-replication-works-step-by-step">How Replication Works (Step by Step)</h2>
+<h1 id="producer-writes-to-the-partition-leader"><em>Producer writes</em> to the partition <em>leader</em>.</h1>
+<h1 id="leader-writes-to-its-local-log">Leader writes to its local log.</h1>
+<h1 id="followers-pull-data-from-the-leader-and-replicate-it"><em>Followers pull data</em> from the leader and replicate it.</h1>
+<h1 id="once-followers-have-copied-the-data-they-are-considered-in-sync-part-of-the-isr-in-sync-replica-set">Once followers have copied the data, they are considered <em>in-sync</em> (part of the ISR — In-Sync Replica set).</h1>
+<h1 id="data-is-now-durable">Data is now durable.</h1>
+<h2 id="without-vs-with-replication">Without vs With Replication</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>WITHOUT replication:</span></span>
+<span class="giallo-l"><span>  Broker crashes → partition data gone forever ❌</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>WITH replication (RF=3):</span></span>
+<span class="giallo-l"><span>  Broker crashes → follower becomes new leader → no data loss ✅</span></span></code></pre>
+<hr />
+<h1 id="8-producers">8. Producers</h1>
+<h2 id="how-a-producer-routes-a-message">How a Producer Routes a Message</h2>
+<h1 id="producer-connects-to-any-broker-listed-in-bootstrap-servers-initial-contact-only">Producer connects to any broker listed in <code>bootstrap-servers</code> (initial contact only).</h1>
+<h1 id="downloads-cluster-metadata-a-map-of-which-broker-is-the-leader-for-each-partition">Downloads cluster <em>metadata</em> — a map of which broker is the leader for each partition.</h1>
+<h1 id="determines-target-partition-via-key-hash-round-robin-or-manual-override">Determines target partition (via key hash, round-robin, or manual override).</h1>
+<h1 id="sends-the-message-directly-to-the-leader-broker-of-that-partition">Sends the message <em>directly to the leader broker</em> of that partition.</h1>
+<h1 id="leader-replicates-to-followers">Leader replicates to followers.</h1>
+<h2 id="producer-acks-setting">Producer <code>acks</code> Setting</h2>
+<p>The <code>acks</code> setting controls <em>durability guarantees</em>:</p>
+<table><thead><tr><th><code>acks</code> value</th><th>Meaning</th><th>Risk</th></tr></thead><tbody>
+<tr><td><code>acks=0</code></td><td>Fire and forget — no acknowledgment</td><td>Possible data loss</td></tr>
+<tr><td><code>acks=1</code></td><td>Leader writes to its log, then acks</td><td>Data loss if leader crashes before replication</td></tr>
+<tr><td><code>acks=all</code></td><td>Leader + all ISR followers must acknowledge</td><td><em>Strongest guarantee — use in production</em></td></tr>
+</tbody></table>
+<hr />
+<h1 id="9-how-spring-boot-bootstraps-routes-messages">9. How Spring Boot Bootstraps &amp; Routes Messages</h1>
+<p>This is a very common interview question. Understanding this end-to-end is essential.</p>
+<h2 id="configuration">Configuration</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># application.properties</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.bootstrap-servers</span><span style="color: #94E2D5;">=</span><span>broker1:9092,broker2:9092,broker3:9092</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.producer.key-serializer</span><span style="color: #94E2D5;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">spring.kafka.producer.value-serializer</span><span style="color: #94E2D5;">=</span><span>org.apache.kafka.common.serialization.StringSerializer</span></span></code></pre><pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Common misconception:* &quot;The producer only talks to the bootstrap server.&quot;</span></span>
+<span class="giallo-l"><span>*Reality:* Bootstrap servers are just the *initial contact point*. After the first handshake, the producer talks directly to whichever broker is the partition leader.</span></span></code></pre><h2 id="step-by-step-what-happens-when-spring-boot-sends-a-message">Step-by-Step: What Happens When Spring Boot Sends a Message</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Step 1: Bootstrap Connection</span></span>
+<span class="giallo-l"><span>      Spring Boot Producer</span></span>
+<span class="giallo-l"><span>             │</span></span>
+<span class="giallo-l"><span>             │ Initial connection (just for metadata)</span></span>
+<span class="giallo-l"><span>             ▼</span></span>
+<span class="giallo-l"><span>         Broker-1 (any broker in list)</span></span>
+<span class="giallo-l"><span>             │</span></span>
+<span class="giallo-l"><span>             │ Responds with cluster metadata:</span></span>
+<span class="giallo-l"><span>             │   &quot;Partition 0 → Leader: Broker-1&quot;</span></span>
+<span class="giallo-l"><span>             │   &quot;Partition 1 → Leader: Broker-2&quot;</span></span>
+<span class="giallo-l"><span>             │   &quot;Partition 2 → Leader: Broker-3&quot;</span></span>
+<span class="giallo-l"><span>             ▼</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Step 2: Partition Selection</span></span>
+<span class="giallo-l"><span>      Producer hashes the message key</span></span>
+<span class="giallo-l"><span>      → selects Partition 1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Step 3: Direct Send to Leader</span></span>
+<span class="giallo-l"><span>      Producer sends message DIRECTLY to Broker-2</span></span>
+<span class="giallo-l"><span>      (leader of Partition 1)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Step 4: Replication</span></span>
+<span class="giallo-l"><span>      Broker-2 (Leader)</span></span>
+<span class="giallo-l"><span>         │ replicates</span></span>
+<span class="giallo-l"><span>         ├──→ Broker-1 (Follower of P1)</span></span>
+<span class="giallo-l"><span>         └──→ Broker-3 (Follower of P1)</span></span></code></pre><h2 id="whiteboard-diagram">Whiteboard Diagram</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>        +----------------------+</span></span>
+<span class="giallo-l"><span>        |  Spring Boot Producer|</span></span>
+<span class="giallo-l"><span>        +----------+-----------+</span></span>
+<span class="giallo-l"><span>                   │</span></span>
+<span class="giallo-l"><span>                   │ (1) Bootstrap connection</span></span>
+<span class="giallo-l"><span>                   ▼</span></span>
+<span class="giallo-l"><span>        +----------------------+</span></span>
+<span class="giallo-l"><span>        |   Broker-1           |</span></span>
+<span class="giallo-l"><span>        | (Metadata request)   |</span></span>
+<span class="giallo-l"><span>        +----------+-----------+</span></span>
+<span class="giallo-l"><span>                   │</span></span>
+<span class="giallo-l"><span>                   │ (2) Metadata response:</span></span>
+<span class="giallo-l"><span>                   │     Partition → Leader mapping</span></span>
+<span class="giallo-l"><span>                   ▼</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>     Topic: payments</span></span>
+<span class="giallo-l"><span>     -------------------------</span></span>
+<span class="giallo-l"><span>     Partition 0 → Broker-1</span></span>
+<span class="giallo-l"><span>     Partition 1 → Broker-2</span></span>
+<span class="giallo-l"><span>     Partition 2 → Broker-3</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>                   │</span></span>
+<span class="giallo-l"><span>                   │ (3) Select partition (key hash / round-robin)</span></span>
+<span class="giallo-l"><span>                   ▼</span></span>
+<span class="giallo-l"><span>        +----------------------+</span></span>
+<span class="giallo-l"><span>        |   Broker-2           |  ← Leader of Partition 1</span></span>
+<span class="giallo-l"><span>        +----------+-----------+</span></span>
+<span class="giallo-l"><span>                   │</span></span>
+<span class="giallo-l"><span>                   │ (4) Replication</span></span>
+<span class="giallo-l"><span>         ──────────────────────────────</span></span>
+<span class="giallo-l"><span>         │                            │</span></span>
+<span class="giallo-l"><span>         ▼                            ▼</span></span>
+<span class="giallo-l"><span>  +-------------+           +-------------+</span></span>
+<span class="giallo-l"><span>  | Broker-1    |           | Broker-3    |</span></span>
+<span class="giallo-l"><span>  | (Follower)  |           | (Follower)  |</span></span>
+<span class="giallo-l"><span>  +-------------+           +-------------+</span></span></code></pre><h2 id="interview-answer-crisp-complete">Interview Answer (Crisp &amp; Complete)</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;Producer connects to any bootstrap broker to fetch cluster metadata — topics, partitions, and their leader brokers. When sending a message, Kafka determines the target partition based on the message key (via hashing) or using round-robin if no key is provided. The producer then sends the message *directly to the leader broker* of that partition, not necessarily the bootstrap broker. After receiving the message, the leader replicates it to follower brokers. If a broker goes down, Kafka elects a new leader and the producer automatically updates its metadata and continues — no manual intervention needed.&quot;</span></span></code></pre>
+<hr />
+<h1 id="10-consumers-consumer-groups">10. Consumers &amp; Consumer Groups</h1>
+<h2 id="consumer">Consumer</h2>
+<p>A consumer reads events from one or more partitions of a topic.</p>
+<ul>
+<li>Consumers track their position using <em>offsets</em> — an incrementing number that marks which events have been read.</li>
+<li>Offsets are committed to Kafka (in the <code>__consumer_offsets</code> internal topic).</li>
+<li>A consumer can <em>replay</em> events by resetting its offset.</li>
+</ul>
+<h2 id="consumer-group">Consumer Group</h2>
+<p>A <em>Consumer Group</em> is a set of consumers that work together to consume a topic.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>*Core rule:* Within a consumer group, each partition is consumed by *at most one consumer*. But multiple consumer groups can each independently consume the same topic.</span></span></code></pre><h2 id="partition-assignment-within-a-group">Partition Assignment Within a Group</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Topic: orders (3 partitions)</span></span>
+<span class="giallo-l"><span>Consumer Group: payment-service</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>P0 → Consumer-1</span></span>
+<span class="giallo-l"><span>P1 → Consumer-2</span></span>
+<span class="giallo-l"><span>P2 → Consumer-3</span></span></code></pre>
+<ul>
+<li>If you have <em>more consumers than partitions</em>, the extra consumers sit idle.</li>
+<li>If you have <em>fewer consumers than partitions</em>, some consumers handle multiple partitions.</li>
+</ul>
+<h2 id="scaling-consumers">Scaling Consumers</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>3 partitions, 3 consumers → perfect parallelism ✅</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>         P0    P1    P2</span></span>
+<span class="giallo-l"><span>          │     │     │</span></span>
+<span class="giallo-l"><span>          C1    C2    C3</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>3 partitions, 2 consumers → C1 handles 2 partitions</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>         P0    P1    P2</span></span>
+<span class="giallo-l"><span>          │     │     │</span></span>
+<span class="giallo-l"><span>          C1   C1    C2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>3 partitions, 4 consumers → C4 is idle</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>         P0    P1    P2   (nothing)</span></span>
+<span class="giallo-l"><span>          │     │     │      │</span></span>
+<span class="giallo-l"><span>          C1    C2    C3     C4 ← idle ❌</span></span></code></pre>
+<p><em>Maximum useful parallelism = number of partitions</em></p>
+<h2 id="multiple-consumer-groups-fan-out-pattern">Multiple Consumer Groups (Fan-Out Pattern)</h2>
+<p>This is where Kafka truly shines. The same data can be consumed independently by completely different services.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>                Topic: payments (2 partitions)</span></span>
+<span class="giallo-l"><span>               ─────────────────────────────────</span></span>
+<span class="giallo-l"><span>                   P0                 P1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Group A (Payment Service):    C1               C2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Group B (Fraud Detection):    C3 ← reads both P0 and P1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Group C (Analytics):          C4 ← reads both P0 and P1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Group D (Audit Logging):      C5 ← reads both P0 and P1</span></span></code></pre>
+<ul>
+<li>Each group has its <em>own independent offset</em> — they read at their own pace.</li>
+<li>One group lagging does not affect any other group.</li>
+<li>This is the <em>fan-out</em> pattern — publish once, consume many times for different purposes.</li>
+</ul>
+<h3 id="real-world-example">Real-World Example</h3>
+<p>Same payment event is consumed by:</p>
+<ul>
+<li><em>Payment Service</em> → processes and updates the database</li>
+<li><em>Fraud Detection</em> → checks for suspicious patterns</li>
+<li><em>Analytics Service</em> → aggregates revenue metrics</li>
+<li><em>Audit Logger</em> → writes to compliance logs</li>
+</ul>
+<h2 id="interview-answer">Interview Answer</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>&quot;If consumers belong to *different consumer groups*, each group independently consumes the same data. The one-partition-per-consumer rule applies only _within_ a consumer group. So multiple services can each receive every event, enabling fan-out patterns. Offsets are tracked per consumer group, so each group reads at its own pace without affecting others.&quot;</span></span></code></pre>
+<hr />
+<h1 id="11-kafka-connect">11. Kafka Connect</h1>
+<p><em>Kafka Connect</em> is a framework for moving data into and out of Kafka without writing custom code.</p>
+<h2 id="why-it-exists">Why It Exists</h2>
+<p>In enterprise systems, Kafka acts as a central data backbone. But you need to:</p>
+<h1 id="import-data-into-kafka-from-existing-systems-databases-file-systems-etc"><em>Import data INTO Kafka</em> from existing systems (databases, file systems, etc.)</h1>
+<h1 id="export-data-out-of-kafka-to-downstream-systems-search-engines-data-warehouses-etc"><em>Export data OUT OF Kafka</em> to downstream systems (search engines, data warehouses, etc.)</h1>
+<p>Writing this integration code manually is error-prone, repetitive, and fragile. Kafka Connect solves this with ready-made <em>connectors</em>.</p>
+<h2 id="import-source-connectors">Import (Source Connectors)</h2>
+<p>Data flows <em>into Kafka</em> from:</p>
+<ul>
+<li>SQL databases (MySQL, PostgreSQL, Oracle) — via CDC (Change Data Capture)</li>
+<li>File systems (logs, CSV dumps)</li>
+<li>Message queues (RabbitMQ, ActiveMQ)</li>
+</ul>
+<h2 id="export-sink-connectors">Export (Sink Connectors)</h2>
+<p>Data flows <em>out of Kafka</em> to:</p>
+<ul>
+<li>Elasticsearch (search)</li>
+<li>Data warehouses (Snowflake, BigQuery, Redshift)</li>
+<li>Object storage (AWS S3, GCS)</li>
+<li>Other Kafka clusters</li>
+</ul>
+<h2 id="why-not-read-directly-from-the-database">Why Not Read Directly from the Database?</h2>
+<table><thead><tr><th>Problem</th><th>Why Kafka Connect Helps</th></tr></thead><tbody>
+<tr><td>Database overload</td><td>Kafka buffers data; downstream systems don't query DB directly</td></tr>
+<tr><td>Point-to-point integrations</td><td>One Kafka topic can feed many consumers instead of N×M integrations</td></tr>
+<tr><td>No real-time streaming</td><td>Kafka provides millisecond-latency event propagation</td></tr>
+<tr><td>No replay capability</td><td>Kafka retains events; consumers can replay</td></tr>
+</tbody></table>
+<h2 id="architecture-diagram">Architecture Diagram</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Source Systems         Kafka              Sink Systems</span></span>
+<span class="giallo-l"><span>─────────────     ──────────────     ──────────────────</span></span>
+<span class="giallo-l"><span>  MySQL DB    →   │            │  →    Elasticsearch</span></span>
+<span class="giallo-l"><span>  PostgreSQL  →   │   Kafka    │  →    Snowflake DW</span></span>
+<span class="giallo-l"><span>  File System →   │  Cluster   │  →    AWS S3</span></span>
+<span class="giallo-l"><span>  Oracle      →   │            │  →    Another Kafka</span></span>
+<span class="giallo-l"><span>─────────────     ──────────────     ──────────────────</span></span>
+<span class="giallo-l"><span>                  ↑ Source          ↑ Sink</span></span>
+<span class="giallo-l"><span>                  Connectors        Connectors</span></span></code></pre>
+<hr />
+<h1 id="12-how-to-decide-partition-count">12. How to Decide Partition Count</h1>
+<p>Choosing the right number of partitions is a critical design decision. Too few = bottleneck. Too many = overhead.</p>
+<h2 id="why-partition-count-matters">Why Partition Count Matters</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>BAD DESIGN (too few partitions — bottleneck):</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        Topic (1 Partition)</span></span>
+<span class="giallo-l"><span>                │</span></span>
+<span class="giallo-l"><span>                ▼</span></span>
+<span class="giallo-l"><span>           Broker-1 (Leader)</span></span>
+<span class="giallo-l"><span>        (ALL traffic hits here) ❌</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>GOOD DESIGN (distributed load):</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        Topic (6 Partitions)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>   P0 → Broker-1      P3 → Broker-1</span></span>
+<span class="giallo-l"><span>   P1 → Broker-2      P4 → Broker-2</span></span>
+<span class="giallo-l"><span>   P2 → Broker-3      P5 → Broker-3</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>   ✔ Load spread across all brokers</span></span>
+<span class="giallo-l"><span>   ✔ Parallel producers &amp; consumers</span></span></code></pre><h2 id="rules-for-deciding-partition-count">Rules for Deciding Partition Count</h2>
+<table><thead><tr><th>Factor</th><th>Guidance</th></tr></thead><tbody>
+<tr><td><em>Max consumer parallelism</em></td><td>Partitions = max number of consumers you'll ever want in a group</td></tr>
+<tr><td><em>Throughput target</em></td><td>Measure throughput per partition, then divide target by that</td></tr>
+<tr><td><em>Number of brokers</em></td><td>Partitions should be a multiple of broker count for even distribution</td></tr>
+<tr><td><em>Ordering requirements</em></td><td>If you need strict ordering for an entity (e.g., per user), all messages for that entity go to one partition via key</td></tr>
+</tbody></table>
+<h2 id="practical-formula">Practical Formula</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>Desired partition count ≈ max(</span></span>
+<span class="giallo-l"><span>    target throughput / throughput per partition,</span></span>
+<span class="giallo-l"><span>    max consumer instances you&#39;ll scale to</span></span>
+<span class="giallo-l"><span>)</span></span></code></pre><h2 id="real-example">Real Example</h2>
+<ul>
+<li>Target: 600 MB/s throughput</li>
+<li>Throughput per partition: ~100 MB/s</li>
+<li>Max consumers you plan to scale to: 12</li>
+</ul>
+<p>→ Use <em>12 partitions</em> (covers both throughput and consumer parallelism)</p>
+<h2 id="important-caveat">Important Caveat</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>You can *increase* partitions later, but you *cannot decrease* them.</span></span>
+<span class="giallo-l"><span>Increasing partitions can also break key-based ordering for existing keys.</span></span>
+<span class="giallo-l"><span>So: *over-partition slightly* rather than under-partition.</span></span></code></pre><h2 id="general-recommendations">General Recommendations</h2>
+<table><thead><tr><th>Cluster Size</th><th>Recommendation</th></tr></thead><tbody>
+<tr><td>Small / Dev</td><td>3–6 partitions per topic</td></tr>
+<tr><td>Medium</td><td>12–24 partitions for high-throughput topics</td></tr>
+<tr><td>Large / Enterprise</td><td>50–100+ partitions, based on SLA and scaling targets</td></tr>
+</tbody></table>
+<hr />
+<h1 id="13-creating-a-topic-cli-commands">13. Creating a Topic — CLI Commands</h1>
+<h2 id="start-kafka-locally-kraft-mode">Start Kafka Locally (KRaft Mode)</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 1: Generate Cluster ID</span></span>
+<span class="giallo-l"><span>KAFKA_CLUSTER_ID</span><span style="color: #94E2D5;">=</span><span style="color: #A6E3A1;">&quot;</span><span style="color: #9399B2;">$(</span><span style="color: #89B4FA;font-style: italic;">./bin/kafka-storage.sh</span><span style="color: #A6E3A1;"> random-uuid</span><span style="color: #9399B2;">)</span><span style="color: #A6E3A1;">&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 2: Format storage</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-storage.sh</span><span style="color: #A6E3A1;"> format --standalone -t</span><span> $KAFKA_CLUSTER_ID</span><span style="color: #A6E3A1;"> -c config/server.properties</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Step 3: Start the broker</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-server-start.sh</span><span style="color: #A6E3A1;"> config/server.properties</span></span></code></pre><h2 id="topic-operations">Topic Operations</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Create a topic</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --create</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --partitions</span><span style="color: #FAB387;"> 3</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --replication-factor</span><span style="color: #FAB387;"> 1</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Describe a topic (shows partition distribution, leaders, ISR)</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --describe</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># List all topics</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --list</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Delete a topic</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-topics.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --delete</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span></code></pre><h2 id="producer-consumer-cli-testing">Producer &amp; Consumer (CLI Testing)</h2>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="shellscript"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Start a console producer</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-producer.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Start a console consumer (read from beginning)</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-consumer.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --from-beginning</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Consumer in a group</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">./bin/kafka-console-consumer.sh</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --topic payments</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --group payment-service</span><span style="color: #F5C2E7;"> \</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">  --bootstrap-server localhost:9092</span></span></code></pre>
+<hr />
+<h1 id="14-starting-kafka-locally-kraft-mode">14. Starting Kafka Locally (KRaft Mode)</h1>
+<h2 id="what-kraft-mode-is">What KRaft Mode Is</h2>
+<p>Before Kafka 3.x, Kafka required <em>ZooKeeper</em> as a separate service to manage cluster metadata (leader elections, broker registry, etc.).</p>
+<p><em>KRaft (Kafka Raft)</em> removes this dependency. Kafka now manages its own metadata internally using a built-in Raft consensus protocol.</p>
+<h2 id="process-roles-in-kraft">Process Roles in KRaft</h2>
+<p>In <code>server.properties</code>:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Combined mode (broker + controller in one process) — good for local dev</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">process.roles</span><span style="color: #94E2D5;">=</span><span>broker,controller</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;"># Recommended log directory configuration</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">log.dirs</span><span style="color: #94E2D5;">=</span><span>/path/to/kafka-broker-logs</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;">metadata.log.dir</span><span style="color: #94E2D5;">=</span><span>/path/to/kafka-metadata-logs</span></span></code></pre>
+<p>For production, these directories should be on <em>separate disks</em> for reliability.</p>
+<h2 id="why-two-log-directories">Why Two Log Directories?</h2>
+<table><thead><tr><th>Directory</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>log.dirs</code></td><td>Broker data logs — actual topic/partition event data</td></tr>
+<tr><td><code>metadata.log.dir</code></td><td>KRaft controller metadata — cluster state, leader info</td></tr>
+</tbody></table>
+<p>Separating them ensures metadata writes (which need low latency) don't compete with data writes.</p>
+<hr />
+<h1 id="15-real-world-architecture-example">15. Real-World Architecture Example</h1>
+<h2 id="payment-processing-platform">Payment Processing Platform</h2>
+<p>This is a real architecture using Kafka to decouple services:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;" ><code data-lang="plain"><span class="giallo-l"><span>External        Config      Kafka          Middleware     Targets</span></span>
+<span class="giallo-l"><span>Sources         Manager    Cluster         Service        (3rd Party)</span></span>
+<span class="giallo-l"><span>─────────      ─────────  ─────────       ─────────      ─────────</span></span>
+<span class="giallo-l"><span>                          ┌─────────┐</span></span>
+<span class="giallo-l"><span> Merchant  →  CM Service →│bin data │→ MW consumes →    Cache</span></span>
+<span class="giallo-l"><span> Data                     │merchant │   merchant &amp;       (Redis)</span></span>
+<span class="giallo-l"><span>                          │ topic   │   bin data     →  Payment</span></span>
+<span class="giallo-l"><span>                          └─────────┘                   Processor A</span></span>
+<span class="giallo-l"><span>                                                    →  Payment</span></span>
+<span class="giallo-l"><span>                          ┌─────────┐                   Processor B</span></span>
+<span class="giallo-l"><span> Transaction →  App      →│txn      │→ TLM consumes → DB (save txn)</span></span>
+<span class="giallo-l"><span> Events                   │events   │</span></span>
+<span class="giallo-l"><span>                          │ topic   │</span></span>
+<span class="giallo-l"><span>                          └─────────┘</span></span>
+<span class="giallo-l"><span>                           Kafka Cluster</span></span></code></pre>
+<p><em>Flow:</em></p>
+<h1 id="cm-config-manager-publishes-merchant-and-bin-data-kafka-topic"><em>CM (Config Manager)</em> publishes merchant and BIN data → Kafka topic.</h1>
+<h1 id="middleware-mw-consumes-this-data-stores-in-redis-cache"><em>Middleware (MW)</em> consumes this data → stores in <em>Redis cache</em>.</h1>
+<h1 id="during-a-transaction-mw-checks-redis-first-if-cache-miss-falls-back-to-cm-api">During a transaction, MW checks Redis first; if cache miss → falls back to CM API.</h1>
+<h1 id="transaction-data-is-produced-to-a-kafka-topic-tlm-transaction-ledger-manager-consumes-saves-to-db">Transaction data is produced to a Kafka topic → <em>TLM (Transaction Ledger Manager)</em> consumes → saves to DB.</h1>
+<h1 id="frontend-dashboards-merchants-transactions-monitoring-query-the-db-and-cache"><em>Frontend dashboards</em> (merchants, transactions, monitoring) query the DB and cache.</h1>
+<p><em>Why Kafka here?</em></p>
+<ul>
+<li>CM doesn't get hammered by MW polling it constantly — data is pushed via Kafka.</li>
+<li>Multiple consumers (MW, analytics, audit) all independently read transaction events.</li>
+<li>If MW goes down, events are retained in Kafka and processed when it recovers.</li>
+</ul>
+<hr />
+<h1 id="16-interview-cheat-sheet">16. Interview Cheat Sheet</h1>
+<h2 id="one-line-answers">One-Line Answers</h2>
+<table><thead><tr><th>Question</th><th>One-Line Answer</th></tr></thead><tbody>
+<tr><td>What is Kafka?</td><td>A distributed, fault-tolerant event streaming platform for publishing, storing, and processing real-time data streams.</td></tr>
+<tr><td>What is a topic?</td><td>A logical category for organizing events, similar to a folder, split into partitions for scalability.</td></tr>
+<tr><td>What is a partition?</td><td>A physical, ordered, append-only log that is the actual unit of storage and parallelism in Kafka.</td></tr>
+<tr><td>What is a broker?</td><td>A single Kafka server that stores partitions and serves producer/consumer requests.</td></tr>
+<tr><td>What is a partition leader?</td><td>The one broker responsible for all reads and writes for a given partition.</td></tr>
+<tr><td>What is replication factor?</td><td>The number of copies of each partition across the cluster — ensures fault tolerance.</td></tr>
+<tr><td>How does Spring Boot connect to Kafka?</td><td>It connects to bootstrap servers for initial metadata, then routes messages directly to the partition leader.</td></tr>
+<tr><td>What is a consumer group?</td><td>A set of consumers that together consume a topic, with each partition assigned to exactly one consumer in the group.</td></tr>
+<tr><td>How does Kafka scale?</td><td>By increasing partition count and adding brokers, distributing leader partitions across the cluster.</td></tr>
+<tr><td>Why can't consumers share a partition in a group?</td><td>To guarantee ordering — only one consumer reads from a partition at a time within a group.</td></tr>
+</tbody></table>
+<h2 id="key-numbers-to-remember">Key Numbers to Remember</h2>
+<table><thead><tr><th>Setting</th><th>Common Value</th></tr></thead><tbody>
+<tr><td>Replication Factor (production)</td><td>3</td></tr>
+<tr><td>Min brokers for RF=3</td><td>3</td></tr>
+<tr><td>Default retention</td><td>7 days</td></tr>
+<tr><td>Max consumers useful per topic</td><td>= number of partitions</td></tr>
+</tbody></table>
+<h2 id="pro-tip-phrases-for-interviews">"Pro Tip" Phrases for Interviews</h2>
+<ul>
+<li><em>"Ordering is guaranteed within a partition, not across partitions."</em></li>
+<li><em>"The bootstrap server is just an initial contact point — the producer routes directly to the partition leader."</em></li>
+<li><em>"Kafka scales throughput not by reading from followers, but by increasing partition count."</em></li>
+<li><em>"Consumer groups allow fan-out — the same event is processed independently by multiple services."</em></li>
+<li><em>"Replication factor ensures durability — if a leader fails, a follower is automatically elected."</em></li>
+<li><em>"The maximum useful consumer parallelism in a group equals the number of partitions."</em></li>
+</ul>
+<hr />
+<p><em>These notes cover: Event Streaming, Kafka Architecture, Topics, Partitions, Brokers, Leaders &amp; Followers, Replication, Producers, Spring Boot Bootstrap, Consumer Groups, Kafka Connect, Partition Sizing, Topic CLI Commands, and KRaft mode.</em></p>
+<hr />
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

@@ -1,5 +1,4 @@
 base_url = "https://pratik280.github.io/"
-base_url = "https://pratik280.github.io/myblog"
 output_dir = "docs"
 
 compile_sass = true

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title> | Part 1 : Peer Aware Eureka Service Registry</title>
+    
+    <link rel="stylesheet" href="https://pratik280.github.io/style.css?h=cbcdef3ba99f5be1d46b">
+    
+    
+        
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https://pratik280.github.io/">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Part 1 : Peer Aware Eureka Service Registry</h1>
+    
+    <p class="secondary small">
+        29 January, 2026
+
+        
+
+        
+    </p>
+    
+    <div class="space"></div>
+    <hr />
+<blockquote>
+<p><strong>New Series:</strong> Spring Cloud Microservice Architecture<br />
+<em>(Service Discovery · Gateway · Nginx · Production Patterns)</em></p>
+</blockquote>
+<p>This blog marks the <strong>beginning of a new series</strong> focused entirely on <strong>Spring Cloud–based microservice architecture</strong> and <strong>production-grade system design</strong>.</p>
+<p>In this series, we will design and evolve a complete microservices ecosystem using:</p>
+<ul>
+<li>Spring Cloud Netflix Eureka (Service Discovery)</li>
+<li>Spring Cloud Gateway (API Gateway)</li>
+<li>Nginx (Edge reverse proxy &amp; load balancer)</li>
+<li>Production-ready scaling and fault-tolerance patterns</li>
+</ul>
+<hr />
+<h3 id="about-the-order-system-used-in-this-series">About the Order System Used in This Series</h3>
+<p>To avoid reinventing the wheel, this series <strong>reuses an existing microservice</strong> from my earlier work:</p>
+<p>👉 <strong>Production-Grade Spring Boot API Design</strong> : <a rel="external" href="https://pratik280.github.io/blog/0-production-grade-spring-boot-apis-part-1-web-jpa-what-really-happens-at-startup/">Part 1 : Web, JPA &amp; What Really Happens at Startup</a></p>
+<p>The <strong>order-system</strong> from that series is used <strong>only as a sample business service</strong> so we can focus purely on:</p>
+<ul>
+<li>Service discovery</li>
+<li>Inter-service communication</li>
+<li>Load balancing</li>
+<li>Infrastructure concerns</li>
+</ul>
+<p>📌 <strong>This Spring Cloud series is completely independent</strong> and does <strong>not require reading the previous series</strong>, although familiarity with the order-system API helps.</p>
+<p><strong>Source Code</strong>:</p>
+<ul>
+<li>order-system : <a rel="external" href="https://github.com/Pratik280/order-system">https://github.com/Pratik280/order-system</a></li>
+<li>order-consumer : <a rel="external" href="https://github.com/Pratik280/order-consumer">https://github.com/Pratik280/order-consumer</a></li>
+<li>eureka-server : <a rel="external" href="https://github.com/Pratik280/eureka-server">https://github.com/Pratik280/eureka-server</a></li>
+</ul>
+<hr />
+<h3 id="what-this-part-covers">What This Part Covers</h3>
+<p>This <strong>Part 1</strong> focuses on:</p>
+<ul>
+<li>Why service discovery is mandatory in production</li>
+<li>Why a <strong>single Eureka server is not enough</strong></li>
+<li>How to design a <strong>peer-aware Eureka cluster</strong></li>
+<li>How microservices register themselves using logical names</li>
+<li>How this eliminates hardcoded IPs and ports</li>
+</ul>
+<hr />
+<h2 id="what-is-a-service-registry">What Is a Service Registry?</h2>
+<p>A <strong>Service Registry</strong> is a centralized system that keeps track of <strong>all running microservice instances</strong> in a distributed system.</p>
+<p>Instead of services communicating using <strong>fixed IP addresses and ports</strong>, they:</p>
+<ul>
+<li><strong>Register themselves</strong> with the registry</li>
+<li><strong>Discover other services dynamically</strong> using logical names</li>
+</ul>
+<p>📌 In Spring Cloud, <strong>Eureka</strong> acts as the Service Registry.</p>
+<hr />
+<h3 id="why-start-with-eureka">Why Start with Eureka?</h3>
+<p>Before gateways, security, or scaling:</p>
+<blockquote>
+<p><strong>Services must be able to find each other reliably.</strong></p>
+</blockquote>
+<p>That is exactly what <strong>Eureka Service Registry</strong> solves — and it’s the foundation of every production-grade Spring Cloud system.</p>
+<hr />
+<h3 id="let-s-begin-rocket">Let’s Begin 🚀</h3>
+<p>In the next sections, we’ll set up a <strong>3-node peer-aware Eureka cluster</strong> and use it as the backbone for all service communication in the system.</p>
+<hr />
+<h2 id="why-service-discovery-is-mandatory-in-production">Why Service Discovery Is Mandatory in Production</h2>
+<p>In real production systems:</p>
+<ul>
+<li>Services <strong>scale dynamically</strong></li>
+<li>Instances <strong>come and go</strong></li>
+<li>IPs and ports <strong>must never be hardcoded</strong></li>
+<li>Load balancing <strong>must be automatic</strong></li>
+<li>Failure of one node <strong>must not break the system</strong></li>
+</ul>
+<p>Hardcoding endpoints like:</p>
+<p>http://localhost:8080/orders</p>
+<p>❌ breaks scaling<br />
+❌ breaks failover<br />
+❌ tightly couples services</p>
+<hr />
+<h2 id="high-level-architecture">High-Level Architecture</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>Client</span></span>
+<span class="giallo-l"><span>↓</span></span>
+<span class="giallo-l"><span>Nginx (Reverse Proxy &amp; LB)</span></span>
+<span class="giallo-l"><span>↓</span></span>
+<span class="giallo-l"><span>Spring Cloud Gateway (multiple instances)</span></span>
+<span class="giallo-l"><span>↓</span></span>
+<span class="giallo-l"><span>Eureka Cluster (3 peer-aware nodes)</span></span>
+<span class="giallo-l"><span>↓</span></span>
+<span class="giallo-l"><span>Order System (multiple instances)</span></span></code></pre>
+<hr />
+<h2 id="existing-order-system">Existing Order System</h2>
+<p>From the earlier series, the <strong>order-system</strong> already exposes:</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>GET http://localhost:8085/orders</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>  &quot;status&quot;: 200,</span></span>
+<span class="giallo-l"><span>  &quot;message&quot;: &quot;All orders fetch successfully&quot;,</span></span>
+<span class="giallo-l"><span>  &quot;data&quot;: [</span></span>
+<span class="giallo-l"><span>    { &quot;id&quot;: 1, &quot;productName&quot;: &quot;Mobile&quot; },</span></span>
+<span class="giallo-l"><span>    { &quot;id&quot;: 2, &quot;productName&quot;: &quot;Mobile&quot; },</span></span>
+<span class="giallo-l"><span>    { &quot;id&quot;: 3, &quot;productName&quot;: &quot;Mobile&quot; },</span></span>
+<span class="giallo-l"><span>    { &quot;id&quot;: 4, &quot;productName&quot;: &quot;Smartwatch&quot; }</span></span>
+<span class="giallo-l"><span>  ],</span></span>
+<span class="giallo-l"><span>  &quot;errors&quot;: null</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Now we make this production-grade using service discovery.</p>
+<h2 id="step-1-peer-aware-eureka-service-registry-3-nodes">Step 1: Peer-Aware Eureka Service Registry (3 Nodes)</h2>
+<h3 id="why-peer-aware-eureka">Why Peer-Aware Eureka?</h3>
+<ul>
+<li>A single Eureka server is a <strong>single point of failure</strong></li>
+<li>In production, Eureka must be <strong>highly available</strong></li>
+<li>Each Eureka node <strong>replicates registry data</strong> with its peers</li>
+</ul>
+<p>👉 <strong>Minimum recommended: 3 nodes</strong></p>
+<hr />
+<h3 id="eureka-server-configuration">Eureka Server Configuration</h3>
+<p>properties</p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>spring.application.name=eureka-server</span></span>
+<span class="giallo-l"><span>server.port=8760</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>eureka.client.service-url.defaultZone=\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance1IP:8760/eureka,\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance2IP:8761/eureka,\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance3IP:8762/eureka</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>eureka.client.register-with-eureka=true</span></span>
+<span class="giallo-l"><span>eureka.client.fetch-registry=true</span></span></code></pre><h2 id="step-1-peer-aware-eureka-service-registry-3-nodes-1">Step 1: Peer-Aware Eureka Service Registry (3 Nodes)</h2>
+<h3 id="why-peer-aware-eureka-1">Why Peer-Aware Eureka?</h3>
+<ul>
+<li>A single Eureka server is a <strong>single point of failure</strong></li>
+<li>In production, Eureka must be <strong>highly available</strong></li>
+<li>Each Eureka node <strong>replicates registry data</strong> with its peers</li>
+</ul>
+<p>👉 <strong>Minimum recommended: 3 nodes</strong></p>
+<hr />
+<h3 id="eureka-server-configuration-1">Eureka Server Configuration</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="ini"><span class="giallo-l"><span style="color: #FB4934;">spring.application.name</span><span style="color: #A89984;">=</span><span>eureka-server</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">server.port</span><span style="color: #A89984;">=</span><span>8760</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">eureka.client.service-url.defaultZone</span><span style="color: #A89984;">=</span><span>\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance1IP:8760/eureka,\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance2IP:8761/eureka,\</span></span>
+<span class="giallo-l"><span>http://EurekaInstance3IP:8762/eureka</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FB4934;">eureka.client.register-with-eureka</span><span style="color: #A89984;">=</span><span>true</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">eureka.client.fetch-registry</span><span style="color: #A89984;">=</span><span>true</span></span></code></pre>
+<p><strong>Note:</strong><br />
+This configuration represents <strong>one Eureka server instance</strong>.</p>
+<p>For a <strong>peer-aware Eureka cluster</strong>, create multiple Eureka applications (for example, 3 instances) and modify:</p>
+<ul>
+<li><code>server.port</code></li>
+<li><code>eureka.client.service-url.defaultZone</code></li>
+</ul>
+<p>so that each Eureka node points to <strong>all other Eureka nodes</strong> using their respective <strong>IPs and ports</strong>.</p>
+<h3 id="eureka-server-application">Eureka Server Application</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">SpringBootApplication</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">EnableEurekaServer</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> EurekaServerApplication</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public static void</span><span style="color: #FABD2F;"> main</span><span style="color: #A89984;">(</span><span style="color: #FE8019;">String</span><span style="color: #A89984;">[]</span><span style="color: #83A598;"> args</span><span style="color: #A89984;">) {</span></span>
+<span class="giallo-l"><span>        SpringApplication</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">run</span><span style="color: #A89984;">(</span><span>EurekaServerApplication</span><span style="color: #A89984;">.</span><span>class</span><span style="color: #A89984;">,</span><span> args</span><span style="color: #A89984;">);</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>What does @EnableEurekaServer do?</p>
+<ul>
+<li>Turns a Spring Boot application into a Service Registry</li>
+<li>Accepts service registrations from microservices</li>
+<li>Tracks heartbeats to detect unhealthy instances</li>
+<li>Replicates registry information to peer Eureka nodes</li>
+</ul>
+<h2 id="step-2-register-order-system-with-eureka">Step 2: Register Order System with Eureka</h2>
+<h3 id="order-system-configuration">Order System Configuration</h3>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>spring.application.name=order-system</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>eureka.client.service-url.defaultZone=\</span></span>
+<span class="giallo-l"><span>http://localhost:8760/eureka,\</span></span>
+<span class="giallo-l"><span>http://localhost:8761/eureka,\</span></span>
+<span class="giallo-l"><span>http://localhost:8762/eureka</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>eureka.instance.prefer-ip-address=true</span></span></code></pre>
+<p><strong>Result</strong></p>
+<ul>
+<li>Run multiple instances of order-system</li>
+<li>All instances register under one logical name:</li>
+</ul>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>ORDER-SYSTEM → [instance-1, instance-2, instance-3]</span></span></code></pre><h2 id="step-3-create-order-consumer-microservice">Step 3: Create Order Consumer Microservice</h2>
+<p>This service consumes <strong>order-system</strong> data without knowing:</p>
+<ul>
+<li>IP address</li>
+<li>Port</li>
+<li>Number of running instances</li>
+</ul>
+<p><strong>What Is RestTemplate?</strong></p>
+<p><strong>RestTemplate</strong> is Spring’s synchronous HTTP client used for REST calls.</p>
+<p>By default:</p>
+<ul>
+<li>It only supports fixed URLs</li>
+<li>It does not understand Eureka</li>
+</ul>
+<p>Why <strong>@LoadBalanced</strong> ?</p>
+<p><strong>@LoadBalanced</strong> enables:</p>
+<ul>
+<li>Service name resolution</li>
+<li>Instance lookup from Eureka</li>
+<li>Client-side load balancing</li>
+</ul>
+<p><strong>Load-Balanced RestTemplate Configuration</strong></p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">Configuration</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> RestConfig</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">Bean</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">LoadBalanced</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> RestTemplate restTemplate</span><span style="color: #A89984;">(){</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return new</span><span style="color: #FABD2F;"> RestTemplate</span><span style="color: #A89984;">();</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p><strong>Order Consumer Controller</strong></p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="java"><span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">RestController</span></span>
+<span class="giallo-l"><span style="color: #A89984;">@</span><span style="color: #83A598;font-weight: bold;">RequestMapping</span><span style="color: #A89984;">(&quot;</span><span style="color: #B8BB26;">/consume</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">public class</span><span style="color: #FABD2F;"> OrderConsumerController</span><span style="color: #A89984;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    private final</span><span style="color: #FABD2F;"> RestTemplate</span><span> restTemplate</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> OrderConsumerController</span><span style="color: #A89984;">(</span><span style="color: #FABD2F;">RestTemplate</span><span style="color: #83A598;"> restTemplate</span><span style="color: #A89984;">){</span></span>
+<span class="giallo-l"><span style="color: #83A598;">        this</span><span style="color: #A89984;">.</span><span>restTemplate</span><span style="color: #8EC07C;"> =</span><span> restTemplate</span><span style="color: #A89984;">;</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A89984;">    @</span><span style="color: #83A598;font-weight: bold;">GetMapping</span><span style="color: #A89984;">(&quot;</span><span style="color: #B8BB26;">/orders</span><span style="color: #A89984;">&quot;)</span></span>
+<span class="giallo-l"><span style="color: #FE8019;">    public</span><span style="color: #FABD2F;"> String fetchOrders</span><span style="color: #A89984;">() {</span></span>
+<span class="giallo-l"><span style="color: #FB4934;">        return</span><span> restTemplate</span><span style="color: #A89984;">.</span><span style="color: #FABD2F;">getForObject</span><span style="color: #A89984;">(</span></span>
+<span class="giallo-l"><span style="color: #A89984;">                &quot;</span><span style="color: #B8BB26;">http://order-system/orders</span><span style="color: #A89984;">&quot;,</span></span>
+<span class="giallo-l"><span>                String</span><span style="color: #A89984;">.</span><span>class</span></span>
+<span class="giallo-l"><span style="color: #A89984;">        );</span></span>
+<span class="giallo-l"><span style="color: #A89984;">    }</span></span>
+<span class="giallo-l"><span style="color: #A89984;">}</span></span></code></pre>
+<p>Key Point
+http://order-system/orders</p>
+<p>✔ No IP</p>
+<p>✔ No port</p>
+<p>✔ Logical service name</p>
+<p>✔ Resolved dynamically via Eureka</p>
+<p><strong>Order Consumer Configuration</strong></p>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>spring:</span></span>
+<span class="giallo-l"><span>  application:</span></span>
+<span class="giallo-l"><span>    name: order-consumer</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>server:</span></span>
+<span class="giallo-l"><span>  port: 8090</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>eureka:</span></span>
+<span class="giallo-l"><span>  client:</span></span>
+<span class="giallo-l"><span>    service-url:</span></span>
+<span class="giallo-l"><span>      defaultZone: http://localhost:8760/eureka, http://localhost:8761/eureka, http://localhost:8762/eureka</span></span>
+<span class="giallo-l"><span>  instance:</span></span>
+<span class="giallo-l"><span>    prefer-ip-address: true</span></span></code></pre><h2 id="step-4-service-to-service-call">Step 4: Service-to-Service Call</h2>
+<pre class="giallo" style="color: #EBDBB2; background-color: #282828;" ><code data-lang="plain"><span class="giallo-l"><span>GET http://localhost:8090/consume/orders</span></span></code></pre>
+<p><strong>What Happens Internally?</strong></p>
+<ol>
+<li>Consumer calls http://order-system/orders</li>
+<li>@LoadBalanced RestTemplate intercepts the call</li>
+<li>Eureka returns all registered order-system instances</li>
+<li>One instance is selected</li>
+<li>Request is forwarded</li>
+<li>Response is returned</li>
+</ol>
+<p>✔ Load balanced</p>
+<p>✔ Fault tolerant</p>
+<p>✔ Zero hardcoding</p>
+<p><strong>Why This Architecture Is Production-Grade</strong></p>
+<ul>
+<li>No hardcoded IPs or ports</li>
+<li>Automatic scaling</li>
+<li>High availability</li>
+<li>Fault tolerance</li>
+<li>Clean separation of concerns</li>
+<li>Gateway + Nginx hide internal topology</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<ul>
+<li>Eureka provides service discovery</li>
+<li>Peer-aware Eureka removes SPOF</li>
+<li>@EnableEurekaServer creates the registry</li>
+<li>@LoadBalanced RestTemplate enables dynamic routing</li>
+<li>Services communicate using logical names</li>
+<li>Scaling requires no code changes</li>
+</ul>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://pratik280.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://pratik280.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.querySelector("html").classList;
+        const sessionTheme = sessionStorage.getItem("theme");
+
+        function setDark() {
+            cls.add("dark-mode");
+            cls.remove("light-mode");
+            sessionStorage.setItem("theme", "dark");
+        }
+        function setLight() {
+            cls.add("light-mode");
+            cls.remove("dark-mode");
+            sessionStorage.setItem("theme", "light");
+        }
+
+        if (sessionTheme === "dark") {
+            setDark();
+        } else if (sessionTheme === "light") {
+            setLight();
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setDark();
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            setDark();
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            setLight();
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>
